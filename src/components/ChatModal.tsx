@@ -466,8 +466,9 @@ export default function ChatModal({
       setIsListening(false);
     }
 
+    // [모바일 최적화] 상담 시작 시 공간을 많이 차지하는 첫 환영 메시지를 제거하여 실제 상담 답변이 상단에 시원하게 보이도록 처리
     setMessages((prev) => [
-      ...prev,
+      ...prev.filter((msg) => msg.id !== "welcome"),
       {
         id: String(Date.now()),
         sender: "user",
