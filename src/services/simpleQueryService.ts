@@ -1,6 +1,8 @@
 import { findSchoolInfo } from "@/data/schoolsDirectory";
+import { findCommunityCenterInfo } from "@/data/communityCentersDirectory";
 import { getSubwayArrivalInfo, localSubwayStations } from "./seoulSubwayService";
 import { getRealtimeBusInfo, localBusRoutes } from "./precisionBusService";
+import { generateAISearchFallbackReply } from "./aiSearchFallbackService";
 
 export interface SimpleQueryResponse {
   isSimple: boolean;
@@ -38,13 +40,38 @@ const localPublicFacilityDB: Record<string, { phone: string; address: string; ex
 };
 
 /**
- * 모든 간단 질의(버스, 지하철, 학교, 관공서, 전화번호, 일상 대화 등) 판별 및 즉시 응답 생성
+ * 모든 간단 질의(행정복지센터, 버스, 지하철, 학교, 관공서, 전화번호, 일상 대화 등) 판별 및 즉시 응답 생성
  */
 export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise<SimpleQueryResponse | null> {
   const q = userQuery.trim().toLowerCase();
   const rawQ = userQuery.trim();
 
-  // 1. [초정밀 버스 실시간 위치 및 노선 질의]
+  // [중요] 10단계 복합 지원 계획이 필요한 질의인지 확인 (신청, 생계위기, 수술비지원 등)
+  const isComplexCaseQuery =
+    (q.includes("신청") || q.includes("지원받고") || q.includes("지원금") || q.includes("생계비") || q.includes("수술비") || q.includes("월세가 막막") || q.includes("실직") || q.includes("돌봄이 필요") || q.includes("바우처 신청") || q.includes("구직촉진수당") || q.includes("10단계")) &&
+    !q.includes("전화번호") && !q.includes("연락처") && !q.includes("몇번") && !q.includes("전화") && !q.includes("지하철") && !q.includes("주민센터");
+
+  if (isComplexCaseQuery) {
+    return null;
+  }
+
+  // 1. [최우선] 남양주시 및 구리시 읍·면·동 행정복지센터(주민센터) 정확 검색
+  const matchedCenter = findCommunityCenterInfo(rawQ);
+  if (matchedCenter) {
+    return {
+      isSimple: true,
+      replyText: `문의하신 **${matchedCenter.name}** 공식 연락처 및 위치 안내입니다! 🏛️
+
+📍 **${matchedCenter.name}** (${matchedCenter.region})
+- 📞 **대표 민원실**: **${matchedCenter.phone}** (등초본·인감·가족관계·전입신고)
+${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**: **${matchedCenter.welfarePhone}** (복지상담·생계급여·에너지바우처)\n` : ""}- 🏢 **주소**: ${matchedCenter.address}
+
+💡 *운영시간: 평일 오전 9시 ~ 오후 6시 (점심시간 12:00 ~ 13:00 교대 근무)*
+복지 급여나 긴급 지원 신청은 위 **복지지원팀**으로 전화하시면 친절히 안내받으실 수 있습니다.`
+    };
+  }
+
+  // 2. [초정밀 버스 실시간 위치 및 노선 질의]
   if (
     q.includes("버스") || q.includes("정류장") || q.includes("정류소") ||
     q.includes("땡큐") || q.includes("m23") || q.includes("광역버스") || q.includes("마을버스") ||
@@ -57,7 +84,7 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     };
   }
 
-  // 2. [지하철 / 전철 / 역 도착정보 질의]
+  // 3. [지하철 / 전철 / 역 도착정보 질의]
   if (
     q.includes("지하철") || q.includes("전철") || q.includes("열차") || q.includes("기차") ||
     q.includes("별내선") || q.includes("진접선") || q.includes("경춘선") || q.includes("경의중앙선") ||
@@ -78,28 +105,7 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     };
   }
 
-  // 동기 판별기 호출
-  return checkAndHandleSimpleQuery(userQuery);
-}
-
-/**
- * 동기식 간단 질의 처리기
- */
-export function checkAndHandleSimpleQuery(userQuery: string): SimpleQueryResponse | null {
-  const q = userQuery.trim().toLowerCase();
-  const rawQ = userQuery.trim();
-
-  // [중요] 10단계 복합 지원 계획이 필요한 질의인지 확인 (신청, 생계위기, 수술비지원 등)
-  const isComplexCaseQuery =
-    (q.includes("신청") || q.includes("지원받고") || q.includes("지원금") || q.includes("생계비") || q.includes("수술비") || q.includes("월세가 막막") || q.includes("실직") || q.includes("돌봄이 필요") || q.includes("바우처 신청") || q.includes("구직촉진수당") || q.includes("10단계")) &&
-    !q.includes("전화번호") && !q.includes("연락처") && !q.includes("몇번") && !q.includes("전화") && !q.includes("지하철");
-
-  if (isComplexCaseQuery) {
-    // 10단계 RAG로 넘김
-    return null;
-  }
-
-  // 1. [최우선] 구리시 및 남양주시 전체 초·중·고등학교 정확 검색
+  // 4. [구리·남양주 초·중·고교 정확 검색]
   const matchedSchool = findSchoolInfo(rawQ);
   if (matchedSchool) {
     return {
@@ -109,56 +115,59 @@ export function checkAndHandleSimpleQuery(userQuery: string): SimpleQueryRespons
 📍 **${matchedSchool.name}**
 - 📞 **교무실 (대표전화)**: **${matchedSchool.phone}**
 ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone}**\n` : ""}- 🏢 **주소**: ${matchedSchool.address}
-- 🏛️ **소속**: 경기도구리남양주교육지원청
-
-💡 학사 일정, 전학 및 입학 관련 문의는 위 교무실 또는 교육지원청(📞 031-550-6114)으로 문의하시면 됩니다.`
+- 🏛️ **소속**: 경기도구리남양주교육지원청 (📞 031-550-6114)`
     };
   }
 
-  // 2. 학교 관련 질의이나 특정 학교가 DB에 없는 경우의 안전한 100% 팩트 안내 (절대 엉뚱한 학교를 예시로 들지 않음!)
-  if (q.includes("초등") || q.includes("중학") || q.includes("고등") || q.includes("학교")) {
-    if (q.includes("전화") || q.includes("번호") || q.includes("연락") || q.includes("어디") || q.includes("위치") || q.length <= 15) {
-      return {
-        isSimple: true,
-        replyText: `문의하신 학교 연락처 안내입니다! 🏫
-
-📍 **경기도구리남양주교육지원청**: 📞 **031-550-6114**
-   - 주소: 경기도 구리시 안골로 48 (교문동)
-   - 주요업무: 구리시·남양주시 관내 모든 초·중·고교 학사, 전학 배정, 전화번호 안내
-
-📍 **전국 학교알리미 / 114 전화번호 안내**: 📞 **국번없이 114**
-
-💡 찾으시는 학교의 정확한 명칭(예: *인창초등학교*, *금곡중학교*, *평내고등학교*)을 말씀해주시면 직통 전화번호와 주소를 즉시 알려드립니다!`
-      };
-    }
+  // 5. 동기 판별기 호출
+  const syncResult = checkAndHandleSimpleQuery(userQuery);
+  if (syncResult && syncResult.isSimple) {
+    return syncResult;
   }
 
-  // 3. 지하철/전철 질의 (동기 fallback)
-  if (
-    q.includes("지하철") || q.includes("전철") || q.includes("열차") ||
-    Object.keys(localSubwayStations).some((st) => q.includes(st) && (q.includes("역") || q.includes("도착") || q.includes("시간")))
-  ) {
-    let stationName = "구리";
-    for (const st of Object.keys(localSubwayStations)) {
-      if (q.includes(st)) {
-        stationName = st;
-        break;
-      }
-    }
-    const meta = localSubwayStations[stationName];
+  // 6. [AI 스마트 검색 폴백 엔진 (Gemini / ChatGPT 인텔리전스)]
+  // 내부 DB에 미등록된 임의의 시설/위치/정보 질의 시 실시간 AI 지식망으로 응답 생성
+  const aiFallbackText = await generateAISearchFallbackReply(rawQ);
+  return {
+    isSimple: true,
+    replyText: aiFallbackText
+  };
+}
+
+/**
+ * 동기식 간단 질의 처리기
+ */
+export function checkAndHandleSimpleQuery(userQuery: string): SimpleQueryResponse | null {
+  const q = userQuery.trim().toLowerCase();
+  const rawQ = userQuery.trim();
+
+  // 1. 행정복지센터 동기 매칭
+  const matchedCenter = findCommunityCenterInfo(rawQ);
+  if (matchedCenter) {
     return {
       isSimple: true,
-      replyText: `🚊 **${stationName}역 지하철 운행 안내**
+      replyText: `문의하신 **${matchedCenter.name}** 공식 연락처입니다! 🏛️
 
-📍 **노선**: **${meta ? meta.line : "수도권 전철"}**
-🏢 **위치**: ${meta ? meta.address : "해당 전철역"}
-📞 **고객센터**: ${meta ? meta.phone : "1544-7788"} (한국철도공사 코레일 / 서울교통공사)
-
-💡 만 65세 이상 어르신은 **G-PASS 어르신 카드**로 수도권 전철을 **100% 무료(무임)**로 이용하실 수 있습니다.`
+📍 **${matchedCenter.name}** (${matchedCenter.region})
+- 📞 **대표 민원실**: **${matchedCenter.phone}**
+${matchedCenter.welfarePhone ? `- 📞 **복지지원팀**: **${matchedCenter.welfarePhone}**\n` : ""}- 🏢 **주소**: ${matchedCenter.address}`
     };
   }
 
-  // 4. 주요 행정/치안/도서관 시설 매칭
+  // 2. 학교 검색
+  const matchedSchool = findSchoolInfo(rawQ);
+  if (matchedSchool) {
+    return {
+      isSimple: true,
+      replyText: `문의하신 **${matchedSchool.name}** 공식 연락처입니다! 🏫
+
+📍 **${matchedSchool.name}**
+- 📞 **교무실**: **${matchedSchool.phone}**
+${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone}**\n` : ""}- 🏢 **주소**: ${matchedSchool.address}`
+    };
+  }
+
+  // 3. 주요 시설 매칭
   for (const [key, info] of Object.entries(localPublicFacilityDB)) {
     if (q.includes(key.toLowerCase())) {
       return {
@@ -173,89 +182,34 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
     }
   }
 
-  // 5. 보건소 / 치매안심센터 질의
-  if (q.includes("보건소") || q.includes("보건지소") || q.includes("치매안심센터") || q.includes("보건센터")) {
+  // 4. 보건소
+  if (q.includes("보건소") || q.includes("보건지소") || q.includes("치매안심센터")) {
     return {
       isSimple: true,
       replyText: `보건소 연락처를 안내해드릴게요! 😊
 
 📍 **남양주시보건소 (다산동 본소)**: 📞 **031-590-4048** (다산중앙로82번안길 118)
-📍 **남양주시 풍양보건소 (진접·오남·별내)**: 📞 **031-590-5340** (진접읍 해밀예당1로 43)
-📍 **남양주시 동부보건센터 (화도·수동·호평)**: 📞 **031-590-4740** (화도읍 비룡로 57)
-📍 **구리시보건소**: 📞 **031-550-2441** (구리시 안골로 48)
-📍 **보건복지상담센터 (전국)**: 📞 **국번없이 129** (24시간)`
+📍 **남양주시 풍양보건소 (진접·오남·별내)**: 📞 **031-590-5340**
+📍 **남양주시 동부보건센터 (화도·수동·호평)**: 📞 **031-590-4740**
+📍 **구리시보건소**: 📞 **031-550-2441**
+📍 **보건복지상담센터 (전국)**: 📞 **국번없이 129**`
     };
   }
 
-  // 6. 상하수도 / 수도세 / 누수 질의
-  if (q.includes("수도") || q.includes("상수도") || q.includes("누수")) {
+  // 5. 수도 / 가스 / 전기
+  if (q.includes("수도") || q.includes("누수")) {
     return {
       isSimple: true,
       replyText: `남양주시 상하수도 관련 연락처를 안내해드릴게요! 🚰
 
-📍 **남양주시 상하수도관리센터 수도과**: 📞 **031-590-4411**
-📍 **수도요금 고지 및 이사정산**: 📞 **031-590-4412**
+📍 **남양주시 수도과 (요금/고지)**: 📞 **031-590-4411**
 📍 **상수도 누수 신고 및 긴급 보수**: 📞 **031-590-4415**
 📍 **하수도 및 정화조 청소**: 📞 **031-590-4441**`
     };
   }
 
-  // 7. 도시가스 / 난방 / 전기 질의
-  if (q.includes("도시가스") || q.includes("가스회사") || q.includes("예스코") || q.includes("대륜") || q.includes("한전") || q.includes("전기요금")) {
-    return {
-      isSimple: true,
-      replyText: `에너지 공급기관 고객센터 연락처입니다! ⚡🔥
-
-📍 **예스코 (남양주 남부·서부 / 구리시)**: 📞 **1544-3131**
-📍 **대륜E&S (남양주 북부)**: 📞 **1566-6116**
-📍 **한국전력공사 (한전 전기요금/고장)**: 📞 **국번없이 123**
-📍 **에너지바우처 안내 콜센터**: 📞 **1600-3190**`
-    };
-  }
-
-  // 8. 교통약자 이동지원 / 드림콜 / 택시 질의
-  if (q.includes("드림콜") || q.includes("교통약자") || q.includes("장애인택시") || q.includes("바우처택시")) {
-    return {
-      isSimple: true,
-      replyText: `남양주시 교통약자 이동지원(드림콜) 연락처입니다! 🚕
-
-📍 **남양주시 교통약자이동지원센터 (드림콜)**: 📞 **1666-5522**
-   - 이용대상: 중증장애인, 거동불편 만 65세 이상 어르신, 임산부
-   - 이용요금: 기본 10km 1,500원 (초과 5km당 100원)
-   - 운영시간: 24시간 연중무휴`
-    };
-  }
-
-  // 9. 복지관 / 희망케어센터 / 노인복지관 질의
-  if (q.includes("복지관") || q.includes("희망케어") || q.includes("자원봉사") || q.includes("복지재단")) {
-    return {
-      isSimple: true,
-      replyText: `주요 복지관 및 지원센터 연락처입니다! 😊
-
-📍 **남양주시복지재단**: 📞 **031-524-9830** (다산순환로 20)
-📍 **남양주시노인복지관 (금곡 본관)**: 📞 **031-595-5060**
-📍 **남양주시동부노인복지관 (화도)**: 📞 **031-595-9988**
-📍 **해피누리노인복지관 (진접)**: 📞 **031-527-3100**
-📍 **남양주시 희망케어센터 (통합복지)**: 📞 **031-590-8941**
-📍 **남양주시자원봉사센터**: 📞 **031-595-1365**`
-    };
-  }
-
-  // 10. 주민센터 / 시청 / 행정복지센터 질의
-  if (q.includes("주민센터") || q.includes("행정복지센터") || q.includes("동사무소") || q.includes("시청")) {
-    return {
-      isSimple: true,
-      replyText: `행정기관 대표 연락처입니다! 🏛️
-
-📍 **남양주시청 대표 콜센터**: 📞 **031-590-2114**
-📍 **구리시청 대표 콜센터**: 📞 **031-557-1010**
-📍 **정부 민원 안내 콜센터**: 📞 **국번없이 110**
-📍 **보건복지상담센터**: 📞 **국번없이 129**`
-    };
-  }
-
-  // 11. 긴급 / 비상 연락처
-  if (q.includes("119") || q.includes("112") || q.includes("응급") || q.includes("긴급전화") || q.includes("비상") || q.includes("위급")) {
+  // 6. 긴급 / 비상
+  if (q.includes("119") || q.includes("112") || q.includes("응급") || q.includes("긴급전화") || q.includes("비상")) {
     return {
       isSimple: true,
       replyText: `🚨 **긴급 비상 연락처 안내**
@@ -263,35 +217,17 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
 🚑 **화재·구조·응급환자**: 📞 **119** (즉시 출동)
 👮 **범죄 신고 및 경찰**: 📞 **112**
 📞 **보건복지상담센터**: 📞 **129**
-📞 **정신건강 위기상담**: 📞 **1577-0199** (24시간)
 📞 **교통약자 이동지원 (드림콜)**: 📞 **1666-5522**`
     };
   }
 
-  // 12. 일반적인 "전화번호", "연락처 모음" 단답형 질의
-  if (q.includes("전화번호") || q.includes("연락처") || q.includes("번호") || q.includes("어디") || q.includes("위치") || q.length <= 10) {
-    return {
-      isSimple: true,
-      replyText: `"${rawQ}"에 대해 안내해드릴게요! 😊
-
-📍 **남양주시 대표 콜센터**: 📞 **031-590-2114**
-📍 **구리남양주교육지원청 (학교/전학)**: 📞 **031-550-6114**
-📍 **보건복지상담센터 (복지·의료)**: 📞 **국번없이 129**
-📍 **정부 민원 안내 콜센터**: 📞 **국번없이 110**
-📍 **남양주시보건소**: 📞 **031-590-4048**
-🚨 **응급·구조 (소방서)**: 📞 **119**
-
-궁금하신 특정 학교(예: *인창초등학교*), 기관, 병원이나 시설 명칭을 말씀해주시면 정확한 직통 번호를 바로 알려드립니다!`
-    };
-  }
-
-  // 13. 인사 및 일상
+  // 7. 인사 및 감사
   if (q === "안녕" || q === "안녕하세요" || q === "반가워" || q === "하이" || q === "반갑습니다") {
     return {
       isSimple: true,
       replyText: `안녕하세요! 반갑습니다. 저는 지역사회 도우미 **마을지기**예요. 😊
 
-어려운 일이 있으시거나 학교·기관 전화번호, 복지 혜택, 병원비, 공공요금 등 무엇이든 편하게 물어보세요!`
+어려운 일이 있으시거나 읍면동 주민센터, 학교, 병원비, 교통, 공공요금 등 무엇이든 편하게 물어보세요!`
     };
   }
 
