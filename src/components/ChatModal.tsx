@@ -157,6 +157,14 @@ export default function ChatModal({
       };
 
       recognitionRef.current = recognition;
+
+      // 모바일 음성 엔진 워밍업
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
     } else {
       setSpeechSupported(false);
     }
@@ -297,21 +305,88 @@ export default function ChatModal({
     }
   };
 
-  // 10단계 전체를 상세하게 읽어주기 (TTS)
-  const speakAll10Steps = (msgId: string, rag: RAGAnalysisResult) => {
+  // [모바일 완벽 호환 TTS 재생 엔진]
+  const playMobileTTS = (text: string, onStartCallback: () => void, onEndCallback: () => void) => {
     if (!("speechSynthesis" in window)) {
       alert("음성 듣기 기능이 지원되지 않는 브라우저입니다.");
       return;
     }
 
+    // 1. 모바일 브라우저 일시정지 상태 강제 해제 (Audio Resume)
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+    window.speechSynthesis.cancel();
+
+    // 2. 특수기호 및 마크다운 정제
+    const cleanText = text
+      .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮]/g, " ")
+      .replace(/➔/g, "에서 ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!cleanText) return;
+
+    // 모바일 지연 호출 (cancel 버그 방지)
+    setTimeout(() => {
+      try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = "ko-KR";
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+
+        // 3. 한국어 지원 음성 엔진 명시적 바인딩 (모바일 필수)
+        const voices = window.speechSynthesis.getVoices();
+        const koreanVoice = voices.find(
+          (v) => v.lang === "ko-KR" || v.lang === "ko_KR" || v.lang.startsWith("ko")
+        );
+        if (koreanVoice) {
+          utterance.voice = koreanVoice;
+        }
+
+        utterance.onstart = () => {
+          onStartCallback();
+        };
+
+        utterance.onend = () => {
+          (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
+          onEndCallback();
+        };
+
+        utterance.onerror = (e) => {
+          console.warn("TTS playback error:", e);
+          (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
+          onEndCallback();
+        };
+
+        // 4. [중요] 모바일 가비지 컬렉터(GC) 조기 파괴 방지 (전역 참조 유지)
+        (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = utterance;
+
+        window.speechSynthesis.speak(utterance);
+
+        // 안드로이드 크롬 크래시 방지용 주기적 resume 핑
+        const resumeInterval = setInterval(() => {
+          if (!window.speechSynthesis.speaking) {
+            clearInterval(resumeInterval);
+          } else {
+            window.speechSynthesis.resume();
+          }
+        }, 5000);
+      } catch (err) {
+        console.error("SpeechSynthesis execution failed:", err);
+        onEndCallback();
+      }
+    }, 50);
+  };
+
+  // 10단계 전체를 상세하게 읽어주기 (TTS)
+  const speakAll10Steps = (msgId: string, rag: RAGAnalysisResult) => {
     if (speakingMsgId === `full-${msgId}`) {
       window.speechSynthesis.cancel();
       setSpeakingMsgId(null);
       setSpeakingStepNum(null);
       return;
     }
-
-    window.speechSynthesis.cancel();
 
     const narrative = [
       `안녕하세요, 마을지기예요. 주민님께서 겪고 계신 상황에 대해 공공데이터 10단계 지원 계획을 차근차근 읽어드릴게요.`,
@@ -325,31 +400,20 @@ export default function ChatModal({
       `여덟 번째, 챙기셔야 할 준비 서류입니다. ${rag.groundedSteps[7].content}`,
       `아홉 번째, 공식 기관 확인 사항입니다. ${rag.groundedSteps[8].content}`,
       `열 번째, 사람 연결 안내입니다. 혼자 신청하기 어려우시면 아래 주황색 도움 요청하기 버튼을 눌러주세요. 마을관리자가 직접 기관에 연결해드립니다.`
-    ].join(". ... ");
+    ].join(". ");
 
-    const cleanText = narrative.replace(/[#*`💡📌📞🛡️🔒➔]/g, "");
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = "ko-KR";
-    utterance.rate = 0.88;
-
-    utterance.onend = () => {
-      setSpeakingMsgId(null);
-      setSpeakingStepNum(null);
-    };
-
-    utterance.onerror = () => {
-      setSpeakingMsgId(null);
-      setSpeakingStepNum(null);
-    };
-
-    setSpeakingMsgId(`full-${msgId}`);
-    window.speechSynthesis.speak(utterance);
+    playMobileTTS(
+      narrative,
+      () => setSpeakingMsgId(`full-${msgId}`),
+      () => {
+        setSpeakingMsgId(null);
+        setSpeakingStepNum(null);
+      }
+    );
   };
 
   // 특정 개별 단계만 읽어주기 (TTS)
   const speakSingleStep = (stepNum: number, title: string, content: string) => {
-    if (!("speechSynthesis" in window)) return;
-
     if (speakingStepNum === stepNum) {
       window.speechSynthesis.cancel();
       setSpeakingStepNum(null);
@@ -357,41 +421,30 @@ export default function ChatModal({
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const text = `${stepNum}단계, ${title} 내용입니다. ${content.replace(/[#*`💡📌📞🛡️🔒➔]/g, "")}`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ko-KR";
-    utterance.rate = 0.88;
-
-    utterance.onend = () => setSpeakingStepNum(null);
-    utterance.onerror = () => setSpeakingStepNum(null);
-
-    setSpeakingStepNum(stepNum);
-    setSpeakingMsgId(`step-${stepNum}`);
-    window.speechSynthesis.speak(utterance);
+    const text = `${stepNum}단계, ${title} 내용입니다. ${content}`;
+    playMobileTTS(
+      text,
+      () => {
+        setSpeakingStepNum(stepNum);
+        setSpeakingMsgId(`step-${stepNum}`);
+      },
+      () => setSpeakingStepNum(null)
+    );
   };
 
   // 요약 문구 및 단순 챗봇 답변 읽기 (TTS)
   const speakSimpleMessage = (msgId: string, textToSpeak: string) => {
-    if (!("speechSynthesis" in window)) return;
-
     if (speakingMsgId === msgId) {
       window.speechSynthesis.cancel();
       setSpeakingMsgId(null);
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const cleanText = textToSpeak.replace(/[#*`💡📌📞🛡️🔒📍]/g, "").slice(0, 350);
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = "ko-KR";
-    utterance.rate = 0.9;
-
-    utterance.onend = () => setSpeakingMsgId(null);
-    utterance.onerror = () => setSpeakingMsgId(null);
-
-    setSpeakingMsgId(msgId);
-    window.speechSynthesis.speak(utterance);
+    playMobileTTS(
+      textToSpeak.slice(0, 350),
+      () => setSpeakingMsgId(msgId),
+      () => setSpeakingMsgId(null)
+    );
   };
 
   const analyzeAndRespond = async (query: string) => {
