@@ -305,78 +305,126 @@ export default function ChatModal({
     }
   };
 
-  // [모바일 완벽 호환 TTS 재생 엔진]
+  // 현재 재생 중인 HTML5 오디오 객체 참조
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // [모바일 & 인앱 브라우저 완벽 호환 하이브리드 TTS 엔진]
   const playMobileTTS = (text: string, onStartCallback: () => void, onEndCallback: () => void) => {
-    if (!("speechSynthesis" in window)) {
-      alert("음성 듣기 기능이 지원되지 않는 브라우저입니다.");
-      return;
+    // 이전 오디오 재생 중지
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current.currentTime = 0;
+      activeAudioRef.current = null;
     }
 
-    // 1. 모바일 브라우저 일시정지 상태 강제 해제 (Audio Resume)
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
-    }
-    window.speechSynthesis.cancel();
-
-    // 2. 특수기호 및 마크다운 정제
+    // 1. 특수기호 및 마크다운 정제
     const cleanText = text
-      .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮]/g, " ")
+      .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮🏛️🏫]/g, " ")
       .replace(/➔/g, "에서 ")
       .replace(/\s+/g, " ")
       .trim();
 
     if (!cleanText) return;
 
-    // 모바일 지연 호출 (cancel 버그 방지)
-    setTimeout(() => {
+    // 2. 인앱 브라우저(네이버앱, 카카오톡 등) 또는 Web Speech API 미지원 환경용 HTML5 Audio Fallback
+    const playOnlineAudioFallback = () => {
       try {
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.lang = "ko-KR";
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
+        const encoded = encodeURIComponent(cleanText.slice(0, 200));
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=ko&client=tw-ob`;
+        const audio = new Audio(audioUrl);
+        activeAudioRef.current = audio;
 
-        // 3. 한국어 지원 음성 엔진 명시적 바인딩 (모바일 필수)
-        const voices = window.speechSynthesis.getVoices();
-        const koreanVoice = voices.find(
-          (v) => v.lang === "ko-KR" || v.lang === "ko_KR" || v.lang.startsWith("ko")
-        );
-        if (koreanVoice) {
-          utterance.voice = koreanVoice;
-        }
-
-        utterance.onstart = () => {
+        audio.onplay = () => {
           onStartCallback();
         };
-
-        utterance.onend = () => {
-          (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
+        audio.onended = () => {
+          activeAudioRef.current = null;
+          onEndCallback();
+        };
+        audio.onerror = () => {
+          activeAudioRef.current = null;
           onEndCallback();
         };
 
-        utterance.onerror = (e) => {
-          console.warn("TTS playback error:", e);
-          (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
-          onEndCallback();
-        };
-
-        // 4. [중요] 모바일 가비지 컬렉터(GC) 조기 파괴 방지 (전역 참조 유지)
-        (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = utterance;
-
-        window.speechSynthesis.speak(utterance);
-
-        // 안드로이드 크롬 크래시 방지용 주기적 resume 핑
-        const resumeInterval = setInterval(() => {
-          if (!window.speechSynthesis.speaking) {
-            clearInterval(resumeInterval);
-          } else {
-            window.speechSynthesis.resume();
-          }
-        }, 5000);
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn("Audio play blocked:", err);
+            onEndCallback();
+          });
+        }
       } catch (err) {
-        console.error("SpeechSynthesis execution failed:", err);
+        console.warn("Audio fallback error:", err);
         onEndCallback();
       }
-    }, 50);
+    };
+
+    // 3. 브라우저 네이티브 SpeechSynthesis 지원 여부 검사
+    if (!("speechSynthesis" in window) || !window.speechSynthesis) {
+      playOnlineAudioFallback();
+      return;
+    }
+
+    try {
+      // 모바일 브라우저 일시정지 상태 강제 해제 (Audio Resume)
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      window.speechSynthesis.cancel();
+
+      setTimeout(() => {
+        try {
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.lang = "ko-KR";
+          utterance.rate = 0.9;
+          utterance.pitch = 1.0;
+
+          // 한국어 지원 음성 엔진 명시적 바인딩
+          const voices = window.speechSynthesis.getVoices();
+          const koreanVoice = voices.find(
+            (v) => v.lang === "ko-KR" || v.lang === "ko_KR" || v.lang.startsWith("ko")
+          );
+          if (koreanVoice) {
+            utterance.voice = koreanVoice;
+          }
+
+          utterance.onstart = () => {
+            onStartCallback();
+          };
+
+          utterance.onend = () => {
+            (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
+            onEndCallback();
+          };
+
+          utterance.onerror = (e) => {
+            console.warn("SpeechSynthesis error, switching to Audio fallback:", e);
+            (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = undefined;
+            playOnlineAudioFallback();
+          };
+
+          // 모바일 가비지 컬렉터(GC) 조기 파괴 방지
+          (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = utterance;
+
+          window.speechSynthesis.speak(utterance);
+
+          // 안드로이드 크롬 크래시 방지용 주기적 resume 핑
+          const resumeInterval = setInterval(() => {
+            if (!window.speechSynthesis.speaking) {
+              clearInterval(resumeInterval);
+            } else {
+              window.speechSynthesis.resume();
+            }
+          }, 4000);
+        } catch (err) {
+          console.warn("SpeechSynthesis failed, trying audio fallback:", err);
+          playOnlineAudioFallback();
+        }
+      }, 50);
+    } catch (e) {
+      console.warn("SpeechSynthesis init failed:", e);
+      playOnlineAudioFallback();
+    }
   };
 
   // 10단계 전체를 상세하게 읽어주기 (TTS)
