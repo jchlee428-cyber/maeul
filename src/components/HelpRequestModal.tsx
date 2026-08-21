@@ -61,22 +61,22 @@ export default function HelpRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-primary-200 overflow-hidden my-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-primary-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
         {/* 상단 바 */}
-        <div className="flex items-center justify-between px-6 py-4 bg-primary-700 text-white">
-          <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-primary-700 text-white shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-sm sm:text-base shrink-0">
               <i className="ri-hand-heart-fill"></i>
             </span>
-            <div>
-              <h2 className="font-heading font-bold text-lg">이 서비스에 도움 요청하기</h2>
-              <p className="text-xs text-primary-100">마을관리자가 확인 후 관할 기관에 직접 연결합니다</p>
+            <div className="truncate">
+              <h2 className="font-heading font-bold text-sm sm:text-lg truncate">도움 요청하기</h2>
+              <p className="text-[10px] sm:text-xs text-primary-100 truncate">마을관리자 및 관할 기관 직접 연결</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white shrink-0 ml-1"
           >
             <i className="ri-close-line text-xl"></i>
           </button>

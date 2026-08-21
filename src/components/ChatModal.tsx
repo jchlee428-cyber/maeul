@@ -487,38 +487,38 @@ export default function ChatModal({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/65 backdrop-blur-sm">
-        <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-primary-200 overflow-hidden flex flex-col h-[90vh]">
-          {/* 상단 바 */}
-          <div className="flex items-center justify-between px-5 py-3.5 bg-primary-800 text-white shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-xl shadow">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-6 bg-black/75 backdrop-blur-sm">
+        <div className="relative w-full h-[100dvh] sm:h-[90vh] max-w-4xl bg-white rounded-none sm:rounded-3xl shadow-2xl border-0 sm:border border-primary-200 overflow-hidden flex flex-col">
+          {/* 상단 바 (모바일 반응형 최적화) */}
+          <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3.5 bg-primary-800 text-white shrink-0 shadow-md">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <span className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-base sm:text-xl shadow">
                 <i className="ri-heart-3-fill"></i>
               </span>
-              <div>
-                <h2 className="font-heading font-bold text-base md:text-lg flex items-center gap-2">
-                  마을지기 따뜻한 AI 상담
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-primary-900 text-accent-300 rounded-full border border-accent-300/30">
-                    음성/글자 지원
+              <div className="truncate">
+                <h2 className="font-heading font-bold text-sm sm:text-base md:text-lg flex items-center gap-1.5 truncate">
+                  <span className="truncate">마을지기 따뜻한 AI</span>
+                  <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold bg-primary-900 text-accent-300 rounded-full border border-accent-300/30 shrink-0">
+                    음성/글자
                   </span>
                 </h2>
-                <p className="text-xs text-primary-200">
-                  개인정보 없이 · 공공데이터 기반 10단계 안내
+                <p className="text-[11px] sm:text-xs text-primary-200 truncate">
+                  개인정보 없이 · 공공데이터 기반
                 </p>
               </div>
             </div>
 
             {/* 우측 상단 도구: 초기화 & 지난 기록 & 닫기 */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               {/* 대화 내용 초기화 버튼 */}
               <button
                 type="button"
                 onClick={handleResetChat}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-[11px] sm:text-xs font-semibold transition-colors"
                 title="상담 내용 초기화 (새 대화 시작)"
               >
                 <i className="ri-refresh-line"></i>
-                <span className="hidden sm:inline">대화 초기화</span>
+                <span className="hidden sm:inline">초기화</span>
               </button>
 
               {/* 지난 상담 기록 모달 열기 버튼 */}
@@ -528,16 +528,17 @@ export default function ChatModal({
                   loadHistory();
                   setIsHistoryModalOpen(true);
                 }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-accent-500 hover:bg-accent-400 text-foreground-950 text-xs font-bold transition-colors shadow"
+                className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-accent-500 hover:bg-accent-400 text-foreground-950 text-[11px] sm:text-xs font-bold transition-colors shadow"
                 title="저장된 상담 DB 목록"
               >
                 <i className="ri-folder-history-line"></i>
-                <span>상담 기록 ({consultationHistory.length})</span>
+                <span className="hidden xs:inline sm:inline">상담기록</span>
+                <span className="inline-block px-1 bg-foreground-900 text-white rounded text-[10px]">{consultationHistory.length}</span>
               </button>
 
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors ml-1"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors ml-0.5"
                 aria-label="닫기"
               >
                 <i className="ri-close-line text-xl"></i>
@@ -739,17 +740,17 @@ export default function ChatModal({
             </div>
           )}
 
-          {/* 빠른 질문 제안 영역 */}
-          <div className="px-4 py-2 bg-primary-50/70 border-t border-primary-100 shrink-0">
+          {/* 빠른 질문 제안 영역 (모바일 가로 스크롤 최적화) */}
+          <div className="px-3 sm:px-4 py-2 bg-primary-50/70 border-t border-primary-100 shrink-0">
             <div className="text-[11px] font-bold text-primary-800 mb-1 flex items-center gap-1">
-              <i className="ri-flashlight-line"></i> 자주 찾는 공공 지원 상황:
+              <i className="ri-flashlight-line text-amber-600"></i> 자주 찾는 공공 지원 상황:
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 text-xs">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
               {quickQueries.map((qq) => (
                 <button
                   key={qq}
                   onClick={() => handleSendMessage(qq)}
-                  className="px-3 py-1 rounded-full bg-white hover:bg-primary-100 border border-primary-200 text-foreground-800 whitespace-nowrap transition-colors text-left"
+                  className="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-primary-100 border border-primary-200 text-foreground-800 whitespace-nowrap transition-colors text-left text-[11px] sm:text-xs shadow-xs"
                 >
                   {qq}
                 </button>

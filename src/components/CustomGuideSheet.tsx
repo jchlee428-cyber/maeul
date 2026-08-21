@@ -264,31 +264,31 @@ export default function CustomGuideSheet({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/65 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-primary-200 overflow-hidden my-4 max-h-[90vh] flex flex-col">
-        {/* 모달 헤더 */}
-        <div className="flex items-center justify-between px-6 py-4 bg-primary-700 text-white shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-full bg-white text-primary-700 flex items-center justify-center font-bold">
+        {/* 모달 헤더 (모바일 반응형 최적화) */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-primary-700 text-white shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white text-primary-700 flex items-center justify-center font-bold text-sm sm:text-base shrink-0">
               <i className="ri-file-list-3-line"></i>
             </span>
-            <div>
-              <h2 className="font-heading font-bold text-lg md:text-xl">주민 맞춤형 생활안내서 (A4 1장 요약)</h2>
-              <p className="text-xs text-primary-100">마을지기 | 공공·지역사회 자원 쉬운 말 정리</p>
+            <div className="truncate">
+              <h2 className="font-heading font-bold text-sm sm:text-lg md:text-xl truncate">주민 맞춤형 생활안내서</h2>
+              <p className="text-[10px] sm:text-xs text-primary-100 truncate">마을지기 | 공공·지역사회 자원</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg bg-accent-500 text-foreground-950 hover:bg-accent-400 transition-colors shadow"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-accent-500 text-foreground-950 hover:bg-accent-400 transition-colors shadow whitespace-nowrap"
             >
               <i className="ri-printer-line"></i>
-              A4 1장 인쇄 / PDF 저장
+              <span>인쇄 / PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors ml-0.5"
               aria-label="닫기"
             >
-              <i className="ri-close-line text-xl"></i>
+              <i className="ri-close-line text-lg sm:text-xl"></i>
             </button>
           </div>
         </div>
