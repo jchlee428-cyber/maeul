@@ -490,19 +490,19 @@ export default function ChatModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-6 bg-black/75 backdrop-blur-sm">
         <div className="relative w-full h-[100dvh] sm:h-[90vh] max-w-4xl bg-white rounded-none sm:rounded-3xl shadow-2xl border-0 sm:border border-primary-200 overflow-hidden flex flex-col">
           {/* 상단 바 (모바일 반응형 최적화) */}
-          <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3.5 bg-primary-800 text-white shrink-0 shadow-md">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <span className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-base sm:text-xl shadow">
+          <div className="flex items-center justify-between px-2.5 sm:px-5 py-2 sm:py-3 bg-primary-800 text-white shrink-0 shadow-md">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+              <span className="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-sm sm:text-lg shadow">
                 <i className="ri-heart-3-fill"></i>
               </span>
-              <div className="truncate">
-                <h2 className="font-heading font-bold text-sm sm:text-base md:text-lg flex items-center gap-1.5 truncate">
-                  <span className="truncate">마을지기 따뜻한 AI</span>
-                  <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold bg-primary-900 text-accent-300 rounded-full border border-accent-300/30 shrink-0">
+              <div className="min-w-0">
+                <h2 className="font-heading font-bold text-xs sm:text-base flex items-center gap-1">
+                  <span className="truncate">마을지기 AI</span>
+                  <span className="px-1 py-0.2 text-[8px] sm:text-[9px] font-bold bg-primary-900 text-accent-300 rounded border border-accent-300/30 shrink-0">
                     음성/글자
                   </span>
                 </h2>
-                <p className="text-[11px] sm:text-xs text-primary-200 truncate">
+                <p className="text-[10px] sm:text-xs text-primary-200 truncate">
                   개인정보 없이 · 공공데이터 기반
                 </p>
               </div>
@@ -547,7 +547,8 @@ export default function ChatModal({
           </div>
 
           {/* 대화 영역 */}
-          <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 bg-background-50">
+          {/* 대화 영역 */}
+          <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto space-y-3 sm:space-y-4 bg-background-50">
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -556,22 +557,22 @@ export default function ChatModal({
                 }`}
               >
                 <div
-                  className={`max-w-[95%] md:max-w-[85%] rounded-2xl p-4 md:p-5 shadow-sm text-sm md:text-base leading-relaxed ${
+                  className={`max-w-[95%] sm:max-w-[85%] rounded-2xl p-3.5 sm:p-5 shadow-sm text-sm sm:text-base leading-relaxed break-keep ${
                     m.sender === "user"
                       ? "bg-primary-600 text-white rounded-br-none"
                       : "bg-white text-foreground-900 border border-primary-200 rounded-bl-none"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 overflow-hidden">
                       <FormattedMessageText text={m.text} />
                     </div>
-                    {/* 상단 요약 및 단순 챗봇 답변 듣기 버튼 */}
+                    {/* 단순 챗봇 답변 듣기 버튼 */}
                     {m.sender === "bot" && (
                       <button
                         type="button"
                         onClick={() => speakSimpleMessage(m.id, m.text)}
-                        className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-colors border ${
+                        className={`shrink-0 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold rounded-lg transition-colors border ${
                           speakingMsgId === m.id
                             ? "bg-rose-500 text-white border-rose-600 animate-pulse"
                             : "bg-primary-50 hover:bg-primary-100 text-primary-800 border-primary-200"
@@ -579,133 +580,119 @@ export default function ChatModal({
                         title="소리로 읽어주기"
                       >
                         <i className={speakingMsgId === m.id ? "ri-stop-fill" : "ri-volume-up-line"}></i>
-                        <span>{speakingMsgId === m.id ? "멈춤" : "소리로 듣기"}</span>
+                        <span className="text-[10px]">듣기</span>
                       </button>
                     )}
                   </div>
 
-                  {/* RAG 공공데이터 10단계 결과 영역 (복합 지원 상담 시에만 노출) */}
+                  {/* RAG 공공데이터 10단계 결과 영역 */}
                   {m.ragResult && (
-                    <div className="mt-4 pt-4 border-t border-primary-200 space-y-3">
-                      {/* 10단계 상세 음성 설명 전용 배너 버튼 */}
-                      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-accent-400 to-amber-300 border border-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-primary-200 space-y-3">
+                      {/* 10단계 상세 음성 설명 전용 배너 */}
+                      <div className="p-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 border border-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
                         <div className="text-foreground-950">
-                          <div className="text-xs font-bold flex items-center gap-1">
+                          <div className="text-[11px] font-bold flex items-center gap-1">
                             <i className="ri-sound-module-line"></i> 어르신을 위한 맞춤 음성 안내
                           </div>
-                          <div className="font-heading font-bold text-sm md:text-base">
-                            이 10단계 내용을 목소리로 자세히 듣고 싶으신가요?
+                          <div className="font-heading font-bold text-xs sm:text-sm">
+                            10단계 내용을 목소리로 들으시겠어요?
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => speakAll10Steps(m.id, m.ragResult!)}
-                          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm shadow transition-all whitespace-nowrap ${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs shadow transition-all shrink-0 ${
                             speakingMsgId === `full-${m.id}`
                               ? "bg-rose-600 hover:bg-rose-700 text-white animate-pulse"
                               : "bg-primary-800 hover:bg-primary-900 text-white"
                           }`}
                         >
-                          <i className={`text-base ${speakingMsgId === `full-${m.id}` ? "ri-stop-circle-fill" : "ri-volume-up-fill text-accent-300"}`}></i>
-                          <span>{speakingMsgId === `full-${m.id}` ? "🔊 10단계 설명 멈추기" : "🔊 10단계 전체 설명 목소리로 듣기"}</span>
+                          <i className={speakingMsgId === `full-${m.id}` ? "ri-stop-circle-fill text-sm" : "ri-volume-up-fill text-accent-300 text-sm"}></i>
+                          <span>{speakingMsgId === `full-${m.id}` ? "낭독 멈추기" : "10단계 전체 듣기"}</span>
                         </button>
                       </div>
 
                       {/* 공식 출처 배지 */}
-                      <div className="p-3 rounded-xl bg-primary-50 border border-primary-300 text-xs flex flex-col md:flex-row md:items-center justify-between gap-2">
+                      <div className="p-2.5 rounded-xl bg-primary-50 border border-primary-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <div>
                           <span className="font-bold text-primary-900 flex items-center gap-1">
-                            <i className="ri-verified-badge-fill text-primary-600 text-sm"></i>
-                            공식 공공데이터 출처: {m.ragResult.sources.sourceApi}
+                            <i className="ri-verified-badge-fill text-primary-600"></i>
+                            공식 출처: {m.ragResult.sources.sourceApi}
                           </span>
-                          <span className="text-foreground-600 block mt-0.5">
-                            소관: {m.ragResult.sources.department} | 근거: {m.ragResult.sources.legalBasis}
+                          <span className="text-foreground-600 block text-[11px] mt-0.5">
+                            소관: {m.ragResult.sources.department}
                           </span>
                         </div>
-                        <span className="text-[11px] px-2 py-0.5 bg-white border border-primary-200 text-primary-800 rounded font-semibold whitespace-nowrap">
+                        <span className="text-[10px] sm:text-[11px] px-2 py-0.5 bg-white border border-primary-200 text-primary-800 rounded font-semibold whitespace-nowrap self-start sm:self-auto">
                           📞 {m.ragResult.sources.inquiryContact}
                         </span>
                       </div>
 
-                      {/* 10단계 스텝 카드 그리드 (각 카드마다 개별 듣기 버튼 포함) */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs md:text-sm">
-                        {m.ragResult.groundedSteps.map((st) => (
-                          <div
-                            key={st.stepNum}
-                            className={`p-3 rounded-xl border flex flex-col justify-between transition-all ${
-                              speakingStepNum === st.stepNum
-                                ? "bg-amber-100/90 border-amber-400 ring-2 ring-amber-400 shadow-md"
-                                : st.stepNum === 4 || st.stepNum === 7
-                                ? "bg-primary-50/90 border-primary-300 font-medium"
-                                : st.stepNum === 10
-                                ? "bg-accent-50 border-accent-300 md:col-span-2"
-                                : "bg-gray-50/80 border-gray-200"
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-center justify-between font-bold text-primary-800 mb-1">
-                                <span className="flex items-center gap-1">
-                                  <span>STEP {st.stepNum}. {st.title}</span>
-                                </span>
-                                <div className="flex items-center gap-1">
-                                  <span className="text-[10px] text-gray-500 font-normal">[{st.sourceCited}]</span>
-                                  {/* 개별 STEP 듣기 버튼 */}
-                                  <button
-                                    type="button"
-                                    onClick={() => speakSingleStep(st.stepNum, st.title, st.content)}
-                                    className={`p-1 rounded text-xs transition-colors ${
-                                      speakingStepNum === st.stepNum
-                                        ? "bg-rose-500 text-white"
-                                        : "bg-white hover:bg-primary-100 text-primary-700 border border-primary-200"
-                                    }`}
-                                    title={`${st.stepNum}단계만 듣기`}
-                                  >
-                                    <i className={speakingStepNum === st.stepNum ? "ri-stop-fill" : "ri-volume-up-line"}></i>
-                                  </button>
+                      {/* 10단계 스텝 카드 리스트 */}
+                      <div className="space-y-2">
+                        {m.ragResult.groundedSteps.map((step) => {
+                          const isCurrentlyPlaying = speakingStepNum === step.stepNum;
+                          return (
+                            <div
+                              key={step.stepNum}
+                              className={`p-3 rounded-xl border transition-all ${
+                                isCurrentlyPlaying
+                                  ? "bg-amber-50/90 border-amber-400 ring-2 ring-amber-300 shadow-sm"
+                                  : "bg-primary-50/40 border-primary-100 hover:bg-primary-50/80"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-5 h-5 rounded-full bg-primary-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                                    {step.stepNum}
+                                  </span>
+                                  <h4 className="font-bold text-xs sm:text-sm text-primary-950">
+                                    {step.title}
+                                  </h4>
                                 </div>
+                                <button
+                                  type="button"
+                                  onClick={() => speakSingleStep(step.stepNum, step.title, step.content)}
+                                  className={`p-1 rounded text-xs font-bold transition-colors shrink-0 ${
+                                    isCurrentlyPlaying
+                                      ? "bg-rose-500 text-white animate-pulse"
+                                      : "bg-white text-primary-800 hover:bg-primary-100 border border-primary-200 shadow-xs"
+                                  }`}
+                                  title="이 단계만 소리로 듣기"
+                                >
+                                  <i className={isCurrentlyPlaying ? "ri-stop-fill" : "ri-volume-up-line"}></i>
+                                </button>
                               </div>
-                              <div className="text-foreground-800 leading-snug">{st.content}</div>
+
+                              <p className="mt-1 text-xs sm:text-sm text-foreground-800 pl-6.5 leading-snug">
+                                {step.content}
+                              </p>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
-                      {/* 따뜻한 마무리 맺음말 배너 */}
-                      <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
-                        💌 <strong>마을지기의 안심 약속:</strong> "마을지기가 언제나 곁에 있으니, 어려운 일이 생기면 언제든 편하게 다시 찾아주세요."
-                      </div>
+                      {/* 안내서 인쇄 & 도움 요청 액션 버튼 */}
+                      <div className="mt-3 pt-2.5 border-t border-primary-200 flex flex-col sm:flex-row gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openHelpRequest(m.ragResult!.matchedPublicData, m.text)}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-accent-500 hover:bg-accent-400 text-foreground-950 font-bold rounded-xl text-xs sm:text-sm shadow transition-all active:scale-98"
+                        >
+                          <i className="ri-hand-heart-fill text-base"></i>
+                          <span>이 서비스에 도움 요청하기</span>
+                        </button>
 
-                      {/* 핵심 액션 바: [이 서비스에 도움 요청하기] & [A4 맞춤 안내서] */}
-                      <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-primary-900 to-primary-800 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow">
-                        <div>
-                          <div className="text-xs font-bold text-accent-300">
-                            혼자 신청하기 막막하신가요?
-                          </div>
-                          <div className="font-bold text-sm md:text-base">
-                            마을관리자가 관할 기관 및 자원봉사에 직접 연결해드립니다.
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                        {m.matchedResource && (
                           <button
                             type="button"
-                            onClick={() => openHelpRequest(m.ragResult!.matchedPublicData, m.text)}
-                            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs md:text-sm font-bold rounded-xl bg-accent-500 text-foreground-950 hover:bg-accent-400 transition-all shadow whitespace-nowrap"
+                            onClick={() => setSelectedGuideResource(m.matchedResource!)}
+                            className="inline-flex items-center justify-center gap-1 px-3.5 py-2.5 bg-primary-700 hover:bg-primary-800 text-white font-semibold rounded-xl text-xs sm:text-sm shadow transition-colors"
                           >
-                            <i className="ri-hand-heart-fill"></i>
-                            이 서비스에 도움 요청하기
+                            <i className="ri-printer-line"></i>
+                            <span>A4 안내서 인쇄</span>
                           </button>
-                          {m.matchedResource && (
-                            <button
-                              type="button"
-                              onClick={() => setSelectedGuideResource(m.matchedResource!)}
-                              className="inline-flex items-center justify-center gap-1 px-3 py-2.5 text-xs md:text-sm font-medium rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors whitespace-nowrap"
-                              title="A4 안내서 인쇄"
-                            >
-                              <i className="ri-printer-line"></i>
-                              인쇄
-                            </button>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -714,33 +701,31 @@ export default function ChatModal({
             ))}
 
             {isThinking && (
-              <div className="flex items-center gap-2 p-3 bg-white border border-primary-200 rounded-xl max-w-sm shadow-sm">
-                <span className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></span>
-                <span className="text-xs text-primary-900 font-semibold">
-                  안내 정보를 찾는 중입니다...
-                </span>
+              <div className="flex items-center gap-2 text-foreground-600 text-xs sm:text-sm p-3 bg-white rounded-2xl border border-primary-100 w-fit">
+                <span className="w-2 h-2 rounded-full bg-primary-600 animate-ping"></span>
+                <span>공공데이터 및 마을지기 지식망에서 신속히 찾고 있어요...</span>
               </div>
             )}
           </div>
 
           {/* 실시간 음성 듣기 상태 표시 바 */}
           {isListening && (
-            <div className="px-5 py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white flex items-center justify-between text-xs sm:text-sm font-bold shrink-0 shadow-inner">
-              <div className="flex items-center gap-2.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-white animate-ping"></span>
-                <span>🎙️ 귀 기울여 듣고 있어요... 편안하게 말씀해주세요!</span>
+            <div className="px-3 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white flex items-center justify-between text-xs sm:text-sm font-bold shrink-0 shadow-inner">
+              <div className="flex items-center gap-2 truncate">
+                <span className="w-3 h-3 rounded-full bg-white animate-ping shrink-0"></span>
+                <span className="truncate">🎙️ 귀 기울여 듣고 있어요... 편하게 말씀해주세요!</span>
               </div>
               <button
                 type="button"
                 onClick={toggleListening}
-                className="px-3 py-1.5 bg-white text-rose-700 hover:bg-rose-50 font-bold rounded-lg text-xs shadow transition-all"
+                className="px-2.5 sm:px-3 py-1 bg-white text-rose-700 hover:bg-rose-50 font-bold rounded-lg text-xs shadow transition-all shrink-0 ml-1"
               >
                 말씀 끝내기 (전송)
               </button>
             </div>
           )}
 
-          {/* 빠른 질문 제안 영역 (모바일 가로 스크롤 최적화) */}
+          {/* 빠른 질문 제안 영역 (모바일 가로 스크롤) */}
           <div className="px-3 sm:px-4 py-2 bg-primary-50/70 border-t border-primary-100 shrink-0">
             <div className="text-[11px] font-bold text-primary-800 mb-1 flex items-center gap-1">
               <i className="ri-flashlight-line text-amber-600"></i> 자주 찾는 공공 지원 상황:
@@ -758,36 +743,10 @@ export default function ChatModal({
             </div>
           </div>
 
-          {/* 입력창 & 가시성이 극대화된 마이크 음성 입력 버튼 */}
-          <div className="p-4 bg-white border-t border-gray-200 shrink-0 space-y-2">
-            {/* 어르신 안내 툴팁 배너 */}
-            <div className="flex items-center gap-1.5 text-xs text-amber-900 font-semibold px-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
-              <span>글씨 쓰기 힘드시면 아래 <strong>[🎙️ 목소리로 말하기]</strong>를 꾹 눌러 말씀해보세요!</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* 가시성 극대화된 [목소리로 말하기] 버튼 */}
-              <button
-                type="button"
-                onClick={toggleListening}
-                className={`inline-flex items-center justify-center gap-2 px-4 md:px-5 py-3 rounded-full font-black text-sm md:text-base whitespace-nowrap shadow-md hover:shadow-lg transition-all transform active:scale-95 ${
-                  isListening
-                    ? "bg-gradient-to-r from-rose-500 to-red-600 text-white ring-4 ring-rose-300 animate-pulse"
-                    : "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-foreground-950 ring-2 ring-amber-300 hover:ring-amber-400"
-                }`}
-                title={isListening ? "음성 인식 중지" : "마이크로 말하기"}
-              >
-                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm ${
-                  isListening ? "bg-white text-rose-600 animate-bounce" : "bg-white text-orange-600"
-                }`}>
-                  <i className={isListening ? "ri-mic-fill" : "ri-mic-2-fill"}></i>
-                </span>
-                <span className="tracking-tight">
-                  {isListening ? "말씀 듣는 중..." : "목소리로 말하기"}
-                </span>
-              </button>
-
+          {/* 하단 입력 영역: 안드로이드 및 모바일 최적화 (2단 스마트 구조) */}
+          <div className="p-2.5 sm:p-4 bg-white border-t border-gray-200 shrink-0 space-y-2 pb-3 sm:pb-4 shadow-lg">
+            {/* 1단: 텍스트 입력창 + 선명한 [상담하기] 버튼 */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <input
                 type="text"
                 value={input}
@@ -797,22 +756,45 @@ export default function ChatModal({
                     handleSendMessage();
                   }
                 }}
-                placeholder={isListening ? "말씀하신 내용이 글자로 적히고 있어요..." : "어려운 상황을 입력하세요 (마이크로 말씀하셔도 돼요)"}
-                className={`flex-1 px-4 py-3 border rounded-full text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors shadow-inner ${
-                  isListening ? "border-rose-400 bg-rose-50/50" : "border-gray-300 bg-gray-50/50 focus:bg-white"
+                placeholder={isListening ? "🎙️ 말씀하시는 중..." : "주민센터, 버스, 지원금 등 질문하기"}
+                className={`flex-1 min-w-0 px-3.5 sm:px-4 py-2.5 sm:py-3 border rounded-xl text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors shadow-inner ${
+                  isListening ? "border-rose-400 bg-rose-50/50" : "border-gray-300 bg-gray-50/70 focus:bg-white"
                 }`}
               />
 
+              {/* [상담하기] 전송 버튼 (모바일에서도 항상 선명하게 노출) */}
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
-                className="inline-flex items-center gap-1.5 px-5 md:px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-full transition-colors text-sm md:text-base whitespace-nowrap shadow-md"
+                className="inline-flex items-center justify-center gap-1 px-3.5 sm:px-5 py-2.5 sm:py-3 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-bold rounded-xl transition-all text-xs sm:text-sm whitespace-nowrap shadow-md shrink-0 active:scale-95"
               >
-                <i className="ri-send-plane-fill"></i>
-                <span className="hidden sm:inline">상담하기</span>
+                <i className="ri-send-plane-fill text-sm"></i>
+                <span className="font-bold">상담하기</span>
               </button>
             </div>
-            <p className="text-center text-[11px] text-gray-500">
+
+            {/* 2단: 어르신용 큼직한 [🎙️ 목소리로 말하기 (음성 상담)] 풀-너비 버튼 */}
+            <button
+              type="button"
+              onClick={toggleListening}
+              className={`w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform active:scale-98 ${
+                isListening
+                  ? "bg-gradient-to-r from-rose-500 to-red-600 text-white ring-4 ring-rose-300 animate-pulse"
+                  : "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 text-foreground-950 ring-1 ring-amber-300"
+              }`}
+              title={isListening ? "음성 인식 중지" : "마이크로 말하기"}
+            >
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm ${
+                isListening ? "bg-white text-rose-600 animate-bounce" : "bg-white text-orange-600"
+              }`}>
+                <i className={isListening ? "ri-mic-fill" : "ri-mic-2-fill"}></i>
+              </span>
+              <span className="tracking-tight">
+                {isListening ? "말씀 듣는 중... (터치하면 전송)" : "🎙️ 글씨 쓰기 힘드시면 [목소리로 말하기]를 눌러보세요"}
+              </span>
+            </button>
+
+            <p className="text-center text-[10px] sm:text-[11px] text-gray-500 leading-tight">
               🔒 개인정보는 일체 저장되지 않습니다. 위급한 응급 상황은 즉시 <strong>119 · 112</strong>로 연락하세요.
             </p>
           </div>
