@@ -105,6 +105,7 @@ export default function ChatModal({
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // 음성출력 (TTS) 상태
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
@@ -191,8 +192,6 @@ export default function ChatModal({
       }
     }
   }, [isOpen, initialQuery, initialCategory]);
-
-  if (!isOpen) return null;
 
   // 상담 내용 초기화 (새로운 상담 시작)
   const resetToWelcome = () => {
@@ -305,9 +304,6 @@ export default function ChatModal({
       }
     }
   };
-
-  // 현재 재생 중인 HTML5 오디오 객체 참조
-  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // [모바일 & 인앱 브라우저 완벽 호환 하이브리드 TTS 엔진]
   const playMobileTTS = (text: string, onStartCallback: () => void, onEndCallback: () => void) => {
@@ -591,6 +587,8 @@ export default function ChatModal({
     setCurrentQueryContext(userQuery);
     setIsHelpModalOpen(true);
   };
+
+  if (!isOpen) return null;
 
   return (
     <>
