@@ -12,6 +12,7 @@ import {
 import CustomGuideSheet from "./CustomGuideSheet";
 import HelpRequestModal from "./HelpRequestModal";
 import type { CommunityCase } from "@/services/caseManagementService";
+import { reviewAndRefineResponse } from "@/services/geminiReviewEngine";
 
 // Web Speech API 타입 선언
 interface SpeechRecognitionEvent extends Event {
@@ -500,11 +501,15 @@ export default function ChatModal({
       const simpleResponse = await checkAndHandleSimpleQueryAsync(query);
 
       if (simpleResponse && simpleResponse.isSimple) {
+        // [Google Gemini 지능형 듀얼패스 검토 및 자가수정]
+        const reviewed = reviewAndRefineResponse(query, simpleResponse.replyText);
+
         saveConsultationSession({
           userQuery: query,
           matchedServiceName: "간단 안내 및 교통/기관 정보",
           categoryLabel: "생활안내",
-          replyText: simpleResponse.replyText
+          replyText: reviewed.reviewedText,
+          ragResult: reviewed.ragRefinement
         });
         loadHistory();
 
@@ -513,7 +518,8 @@ export default function ChatModal({
           {
             id: String(Date.now()),
             sender: "bot",
-            text: simpleResponse.replyText
+            text: reviewed.reviewedText,
+            ragResult: reviewed.ragRefinement
           }
         ]);
 
@@ -524,19 +530,23 @@ export default function ChatModal({
       console.warn("Simple query async lookup fallback", e);
     }
 
-    // 2. 복합 지원 상담 (공공데이터 RAG 기반 10단계 실행)
+    // 2. 복합 지원 상담 (공공데이터 RAG 기반 10단계 실행 및 Gemini 검토 가드레일)
     setTimeout(() => {
       const rag = searchAndAnalyzePublicData(query);
       const matchedRes = communityResources.find((r) => r.category === rag.matchedPublicData.category) || communityResources[0];
-      const botResponseText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 10단계로 정리해드렸어요. (상담 내역이 안전하게 저장되었습니다)`;
+      const draftText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 10단계로 정리해드렸어요. (상담 내역이 안전하게 저장되었습니다)`;
+
+      // [Google Gemini Intent Classifier & Dual-Pass RAG Review]
+      const reviewed = reviewAndRefineResponse(query, draftText, rag);
+      const finalRag = reviewed.ragRefinement || rag;
 
       // 상담 DB에 자동 저장 (Auto-Save to DB)
       saveConsultationSession({
         userQuery: query,
-        matchedServiceName: rag.matchedPublicData.serviceName,
-        categoryLabel: rag.matchedPublicData.categoryLabel,
-        replyText: botResponseText,
-        ragResult: rag
+        matchedServiceName: finalRag.matchedPublicData.serviceName,
+        categoryLabel: finalRag.matchedPublicData.categoryLabel,
+        replyText: reviewed.reviewedText,
+        ragResult: finalRag
       });
       loadHistory();
 
@@ -545,14 +555,14 @@ export default function ChatModal({
         {
           id: String(Date.now()),
           sender: "bot",
-          text: botResponseText,
-          ragResult: rag,
+          text: reviewed.reviewedText,
+          ragResult: finalRag,
           matchedResource: matchedRes
         }
       ]);
 
       setIsThinking(false);
-    }, 400);
+    }, 350);
   };
 
   const handleSendMessage = (textToSend?: string) => {
