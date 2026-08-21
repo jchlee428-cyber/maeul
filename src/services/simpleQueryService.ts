@@ -55,26 +55,11 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     return null;
   }
 
-  // 1. [최우선] 남양주시 및 구리시 읍·면·동 행정복지센터(주민센터) 정확 검색
-  const matchedCenter = findCommunityCenterInfo(rawQ);
-  if (matchedCenter) {
-    return {
-      isSimple: true,
-      replyText: `문의하신 **${matchedCenter.name}** 공식 연락처 및 위치 안내입니다! 🏛️
-
-📍 **${matchedCenter.name}** (${matchedCenter.region})
-- 📞 **대표 민원실**: **${matchedCenter.phone}** (등초본·인감·가족관계·전입신고)
-${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**: **${matchedCenter.welfarePhone}** (복지상담·생계급여·에너지바우처)\n` : ""}- 🏢 **주소**: ${matchedCenter.address}
-
-💡 *운영시간: 평일 오전 9시 ~ 오후 6시 (점심시간 12:00 ~ 13:00 교대 근무)*
-복지 급여나 긴급 지원 신청은 위 **복지지원팀**으로 전화하시면 친절히 안내받으실 수 있습니다.`
-    };
-  }
-
-  // 2. [초정밀 버스 실시간 위치 및 노선 질의]
+  // 1. [초정밀 버스 실시간 위치 및 노선/구간 질의 - 1순위 최우선 처리]
   if (
     q.includes("버스") || q.includes("정류장") || q.includes("정류소") ||
     q.includes("땡큐") || q.includes("m23") || q.includes("광역버스") || q.includes("마을버스") ||
+    q.includes("잠실") || q.includes("강남") || q.includes("청량리") || q.includes("가는") || q.includes("몇번") ||
     Object.keys(localBusRoutes).some((r) => q.includes(r))
   ) {
     const busReply = await getRealtimeBusInfo(rawQ);
@@ -84,7 +69,7 @@ ${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**:
     };
   }
 
-  // 3. [지하철 / 전철 / 역 도착정보 질의]
+  // 2. [지하철 / 전철 / 역 도착정보 질의]
   if (
     q.includes("지하철") || q.includes("전철") || q.includes("열차") || q.includes("기차") ||
     q.includes("별내선") || q.includes("진접선") || q.includes("경춘선") || q.includes("경의중앙선") ||
@@ -102,6 +87,22 @@ ${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**:
     return {
       isSimple: true,
       replyText: subwayReply
+    };
+  }
+
+  // 3. [남양주시 및 구리시 읍·면·동 행정복지센터(주민센터) 정확 검색]
+  const matchedCenter = findCommunityCenterInfo(rawQ);
+  if (matchedCenter) {
+    return {
+      isSimple: true,
+      replyText: `문의하신 **${matchedCenter.name}** 공식 연락처 및 위치 안내입니다! 🏛️
+
+📍 **${matchedCenter.name}** (${matchedCenter.region})
+- 📞 **대표 민원실**: **${matchedCenter.phone}** (등초본·인감·가족관계·전입신고)
+${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**: **${matchedCenter.welfarePhone}** (복지상담·생계급여·에너지바우처)\n` : ""}- 🏢 **주소**: ${matchedCenter.address}
+
+💡 *운영시간: 평일 오전 9시 ~ 오후 6시 (점심시간 12:00 ~ 13:00 교대 근무)*
+복지 급여나 긴급 지원 신청은 위 **복지지원팀**으로 전화하시면 친절히 안내받으실 수 있습니다.`
     };
   }
 

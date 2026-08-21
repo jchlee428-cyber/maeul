@@ -212,9 +212,53 @@ export const communityCentersDirectory: CommunityCenterInfo[] = [
 
 /**
  * 읍면동 행정복지센터 스마트 검색 함수
+ * 대중교통(버스/전철), 소방서, 경찰서, 병원, 목적지 이동 등 행정복지센터와 무관한 질문은 절대 가로채지 않습니다.
  */
 export function findCommunityCenterInfo(query: string): CommunityCenterInfo | null {
   const cleanQ = query.replace(/[\s\-_,.]/g, "").toLowerCase();
+
+  // 1. 대중교통, 소방서, 경찰서, 길찾기 등 다른 시설/교통 질의가 섞여 있는 경우 즉시 제외 (오매칭 원천 차단)
+  const isOtherIntent = (
+    cleanQ.includes("버스") ||
+    cleanQ.includes("지하철") ||
+    cleanQ.includes("전철") ||
+    cleanQ.includes("소방서") ||
+    cleanQ.includes("경찰서") ||
+    cleanQ.includes("가는") ||
+    cleanQ.includes("가는법") ||
+    cleanQ.includes("가는방법") ||
+    cleanQ.includes("몇번") ||
+    cleanQ.includes("잠실") ||
+    cleanQ.includes("강남") ||
+    cleanQ.includes("청량리") ||
+    cleanQ.includes("병원") ||
+    cleanQ.includes("약국") ||
+    cleanQ.includes("마트")
+  );
+
+  if (isOtherIntent) {
+    return null;
+  }
+
+  // 2. 관공서 관련 키워드가 포함되어 있거나, 지명 단독으로 물어본 경우에만 매칭
+  const isGovKeyword = (
+    cleanQ.includes("주민센터") ||
+    cleanQ.includes("행정복지센터") ||
+    cleanQ.includes("동사무소") ||
+    cleanQ.includes("민원실") ||
+    cleanQ.includes("복지팀") ||
+    cleanQ.includes("등본") ||
+    cleanQ.includes("초본") ||
+    cleanQ.includes("인감") ||
+    cleanQ.includes("전입신고") ||
+    cleanQ.includes("전화번호") ||
+    cleanQ.includes("연락처") ||
+    cleanQ.length <= 8
+  );
+
+  if (!isGovKeyword) {
+    return null;
+  }
 
   for (const center of communityCentersDirectory) {
     if (cleanQ.includes(center.name.replace(/\s/g, "").toLowerCase())) {
