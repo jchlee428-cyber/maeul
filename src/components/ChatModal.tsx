@@ -559,12 +559,16 @@ export default function ChatModal({
   };
 
   const handleSendMessage = (textToSend?: string) => {
-    const q = textToSend || input;
-    if (!q.trim()) return;
+    let q = (textToSend !== undefined ? textToSend : input).trim();
 
     if (isListening && recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
+    }
+
+    // [개선] 만약 사용자가 빈 입력창 상태에서 [상담하기] 버튼을 클릭한 경우
+    if (!q) {
+      q = "도움이 필요해요";
     }
 
     // [모바일 최적화] 상담 시작 시 공간을 많이 차지하는 첫 환영 메시지를 제거하여 실제 상담 답변이 상단에 시원하게 보이도록 처리
