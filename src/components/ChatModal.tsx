@@ -51,9 +51,10 @@ interface Message {
   matchedResource?: CommunityResource;
 }
 
-// 텍스트 마크다운 포맷 렌더러 (굵은 글씨 및 하이라이트)
-function FormattedMessageText({ text }: { text: string }) {
-  const lines = text.split("\n");
+// 텍스트 마크다운 포맷 렌더러 (굵은 글씨 및 하이라이트, 안전 널가드 적용)
+function FormattedMessageText({ text }: { text?: string }) {
+  if (!text) return null;
+  const lines = String(text).split("\n");
   return (
     <div className="space-y-1">
       {lines.map((line, idx) => {
@@ -63,7 +64,7 @@ function FormattedMessageText({ text }: { text: string }) {
         return (
           <p key={idx} className="leading-relaxed">
             {parts.map((part, pIdx) => {
-              if (part.startsWith("**") && part.endsWith("**")) {
+              if (part && part.startsWith("**") && part.endsWith("**")) {
                 return (
                   <strong key={pIdx} className="font-bold text-primary-950">
                     {part.slice(2, -2)}
@@ -719,24 +720,26 @@ export default function ChatModal({
                       </div>
 
                       {/* 공식 출처 배지 */}
-                      <div className="p-2.5 rounded-xl bg-primary-50 border border-primary-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                        <div>
-                          <span className="font-bold text-primary-900 flex items-center gap-1">
-                            <i className="ri-verified-badge-fill text-primary-600"></i>
-                            공식 출처: {m.ragResult.sources.sourceApi}
-                          </span>
-                          <span className="text-foreground-600 block text-[11px] mt-0.5">
-                            소관: {m.ragResult.sources.department}
+                      {m.ragResult.sources && (
+                        <div className="p-2.5 rounded-xl bg-primary-50 border border-primary-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                          <div>
+                            <span className="font-bold text-primary-900 flex items-center gap-1">
+                              <i className="ri-verified-badge-fill text-primary-600"></i>
+                              공식 출처: {m.ragResult.sources.sourceApi || "공공데이터포털"}
+                            </span>
+                            <span className="text-foreground-600 block text-[11px] mt-0.5">
+                              소관: {m.ragResult.sources.department || "정부 및 지자체"}
+                            </span>
+                          </div>
+                          <span className="text-[10px] sm:text-[11px] px-2 py-0.5 bg-white border border-primary-200 text-primary-800 rounded font-semibold whitespace-nowrap self-start sm:self-auto">
+                            📞 {m.ragResult.sources.inquiryContact || "129 / 031-590-2114"}
                           </span>
                         </div>
-                        <span className="text-[10px] sm:text-[11px] px-2 py-0.5 bg-white border border-primary-200 text-primary-800 rounded font-semibold whitespace-nowrap self-start sm:self-auto">
-                          📞 {m.ragResult.sources.inquiryContact}
-                        </span>
-                      </div>
+                      )}
 
                       {/* 10단계 스텝 카드 리스트 */}
                       <div className="space-y-2">
-                        {m.ragResult.groundedSteps.map((step) => {
+                        {(m.ragResult.groundedSteps || []).map((step) => {
                           const isCurrentlyPlaying = speakingStepNum === step.stepNum;
                           return (
                             <div
@@ -780,14 +783,16 @@ export default function ChatModal({
 
                       {/* 안내서 인쇄 & 도움 요청 액션 버튼 */}
                       <div className="mt-3 pt-2.5 border-t border-primary-200 flex flex-col sm:flex-row gap-2">
-                        <button
-                          type="button"
-                          onClick={() => openHelpRequest(m.ragResult!.matchedPublicData, m.text)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-accent-500 hover:bg-accent-400 text-foreground-950 font-bold rounded-xl text-xs sm:text-sm shadow transition-all active:scale-98"
-                        >
-                          <i className="ri-hand-heart-fill text-base"></i>
-                          <span>이 서비스에 도움 요청하기</span>
-                        </button>
+                        {m.ragResult.matchedPublicData && (
+                          <button
+                            type="button"
+                            onClick={() => openHelpRequest(m.ragResult!.matchedPublicData, m.text)}
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-accent-500 hover:bg-accent-400 text-foreground-950 font-bold rounded-xl text-xs sm:text-sm shadow transition-all active:scale-98"
+                          >
+                            <i className="ri-hand-heart-fill text-base"></i>
+                            <span>이 서비스에 도움 요청하기</span>
+                          </button>
+                        )}
 
                         {m.matchedResource && (
                           <button
