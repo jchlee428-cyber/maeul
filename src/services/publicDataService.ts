@@ -98,6 +98,22 @@ export const publicDataRepository: PublicDataRecord[] = [
     lastUpdated: "2026-02-15"
   },
   {
+    id: "PUB-BOKJI-003",
+    sourceApi: "남양주시청·구리시청 교통약자 이동지원 및 외출·동행 돌봄 공공데이터",
+    sourceUrl: "https://www.nyj.go.kr/www/contents.do?key=643",
+    department: "남양주시 대중교통과 / 노인복지과 / 희망케어센터",
+    category: "welfare",
+    categoryLabel: "돌봄·이동",
+    serviceName: "취약계층 및 어르신 외출·동행 돌봄 및 교통약자 특별교통수단(드림콜)",
+    legalBasis: "교통약자의 이동편의 증진법 제16조 및 노인복지법 제27조의2",
+    targetCriteria: "혼자 외출(병원, 종교시설, 관공서, 나들이 등)이 어려운 어르신, 휠체어 이용자, 중증 장애인, 거동불편 취약계층",
+    supportDetails: "1) 교통약자 이동지원(드림콜): 휠체어 리프트 차량 방문 픽업 (기본 10km 1,500원, 시내·시외 병원 및 목적지 이동), 2) 노인맞춤돌봄 및 희망케어센터: 생활지원사·자원봉사자 1:1 병원·외출 동행 및 안전 지원",
+    applicationProcess: "드림콜 콜센터(1666-5522) 즉시 배차 예약 또는 주소지 읍·면·동 행정복지센터 복지팀·희망케어센터에 외출동행 도우미 신청",
+    requiredDocuments: "신분증, 장애인등록증 또는 대중교통 이용제약 의사소견서(드림콜 등록 시)",
+    inquiryContact: "교통약자 이동지원센터 드림콜 (1666-5522) / 희망케어센터 (031-590-8941) / 보건복지상담센터 (129)",
+    lastUpdated: "2026-08-21"
+  },
+  {
     id: "PUB-NHIS-001",
     sourceApi: "국민건강보험공단 재난적의료비 지원 공공API (ID: 150490)",
     sourceUrl: "https://www.nhis.or.kr",
@@ -243,7 +259,13 @@ export function searchAndAnalyzePublicData(userQuery: string): RAGAnalysisResult
   const q = userQuery.toLowerCase();
   let matched: PublicDataRecord = publicDataRepository[0];
 
-  if (q.includes("남양주") && (q.includes("기관") || q.includes("단체") || q.includes("복지관") || q.includes("협회") || q.includes("재단") || q.includes("봉사센터") || q.includes("연락처") || q.includes("주소") || q.includes("희망케어"))) {
+  if (
+    q.includes("교회") || q.includes("성당") || q.includes("절") || q.includes("외출") ||
+    q.includes("동행") || q.includes("혼자") || q.includes("거동") || q.includes("휠체어") ||
+    q.includes("드림콜") || q.includes("이동지원") || q.includes("장애") || q.includes("나들이") || q.includes("보행")
+  ) {
+    matched = publicDataRepository.find((p) => p.id === "PUB-BOKJI-003") || publicDataRepository[0];
+  } else if (q.includes("남양주") && (q.includes("기관") || q.includes("단체") || q.includes("복지관") || q.includes("협회") || q.includes("재단") || q.includes("봉사센터") || q.includes("연락처") || q.includes("주소") || q.includes("희망케어"))) {
     matched = publicDataRepository.find((p) => p.id === "PUB-NYJ-ORGS-001") || publicDataRepository[0];
   } else if (q.includes("남양주") || q.includes("물가") || q.includes("수도") || q.includes("가스료") || q.includes("버스요금") || q.includes("택시요금") || q.includes("공공요금") || q.includes("종량제") || q.includes("정화조") || q.includes("생활요금")) {
     matched = publicDataRepository.find((p) => p.id === "PUB-NYJ-FEES-001") || publicDataRepository[0];

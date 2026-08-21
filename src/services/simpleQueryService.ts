@@ -119,19 +119,28 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
     };
   }
 
-  // 5. 동기 판별기 호출
+  // 5. 동기 판별기 호출 (주민센터, 인사, 응급 등 팩트 질의)
   const syncResult = checkAndHandleSimpleQuery(userQuery);
   if (syncResult && syncResult.isSimple) {
     return syncResult;
   }
 
-  // 6. [AI 스마트 검색 폴백 엔진 (Gemini / ChatGPT 인텔리전스)]
-  // 내부 DB에 미등록된 임의의 시설/위치/정보 질의 시 실시간 AI 지식망으로 응답 생성
-  const aiFallbackText = await generateAISearchFallbackReply(rawQ);
-  return {
-    isSimple: true,
-    replyText: aiFallbackText
-  };
+  // 6. 명확하게 특정 단일 시설/기관의 전화번호나 위치를 묻는 경우에만 AI 스마트 검색 실행
+  const isFacilitySearch = (
+    (q.includes("전화번호") || q.includes("연락처") || q.includes("위치") || q.includes("어디")) &&
+    q.length < 25
+  );
+
+  if (isFacilitySearch) {
+    const aiFallbackText = await generateAISearchFallbackReply(rawQ);
+    return {
+      isSimple: true,
+      replyText: aiFallbackText
+    };
+  }
+
+  // 7. 그 외의 모든 복합적인 주민의 어려움/사연/돌봄/지원 질문은 RAG 10단계 심층 분석으로 전달
+  return null;
 }
 
 /**
@@ -221,8 +230,20 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
     };
   }
 
-  // 7. 일반 도움 요청 및 길라잡이 질의
-  if (q.includes("도움") || q.includes("상담") || q.includes("안내") || q.includes("알려줘") || q.length <= 8) {
+  // 7. 일반 도움 요청 및 길라잡이 질의 (구체적인 문장이 아닌 단독 단어일 때만 작동)
+  const isGenericShortHelp = (
+    q === "도움" ||
+    q === "도움이 필요해요" ||
+    q === "도와줘" ||
+    q === "도와주세요" ||
+    q === "상담" ||
+    q === "상담하기" ||
+    q === "안내" ||
+    q === "메뉴" ||
+    q === "사용법"
+  );
+
+  if (isGenericShortHelp) {
     return {
       isSimple: true,
       replyText: `어려우신 일이 있으신가요? 마을지기가 친절하게 도와드릴게요! 😊
@@ -232,7 +253,7 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
 - 🚌 **실시간 버스**: *165번 버스*, *땡큐10번*, *M2316*, *남양주 버스*
 - 🚊 **실시간 전철**: *구리역 지하철*, *평내호평역*, *다산역 8호선*, *진접역*
 - 🏫 **학교 정보**: *인창초등학교*, *금곡중학교*, *평내고등학교* 등
-- 💡 **복지 및 지원금**: *생계비 지원*, *병원비 수술비*, *에너지바우처*, *노인돌봄*
+- 💡 **복지 및 지원금**: *외출·동행 돌봄*, *생계비 지원*, *병원비 수술비*, *에너지바우처*, *노인돌봄*
 
 찾으시는 질문을 입력창에 적으시거나 아래 **[🎙️ 목소리로 말하기]**를 눌러 말씀해보세요!`
     };
