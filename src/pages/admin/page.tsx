@@ -110,12 +110,13 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* [🏠 홈 (실증 성과 보고)] 예쁜 집 모양 단독 아이콘 버튼 */}
             <Link
               to="/cases"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-white border border-primary-200 text-primary-900 hover:bg-primary-50 shadow-xs transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-primary-200 text-primary-800 hover:bg-primary-50 shadow-xs transition-all hover:scale-105"
+              title="홈 (실증 성과 보고서)"
             >
-              <i className="ri-home-4-fill text-accent-500"></i>
-              실증 성과 (홈)
+              <i className="ri-home-4-fill text-lg text-primary-700"></i>
             </Link>
 
             <Link

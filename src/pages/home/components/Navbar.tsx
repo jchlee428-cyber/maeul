@@ -40,16 +40,17 @@ export default function Navbar() {
 
         {/* 데스크톱 메뉴 */}
         <div className="hidden lg:flex items-center gap-1.5">
+          {/* [🏠 홈] 예쁜 집 모양 단독 아이콘 버튼 */}
           <Link
             to="/cases"
-            className={`px-4 py-2 text-sm font-bold rounded-full transition-colors flex items-center gap-1.5 ${
+            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
               location.pathname === "/cases"
-                ? "bg-primary-800 text-accent-300 shadow-sm"
-                : "text-foreground-800 hover:bg-primary-50"
+                ? "bg-primary-800 text-accent-300 shadow-md ring-2 ring-accent-400/40"
+                : "text-primary-800 hover:bg-primary-100 hover:text-primary-950"
             }`}
+            title="홈 (실증 성과 보고서)"
           >
-            <i className="ri-home-4-fill text-accent-400"></i>
-            <span>실증 성과 보고 (홈)</span>
+            <i className="ri-home-4-fill text-xl"></i>
           </Link>
 
           <Link
