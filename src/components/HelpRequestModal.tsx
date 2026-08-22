@@ -100,18 +100,18 @@ export default function HelpRequestModal({
               </div>
               <p><strong>요청 서비스:</strong> {submittedCase.neededService}</p>
               <p><strong>지역:</strong> {submittedCase.region}</p>
+              <p><strong>접수 연락처:</strong> <span className="font-mono font-bold text-emerald-800">📞 {submittedCase.contactInfo}</span></p>
               <p><strong>처리 상태:</strong> <span className="text-amber-700 font-semibold">1단계 접수 완료 (마을관리자 확인 중)</span></p>
+              <div className="text-xs text-emerald-800 bg-emerald-100/80 p-2.5 rounded-xl border border-emerald-300 mt-2">
+                🤝 <strong>마을관리자 연락 안내</strong>: 관할 마을관리자가 요청 내용을 확인 후, 남겨주신 위 번호로 <strong>24시간 내(평일 기준)</strong> 전화 또는 문자로 친절히 연락드릴 예정입니다.
+              </div>
             </div>
-
-            <p className="text-xs text-foreground-600 leading-relaxed">
-              마을관리자가 공공데이터 자격 요건을 검증한 후, 관할 행정복지센터 또는 복지관 담당자를 통해 연락을 드립니다.
-            </p>
 
             <button
               onClick={onClose}
-              className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl transition-colors shadow"
+              className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:scale-98 text-white font-bold rounded-xl transition-all shadow-md"
             >
-              확인 및 닫기
+              확인 및 대화창으로 돌아가기
             </button>
           </div>
         ) : (
@@ -156,17 +156,19 @@ export default function HelpRequestModal({
 
             <div>
               <label className="block font-bold text-foreground-800 mb-1">
-                연락 가능한 번호 (안심번호/전화번호) <span className="text-rose-500">*</span>
+                연락 가능한 전화번호 (휴대폰 또는 일반전화) <span className="text-rose-500">*</span>
               </label>
               <input
-                type="text"
+                type="tel"
                 required
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="예: 010-1234-5678 또는 안심번호"
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                placeholder="예: 010-1234-5678 또는 031-590-0000"
+                className="w-full px-3.5 py-2.5 border-2 border-primary-400 rounded-xl font-mono text-base font-bold focus:ring-2 focus:ring-primary-500 focus:outline-none bg-primary-50/20"
               />
-              <p className="text-[11px] text-gray-500 mt-1">담당 공무원 또는 복지사의 상담 연결 목적으로만 사용됩니다.</p>
+              <p className="text-[11px] text-emerald-800 font-medium mt-1">
+                🔒 남겨주신 번호는 <strong>마을관리자가 전화를 드려 지원 제도를 연계해드리는 용도</strong>로만 안전하게 사용됩니다.
+              </p>
             </div>
 
             <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">

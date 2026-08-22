@@ -350,10 +350,31 @@ export default function AdminPage() {
                         {c.region}
                       </td>
 
-                      {/* 4. 필요서비스 */}
-                      <td className="py-3.5 px-4 text-foreground-900 max-w-xs truncate" title={c.userSituation}>
-                        <div className="font-semibold">{c.neededService}</div>
-                        <div className="text-xs text-foreground-500 truncate">{c.userSituation}</div>
+                      {/* 4. 필요서비스 & 연락처 */}
+                      <td className="py-3.5 px-4 text-foreground-900 max-w-xs" title={c.userSituation}>
+                        <div className="font-semibold text-primary-950">{c.neededService}</div>
+                        <div className="text-xs text-foreground-500 truncate mt-0.5">{c.userSituation}</div>
+                        {c.contactInfo && (
+                          <div className="flex items-center gap-1.5 mt-1.5 pt-1 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                              📞 {c.contactInfo}
+                            </span>
+                            <a
+                              href={`tel:${c.contactInfo.replace(/[^0-9]/g, "")}`}
+                              className="p-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold"
+                              title="전화걸기"
+                            >
+                              <i className="ri-phone-fill"></i>
+                            </a>
+                            <a
+                              href={`sms:${c.contactInfo.replace(/[^0-9]/g, "")}`}
+                              className="p-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold"
+                              title="문자보내기"
+                            >
+                              <i className="ri-message-2-fill"></i>
+                            </a>
+                          </div>
+                        )}
                       </td>
 
                       {/* 5. AI 추천 */}
@@ -492,6 +513,63 @@ export default function AdminPage() {
                     onChange={(e) => setSelectedCase({ ...selectedCase, aiRecommendation: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-300 font-medium"
                   />
+                </div>
+
+                {/* [주민 안심 연락처 및 원클릭 연락 도구] */}
+                <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl border border-emerald-300 shadow-xs space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-[11px] font-bold text-emerald-800 flex items-center gap-1">
+                        <i className="ri-phone-fill text-emerald-600"></i> 주민 입력 연락처 (상담 및 연계용)
+                      </span>
+                      <div className="font-mono font-black text-base text-foreground-950 mt-0.5">
+                        {selectedCase.contactInfo || "연락처 미기재"}
+                      </div>
+                    </div>
+
+                    {/* 원클릭 통화/문자/복사 액션 버튼 그룹 */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {selectedCase.contactInfo && (
+                        <>
+                          <a
+                            href={`tel:${selectedCase.contactInfo.replace(/[^0-9]/g, "")}`}
+                            className="inline-flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition-all"
+                            title="스마트폰에서 바로 전화걸기"
+                          >
+                            <i className="ri-phone-line text-sm"></i>
+                            <span>전화걸기</span>
+                          </a>
+
+                          <a
+                            href={`sms:${selectedCase.contactInfo.replace(/[^0-9]/g, "")}?body=${encodeURIComponent(
+                              `[마을지기] 안녕하세요, 주민님께서 요청하신 '${selectedCase.neededService}' 지원 상담을 위해 연락드렸습니다. 통화 편하신 시간을 알려주시면 전화드리겠습니다.`
+                            )}`}
+                            className="inline-flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition-all"
+                            title="안내 문자 작성 및 발송"
+                          >
+                            <i className="ri-message-2-line text-sm"></i>
+                            <span>문자보내기</span>
+                          </a>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(selectedCase.contactInfo);
+                              alert(`연락처 (${selectedCase.contactInfo})가 클립보드에 복사되었습니다.`);
+                            }}
+                            className="p-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold rounded-xl text-xs shadow-xs transition-colors"
+                            title="연락처 번호 복사"
+                          >
+                            <i className="ri-file-copy-line text-sm"></i>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-emerald-900 bg-white/70 p-2 rounded-xl border border-emerald-200/80 leading-relaxed">
+                    💡 <strong>관리자 팁</strong>: 어르신께 전화 시 <em>"마을지기 도움요청 보고 연락드린 마을관리자입니다"</em>라고 먼저 밝혀주시면 안심하고 상담에 응하십니다.
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
