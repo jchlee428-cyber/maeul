@@ -429,17 +429,17 @@ export default function Home() {
   return (
     <>
       <SchemaOrg />
-      <main className="w-full h-[100dvh] bg-slate-100 flex flex-col overflow-hidden text-slate-900">
-        {/* 상단 딥그린 고선명 헤더 (모바일 가독성 극대화) */}
-        <header className="h-14 sm:h-16 px-3 sm:px-6 bg-emerald-900 text-white flex items-center justify-between shadow-md shrink-0 z-20">
+      <main className="w-full h-[100dvh] max-h-[100dvh] bg-slate-100 flex flex-col overflow-hidden text-slate-900">
+        {/* 상단 딥그린 고선명 헤더 (모바일 가로 100% 풀 반응형) */}
+        <header className="w-full h-14 sm:h-16 px-3 sm:px-6 bg-emerald-900 text-white flex items-center justify-between shadow-md shrink-0 z-20">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-xl shadow shrink-0">
               <i className="ri-heart-3-fill"></i>
             </span>
-            <div className="min-w-0 truncate">
-              <h1 className="font-heading font-black text-sm sm:text-lg flex items-center gap-1.5 leading-tight truncate">
+            <div className="min-w-0">
+              <h1 className="font-heading font-black text-sm sm:text-lg flex items-center gap-1.5 leading-tight">
                 <span>마을지기 AI</span>
-                <span className="px-1.5 py-0.5 text-[9px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40">
+                <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0">
                   이웃도우미
                 </span>
               </h1>
