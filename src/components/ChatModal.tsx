@@ -862,32 +862,49 @@ export default function ChatModal({
           </div>
 
           {/* 하단 입력 영역: 안드로이드 및 모바일 최적화 (2단 스마트 구조) */}
-          <div className="p-2.5 sm:p-4 bg-white border-t border-gray-200 shrink-0 space-y-2 pb-3 sm:pb-4 shadow-lg">
-            {/* 1단: 텍스트 입력창 + 선명한 [상담하기] 버튼 */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                    handleSendMessage();
-                  }
-                }}
-                placeholder={isListening ? "🎙️ 말씀하시는 중..." : "주민센터, 버스, 지원금 등 질문하기"}
-                className={`flex-1 min-w-0 px-3.5 sm:px-4 py-2.5 sm:py-3 border rounded-xl text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors shadow-inner ${
-                  isListening ? "border-rose-400 bg-rose-50/50" : "border-gray-300 bg-gray-50/70 focus:bg-white"
-                }`}
-              />
+          <div className="p-3 sm:p-4 bg-white border-t-2 border-primary-100 shrink-0 space-y-2.5 pb-3 sm:pb-4 shadow-xl">
+            {/* 1단: 돋보이는 고대비 텍스트 입력창 + 상담하기 전송 버튼 */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 flex items-center">
+                <span className="absolute left-3.5 text-primary-600 text-base flex items-center pointer-events-none">
+                  <i className="ri-edit-2-fill"></i>
+                </span>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder={isListening ? "🎙️ 말씀하시는 중..." : "여기에 질문을 적어주세요 (예: 주민센터, 버스, 지원금)"}
+                  className={`w-full pl-9 pr-9 py-2.5 sm:py-3 bg-white border-2 rounded-2xl text-xs sm:text-base font-bold text-foreground-950 placeholder:text-gray-400 focus:outline-none transition-all shadow-sm ${
+                    isListening
+                      ? "border-rose-500 bg-rose-50/70 ring-4 ring-rose-200"
+                      : "border-primary-500 hover:border-primary-600 focus:border-primary-700 focus:ring-4 focus:ring-primary-200/80"
+                  }`}
+                />
+                {input.length > 0 && !isListening && (
+                  <button
+                    type="button"
+                    onClick={() => setInput("")}
+                    className="absolute right-2.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-xs transition-colors"
+                    title="지우기"
+                  >
+                    <i className="ri-close-line"></i>
+                  </button>
+                )}
+              </div>
 
-              {/* [상담하기] 전송 버튼 (모바일에서도 항상 선명하게 노출) */}
+              {/* [상담하기] 전송 버튼 */}
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
-                className="inline-flex items-center justify-center gap-1 px-3.5 sm:px-5 py-2.5 sm:py-3 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-bold rounded-xl transition-all text-xs sm:text-sm whitespace-nowrap shadow-md shrink-0 active:scale-95"
+                className="inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary-700 to-primary-900 hover:from-primary-800 hover:to-primary-950 active:scale-95 text-white font-black rounded-2xl transition-all text-xs sm:text-sm whitespace-nowrap shadow-md ring-2 ring-primary-300/70 shrink-0"
               >
-                <i className="ri-send-plane-fill text-sm"></i>
-                <span className="font-bold">상담하기</span>
+                <i className="ri-send-plane-fill text-sm sm:text-base"></i>
+                <span className="font-black">상담하기</span>
               </button>
             </div>
 

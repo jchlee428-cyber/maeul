@@ -703,33 +703,55 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 하단 2단 스마트 입력 영역 */}
-        <div className="p-2.5 sm:p-4 bg-white border-t border-gray-200 shrink-0 shadow-xl z-10">
-          <div className="max-w-4xl mx-auto space-y-2 pb-1 sm:pb-2">
-            {/* 1단: 입력창 + 상담하기 */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                    handleSendMessage();
-                  }
-                }}
-                placeholder={isListening ? "🎙️ 말씀하시는 중..." : "주민센터, 버스, 병원비, 생계비 등 무엇이든 질문하세요"}
-                className={`flex-1 min-w-0 px-3.5 sm:px-4 py-2.5 sm:py-3 border rounded-xl text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors shadow-inner ${
-                  isListening ? "border-rose-400 bg-rose-50/50" : "border-gray-300 bg-gray-50/70 focus:bg-white"
-                }`}
-              />
+        {/* 하단 2단 스마트 입력 영역 (시인성 극대화) */}
+        <div className="p-3 sm:p-5 bg-white border-t-2 border-primary-100 shrink-0 shadow-2xl z-10">
+          <div className="max-w-4xl mx-auto space-y-2.5 pb-1 sm:pb-2">
+            {/* 1단: 눈에 확 띄는 고대비 텍스트 입력창 + 상담하기 버튼 */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 flex items-center">
+                {/* 좌측 안내 아이콘 */}
+                <span className="absolute left-3.5 text-primary-600 text-lg flex items-center pointer-events-none">
+                  <i className="ri-edit-2-fill"></i>
+                </span>
 
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : "여기에 질문을 적어주세요 (예: 수술비 지원, 땡큐버스, 주민센터)"}
+                  className={`w-full pl-10 pr-10 py-3 sm:py-3.5 bg-white border-2 rounded-2xl text-sm sm:text-base font-bold text-foreground-950 placeholder:text-gray-400 focus:outline-none transition-all shadow-md ${
+                    isListening
+                      ? "border-rose-500 bg-rose-50/70 ring-4 ring-rose-200"
+                      : "border-primary-500 hover:border-primary-600 focus:border-primary-700 focus:ring-4 focus:ring-primary-200/80"
+                  }`}
+                />
+
+                {/* 입력 내용 있을 때 지우기 버튼 */}
+                {input.length > 0 && !isListening && (
+                  <button
+                    type="button"
+                    onClick={() => setInput("")}
+                    className="absolute right-3 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-xs transition-colors"
+                    title="지우기"
+                  >
+                    <i className="ri-close-line"></i>
+                  </button>
+                )}
+              </div>
+
+              {/* 선명한 [상담하기] 전송 버튼 */}
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
-                className="inline-flex items-center justify-center gap-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-bold rounded-xl transition-all text-xs sm:text-sm whitespace-nowrap shadow-md shrink-0 active:scale-95"
+                className="inline-flex items-center justify-center gap-1.5 px-5 sm:px-7 py-3 sm:py-3.5 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 hover:from-primary-800 hover:to-primary-950 active:scale-95 text-white font-black rounded-2xl transition-all text-sm sm:text-base whitespace-nowrap shadow-lg ring-2 ring-primary-300/70 shrink-0"
               >
-                <i className="ri-send-plane-fill text-sm"></i>
-                <span className="font-bold">상담하기</span>
+                <i className="ri-send-plane-fill text-base sm:text-lg"></i>
+                <span className="font-black tracking-tight">상담하기</span>
               </button>
             </div>
 
