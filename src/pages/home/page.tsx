@@ -485,12 +485,12 @@ export default function Home() {
           </div>
 
           {/* 중앙 & 우측: LOCAL FIRST 지역 선택기 + 10개국 다국어 + 쉬운한국어 스위치 */}
-          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end overflow-x-auto no-scrollbar">
-            {/* 지역 선택 */}
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            {/* 1. 지역 선택 (충분히 넓혀서 '평내동' 안 잘리게 설정) */}
             <select
               value={selectedVillageCode}
               onChange={(e) => setSelectedVillageCode(e.target.value)}
-              className="px-2.5 py-1 bg-emerald-950 text-emerald-200 border border-emerald-700 rounded-lg text-xs font-bold focus:outline-none shrink-0"
+              className="flex-1 sm:flex-none min-w-[105px] px-2.5 sm:px-3 py-1.5 bg-emerald-950 text-emerald-200 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
               title="우리 동네 마을 선택"
             >
               {AVAILABLE_REGIONS[0].townships[0].villages.map((v) => (
@@ -500,11 +500,11 @@ export default function Home() {
               ))}
             </select>
 
-            {/* 10개 다국어 선택 */}
+            {/* 2. 10개 다국어 선택 (슬림하고 콤팩트하게 줄임) */}
             <select
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
-              className="px-2.5 py-1 bg-emerald-950 text-amber-300 border border-emerald-700 rounded-lg text-xs font-bold focus:outline-none shrink-0"
+              className="w-auto max-w-[90px] sm:max-w-none px-2 py-1.5 bg-emerald-950 text-amber-300 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
               title="언어 선택 (10개 다국어)"
             >
               {SUPPORTED_LANGUAGES.map((l) => (
@@ -514,18 +514,18 @@ export default function Home() {
               ))}
             </select>
 
-            {/* 쉬운 한국어 토글 버튼 */}
+            {/* 3. 쉬운 한국어 토글 버튼 */}
             <button
               type="button"
               onClick={() => setIsEasyKorean(!isEasyKorean)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all shrink-0 border ${
+              className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all shrink-0 border whitespace-nowrap shadow-xs ${
                 isEasyKorean
                   ? "bg-amber-400 text-slate-950 border-amber-500 shadow-sm"
                   : "bg-emerald-950/80 text-emerald-200 border-emerald-700 hover:bg-emerald-950"
               }`}
               title="어려운 행정용어를 쉬운 말로 풀어서 설명합니다"
             >
-              {isEasyKorean ? "✨ 쉬운말 ON" : "쉬운말 OFF"}
+              {isEasyKorean ? "✨ 쉬운말" : "쉬운말 OFF"}
             </button>
 
             {/* 데스크톱 버튼 그룹 */}
