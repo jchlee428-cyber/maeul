@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useChatWidget } from "@/hooks/useChatWidget";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -14,8 +13,6 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const openChat = useChatWidget();
 
   return (
     <header

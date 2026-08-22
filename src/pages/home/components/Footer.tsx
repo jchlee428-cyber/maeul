@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
-import { useChatWidget } from "@/hooks/useChatWidget";
 
 export default function Footer() {
-  const openChat = useChatWidget();
-
   return (
     <footer className="w-full bg-primary-950 text-white">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
@@ -16,14 +13,13 @@ export default function Footer() {
             주민의 어려움을 해결해드립니다.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => openChat()}
+            <Link
+              to="/"
               className="inline-flex items-center gap-2.5 px-8 py-4 text-base md:text-lg font-bold rounded-full bg-accent-500 text-foreground-950 hover:bg-accent-400 transition-all shadow-lg whitespace-nowrap"
             >
               <i className="ri-chat-3-line"></i>
               무료 AI 상담 시작하기
-            </button>
+            </Link>
             <Link
               to="/guide"
               className="inline-flex items-center gap-2.5 px-7 py-4 text-base font-semibold rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur transition-colors whitespace-nowrap"

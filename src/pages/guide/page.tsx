@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "../home/components/Navbar";
 import Footer from "../home/components/Footer";
 import { communityResources, type CommunityResource } from "@/data/communityResources";
 import CustomGuideSheet from "@/components/CustomGuideSheet";
-import { useChatWidget } from "@/hooks/useChatWidget";
 
 const categories = [
   { key: "all", label: "전체 분야" },
@@ -20,7 +20,6 @@ export default function GuidePage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSheetResource, setActiveSheetResource] = useState<CommunityResource | null>(null);
-  const openChat = useChatWidget();
 
   const filteredResources = communityResources.filter((r) => {
     const matchCat = selectedCategory === "all" || r.category === selectedCategory;
@@ -121,14 +120,13 @@ export default function GuidePage() {
               </div>
 
               <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
-                <button
-                  type="button"
-                  onClick={() => openChat({ query: `${res.title} 신청 및 상담 방법 안내` })}
+                <Link
+                  to="/"
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-colors"
                 >
                   <i className="ri-chat-3-line"></i>
                   이 제도로 AI 상담
-                </button>
+                </Link>
 
                 <button
                   type="button"
