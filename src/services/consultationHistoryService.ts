@@ -6,7 +6,7 @@ export interface ConsultationRecord {
   userQuery: string;
   matchedServiceName: string;
   categoryLabel: string;
-  replyText?: string; // 챗봇의 실제 상세 답변 내용 (전화번호, 주소, 10단계 요약 등)
+  replyText?: string; // 챗봇의 실제 상세 답변 내용 (전화번호, 주소, 4단계 요약 등)
   ragResult?: RAGAnalysisResult;
   caseId?: string; // 도움 요청으로 연계된 경우 사례번호
 }

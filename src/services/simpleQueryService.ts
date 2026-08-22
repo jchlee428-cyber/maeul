@@ -46,12 +46,12 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
   const q = userQuery.trim().toLowerCase();
   const rawQ = userQuery.trim();
 
-  // [중요] 10단계 복합 지원 계획이 필요한 질의인지 확인 (신청, 생계위기, 수술비지원 등)
-  const isComplexCaseQuery =
-    (q.includes("신청") || q.includes("지원받고") || q.includes("지원금") || q.includes("생계비") || q.includes("수술비") || q.includes("월세가 막막") || q.includes("실직") || q.includes("돌봄이 필요") || q.includes("바우처 신청") || q.includes("구직촉진수당") || q.includes("10단계")) &&
+  // [중요] 4단계 복합 지원 계획이 필요한 질의인지 확인 (신청, 생계위기, 수술비지원 등)
+  const isComplex =
+    (q.includes("신청") || q.includes("지원받고") || q.includes("지원금") || q.includes("생계비") || q.includes("수술비") || q.includes("월세가 막막") || q.includes("실직") || q.includes("돌봄이 필요") || q.includes("바우처 신청") || q.includes("구직촉진수당") || q.includes("맞춤지원")) &&
     !q.includes("전화번호") && !q.includes("연락처") && !q.includes("몇번") && !q.includes("전화") && !q.includes("지하철") && !q.includes("주민센터");
 
-  if (isComplexCaseQuery) {
+  if (isComplex) {
     return null;
   }
 
@@ -104,6 +104,16 @@ ${matchedCenter.welfarePhone ? `- 📞 **복지지원팀 / 맞춤형복지팀**:
 💡 *운영시간: 평일 오전 9시 ~ 오후 6시 (점심시간 12:00 ~ 13:00 교대 근무)*
 복지 급여나 긴급 지원 신청은 위 **복지지원팀**으로 전화하시면 친절히 안내받으실 수 있습니다.`
     };
+  }
+
+  // [중요] 4단계 복합 맞춤 지원 계획이 필요한 질의인지 확인 (신청, 생계위기, 수술비지원 등)
+  const isComplexCaseQuery =
+    (q.includes("신청") || q.includes("지원받고") || q.includes("지원금") || q.includes("생계비") || q.includes("수술비") || q.includes("월세가 막막") || q.includes("실직") || q.includes("돌봄이 필요") || q.includes("바우처 신청") || q.includes("구직촉진수당") || q.includes("맞춤지원") || q.includes("복합상담")) &&
+    !q.includes("전화번호") && !q.includes("연락처") && !q.includes("몇번") && !q.includes("전화") && !q.includes("지하철");
+
+  if (isComplexCaseQuery) {
+    // 4단계 RAG 맞춤 분석으로 넘김
+    return null;
   }
 
   // 4. [구리·남양주 초·중·고교 정확 검색]

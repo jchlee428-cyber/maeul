@@ -290,62 +290,26 @@ export function searchAndAnalyzePublicData(userQuery: string): RAGAnalysisResult
   const groundedSteps = [
     {
       stepNum: 1,
-      title: "주민 문제 의도 분석",
-      content: `주민 상황: "${userQuery.slice(0, 40)}..." 분석 완료. 공공기관 지원 자원 매칭을 진행합니다.`,
-      sourceCited: "의도 분석 엔진"
+      title: "따뜻한 공감 & 핵심 문제 파악",
+      content: `어려우신 상황을 편안하게 말씀해주셔서 감사합니다. 주민님의 상황("[${userQuery.slice(0, 35)}...]")에 가장 적합한 공식 공공 지원 제도를 찾았습니다.`,
+      sourceCited: "마을지기 공감 엔진"
     },
     {
       stepNum: 2,
-      title: "공공데이터 원문 확보",
-      content: `공공데이터포털 연계 [${matched.serviceName}] 공공데이터 원문 규격 및 자격 요건을 대조했습니다.`,
+      title: `맞춤 지원 제도: ${matched.serviceName}`,
+      content: `• 지원 내용: ${matched.supportDetails}\n• 지원 대상: ${matched.targetCriteria}\n• 소관 기관: ${matched.department} (📞 ${matched.inquiryContact})`,
       sourceCited: matched.sourceApi
     },
     {
       stepNum: 3,
-      title: "지원 분야 및 법적 근거",
-      content: `분야: [${matched.categoryLabel}] / 소관: ${matched.department} / 근거법령: ${matched.legalBasis}`,
-      sourceCited: matched.legalBasis
+      title: "주민 행동 순서 (① ➔ ② ➔ ③)",
+      content: `① 준비 서류: ${matched.requiredDocuments}\n② 신청 및 방문처: [${matched.inquiryContact}] 또는 주소지 관할 행정복지센터\n③ 진행 절차: ${matched.applicationProcess}`,
+      sourceCited: matched.sourceApi
     },
     {
       stepNum: 4,
-      title: "공식 지원 내용 (원문 근거)",
-      content: matched.supportDetails,
-      sourceCited: matched.sourceApi
-    },
-    {
-      stepNum: 5,
-      title: "신청 자격 및 소득 기준",
-      content: matched.targetCriteria,
-      sourceCited: matched.sourceApi
-    },
-    {
-      stepNum: 6,
-      title: "쉬운 말 풀이",
-      content: `💡 복잡한 행정 서류 없이, [${matched.inquiryContact}]에 문의하여 공식 접수를 진행할 수 있는 사업입니다.`,
-      sourceCited: "마을지기 쉬운말 엔진"
-    },
-    {
-      stepNum: 7,
-      title: "주민 행동 순서",
-      content: `1단계: 신분증 지참 ➔ 2단계: [${matched.inquiryContact}]에 유선 또는 방문 신청 ➔ 3단계: ${matched.applicationProcess}`,
-      sourceCited: matched.sourceApi
-    },
-    {
-      stepNum: 8,
-      title: "필요 구비 서류",
-      content: matched.requiredDocuments,
-      sourceCited: matched.sourceApi
-    },
-    {
-      stepNum: 9,
-      title: "사람의 최종 확인 사항",
-      content: `⚠️ 최신 소득 산정 및 요금 고시 변경 사항은 [${matched.inquiryContact}] 담당 부서의 확인이 필요합니다.`,
-      sourceCited: "윤리/책임성 원칙"
-    },
-    {
-      stepNum: 10,
-      title: "사람 연결 (마을관리자 연계)",
-      content: `혼자 신청하기 어려우신 경우, 아래 [이 서비스에 도움 요청하기]를 누르시면 마을관리자가 직접 관할 주민센터 복지팀에 연결해드립니다.`,
+      title: "안심 확인 & 사람 연결 (마을관리자)",
+      content: `⚠️ 최신 지원 기준 및 소득 산정은 관할 관공서의 최종 확인이 필요합니다.\n💡 혼자 신청하기 어려우시면 아래 [이 서비스에 도움 요청하기]를 눌러주세요. 마을관리자가 직접 관할 기관에 연결해드립니다.`,
       sourceCited: "마을지기 연계 시스템"
     }
   ];

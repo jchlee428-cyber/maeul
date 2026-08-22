@@ -1,14 +1,36 @@
 const steps = [
-  { n: "1", title: "핵심 문제 정의", desc: "주민이 겪는 어려움의 핵심을 한 문장으로 정리합니다." },
-  { n: "2", title: "AI가 필요한 이유", desc: "왜 이 문제에 AI의 도움이 필요한지 설명합니다." },
-  { n: "3", title: "지원 분야 분류", desc: "복지·행정·의료·교육·주거·일자리·생활·기타로 나눕니다." },
-  { n: "4", title: "지역사회 자원 제시", desc: "살펴봐야 할 기관·제도·지원책을 찾아 제시합니다." },
-  { n: "5", title: "정보 신뢰도 구분", desc: "확인되지 않은 정보와 공식기관 확인 필요 정보를 나눕니다." },
-  { n: "6", title: "쉬운 말로 설명", desc: "확인된 정보를 주민이 이해하기 쉽게 다시 풀어드립니다." },
-  { n: "7", title: "행동 순서 안내", desc: "주민이 실제로 해야 할 일을 ① ② ③ 순서로 정리합니다." },
-  { n: "8", title: "AI 한계 고지", desc: "AI가 잘못 판단할 수 있는 부분을 미리 알려드립니다." },
-  { n: "9", title: "사람 확인 사항", desc: "사람이 최종적으로 확인해야 할 사항을 제시합니다." },
-  { n: "10", title: "재현 가능한 방법", desc: "다른 주민·지역에서도 활용할 수 있는 방법을 안내합니다." },
+  {
+    n: "1",
+    stepBadge: "1단계",
+    title: "따뜻한 공감 & 경청",
+    desc: "어르신의 힘든 마음에 먼저 깊이 공감하고, 겪고 계신 문제를 쉬운 말로 1문장 요약하여 확인합니다.",
+    icon: "ri-heart-2-line",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200"
+  },
+  {
+    n: "2",
+    stepBadge: "2단계",
+    title: "딱 맞는 공공제도 안내",
+    desc: "공공데이터를 기반으로 의료비·생계비·돌봄 등 주민에게 꼭 필요한 공식 지원 제도와 관할 기관을 찾습니다.",
+    icon: "ri-government-line",
+    color: "bg-blue-50 text-blue-700 border-blue-200"
+  },
+  {
+    n: "3",
+    stepBadge: "3단계",
+    title: "행동 순서 (① ➔ ② ➔ ③)",
+    desc: "신분증 지참부터 방문·신청까지, 오늘과 내일 당장 주민이 행동하실 수 있는 순서를 명확하게 알려드립니다.",
+    icon: "ri-footprint-line",
+    color: "bg-amber-50 text-amber-800 border-amber-200"
+  },
+  {
+    n: "4",
+    stepBadge: "4단계",
+    title: "안심 확인 & 사람 연결",
+    desc: "AI의 한계를 명시하고 관공서 최종 확인을 돕습니다. 혼자 어려우시면 마을관리자가 직접 연결해드립니다.",
+    icon: "ri-shield-check-line",
+    color: "bg-purple-50 text-purple-700 border-purple-200"
+  }
 ];
 
 export default function HowItWorks() {
@@ -17,36 +39,50 @@ export default function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-2xl mx-auto">
           <span className="inline-block px-4 py-2 text-sm font-bold rounded-full bg-accent-500 text-foreground-950">
-            이용 방법
+            상담 프로세스
           </span>
           <h2 className="mt-4 font-heading text-3xl md:text-5xl font-bold text-primary-700">
-            10단계로 차근차근 정리해드려요
+            알기 쉬운 4단계로 도와드려요
           </h2>
           <p className="mt-4 text-base md:text-lg text-foreground-700 leading-relaxed">
-            문제 상황을 입력하시면, 마을지기가 아래 순서에 따라 답변을 정리합니다.
+            복잡한 행정 용어 없이, 마을지기가 주민의 눈높이에 맞춰 차근차근 정리합니다.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {steps.map((s) => (
             <div
               key={s.n}
-              className="bg-primary-50 border border-primary-200 rounded-lg p-5 flex flex-col"
+              className={`border rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow ${s.color}`}
             >
-              <span className="w-11 h-11 flex items-center justify-center rounded-full bg-primary-500 text-white text-base font-bold shrink-0">
-                {s.n}
-              </span>
-              <h3 className="mt-3 font-heading text-base md:text-lg font-bold text-foreground-900">
-                {s.title}
-              </h3>
-              <p className="mt-2 text-sm md:text-base text-foreground-700 leading-relaxed">{s.desc}</p>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="w-12 h-12 flex items-center justify-center rounded-xl bg-white shadow-sm text-2xl font-bold">
+                    <i className={s.icon}></i>
+                  </span>
+                  <span className="px-3 py-1 text-xs font-black rounded-full bg-white/80 border border-current shadow-xs">
+                    {s.stepBadge}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-heading text-lg md:text-xl font-bold text-foreground-950">
+                  {s.title}
+                </h3>
+                <p className="mt-2 text-sm md:text-base text-foreground-800 leading-relaxed">
+                  {s.desc}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-black/5 flex items-center text-xs font-semibold text-foreground-600">
+                <span>실시간 맞춤 안내</span>
+              </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-8 text-center text-sm md:text-base text-foreground-600 leading-relaxed">
-          AI 답변은 참고자료이며, 최종 판단과 결정은 항상 사람이 합니다.
-        </p>
+        <div className="mt-10 p-4 rounded-2xl bg-white border border-primary-200 text-center max-w-3xl mx-auto shadow-sm">
+          <p className="text-sm md:text-base text-foreground-800 leading-relaxed font-medium">
+            💡 <strong>기억해주세요:</strong> 마을지기는 개인정보를 일체 묻지 않으며, 최종 결정은 항상 사람(공식 기관)과 함께 확인합니다.
+          </p>
+        </div>
       </div>
     </section>
   );

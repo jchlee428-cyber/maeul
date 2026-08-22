@@ -41,7 +41,7 @@ export default {
     send: "상담 요청",
     safetyNotice: "이름, 주민번호 등 개인정보는 입력하지 마세요. 모든 상담은 익명으로 처리됩니다.",
     quickSuggestions: "빠른 질문 예시",
-    analysisTitle: "10단계 AI 상담 분석 결과",
+    analysisTitle: "마을지기 맞춤 상담 안내 결과",
     makeSheet: "A4 맞춤 안내서 생성하기",
     reCheckNotice: "AI 답변은 참고용이며, 최종 자격 및 신청은 관할 주민센터 등 공식기관 확인이 필요합니다."
   }

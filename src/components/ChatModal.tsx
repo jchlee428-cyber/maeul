@@ -246,14 +246,14 @@ export default function ChatModal({
       return;
     }
 
-    // 2. 10단계 복합 상담 기록인 경우
+    // 2. 4단계 복합 맞춤 상담 기록인 경우
     const matchedRes =
       communityResources.find((r) => r.category === rec.ragResult!.matchedPublicData.category) ||
       communityResources[0];
 
     const restoredBotHeader =
       rec.replyText ||
-      `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rec.matchedServiceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 10단계로 정리해드렸어요.`;
+      `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rec.matchedServiceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 정리해드렸어요.`;
 
     setMessages([
       {
@@ -317,7 +317,7 @@ export default function ChatModal({
 
     // 1. 특수기호 및 마크다운 정제
     const cleanText = text
-      .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮🏛️🏫]/g, " ")
+      .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮🏛️🏫•]/g, " ")
       .replace(/➔/g, "에서 ")
       .replace(/\s+/g, " ")
       .trim();
@@ -425,8 +425,8 @@ export default function ChatModal({
     }
   };
 
-  // 10단계 전체를 상세하게 읽어주기 (TTS)
-  const speakAll10Steps = (msgId: string, rag: RAGAnalysisResult) => {
+  // 4단계 맞춤 지원 전체를 상세하게 읽어주기 (TTS)
+  const speakAll4Steps = (msgId: string, rag: RAGAnalysisResult) => {
     if (speakingMsgId === `full-${msgId}`) {
       window.speechSynthesis.cancel();
       setSpeakingMsgId(null);
@@ -435,17 +435,11 @@ export default function ChatModal({
     }
 
     const narrative = [
-      `안녕하세요, 마을지기예요. 주민님께서 겪고 계신 상황에 대해 공공데이터 10단계 지원 계획을 차근차근 읽어드릴게요.`,
-      `첫 번째, 주민 문제 의도 분석입니다. ${rag.groundedSteps[0].content}`,
-      `두 번째, 공공데이터 원문 확인입니다. ${rag.groundedSteps[1].content}`,
-      `세 번째, 지원 분야와 법적 근거는, ${rag.groundedSteps[2].content}입니다.`,
-      `네 번째, 가장 중요한 공식 지원 내용입니다. ${rag.groundedSteps[3].content}`,
-      `다섯 번째, 신청 자격과 소득 기준은, ${rag.groundedSteps[4].content}`,
-      `여섯 번째, 쉬운 말 풀이입니다. ${rag.groundedSteps[5].content}`,
-      `일곱 번째, 주민님이 실제로 하셔야 할 행동 순서입니다. ${rag.groundedSteps[6].content}`,
-      `여덟 번째, 챙기셔야 할 준비 서류입니다. ${rag.groundedSteps[7].content}`,
-      `아홉 번째, 공식 기관 확인 사항입니다. ${rag.groundedSteps[8].content}`,
-      `열 번째, 사람 연결 안내입니다. 혼자 신청하기 어려우시면 아래 주황색 도움 요청하기 버튼을 눌러주세요. 마을관리자가 직접 기관에 연결해드립니다.`
+      `안녕하세요, 마을지기예요. 주민님께서 겪고 계신 상황에 대해 4단계 맞춤 지원 안내를 차근차근 읽어드릴게요.`,
+      `1단계, 따뜻한 공감과 상황 확인입니다. ${rag.groundedSteps[0]?.content || ""}`,
+      `2단계, 딱 맞는 공공 지원 제도입니다. ${rag.groundedSteps[1]?.content || ""}`,
+      `3단계, 주민님이 실제로 하셔야 할 행동 순서입니다. ${rag.groundedSteps[2]?.content || ""}`,
+      `4단계, 안심 확인과 사람 연결 안내입니다. ${rag.groundedSteps[3]?.content || ""}`
     ].join(". ");
 
     playMobileTTS(
@@ -530,11 +524,11 @@ export default function ChatModal({
       console.warn("Simple query async lookup fallback", e);
     }
 
-    // 2. 복합 지원 상담 (공공데이터 RAG 기반 10단계 실행 및 Gemini 검토 가드레일)
+    // 2. 복합 지원 상담 (공공데이터 RAG 기반 4단계 맞춤 실행 및 Gemini 검토 가드레일)
     setTimeout(() => {
       const rag = searchAndAnalyzePublicData(query);
       const matchedRes = communityResources.find((r) => r.category === rag.matchedPublicData.category) || communityResources[0];
-      const draftText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 10단계로 정리해드렸어요. (상담 내역이 안전하게 저장되었습니다)`;
+      const draftText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요. (상담 내역이 안전하게 저장되었습니다)`;
 
       // [Google Gemini Intent Classifier & Dual-Pass RAG Review]
       const reviewed = reviewAndRefineResponse(query, draftText, rag);
@@ -618,7 +612,7 @@ export default function ChatModal({
                   </span>
                 </h2>
                 <p className="text-[10px] sm:text-xs text-primary-200 truncate">
-                  개인정보 없이 · 공공데이터 기반
+                  개인정보 없이 · 따뜻하고 알기 쉬운 맞춤 안내
                 </p>
               </div>
             </div>
@@ -662,7 +656,6 @@ export default function ChatModal({
           </div>
 
           {/* 대화 영역 */}
-          {/* 대화 영역 */}
           <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto space-y-3 sm:space-y-4 bg-background-50">
             {messages.map((m) => (
               <div
@@ -700,22 +693,22 @@ export default function ChatModal({
                     )}
                   </div>
 
-                  {/* RAG 공공데이터 10단계 결과 영역 */}
+                  {/* RAG 공공데이터 결과 영역 (복합 지원 상담 시에만 노출) */}
                   {m.ragResult && (
                     <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-primary-200 space-y-3">
-                      {/* 10단계 상세 음성 설명 전용 배너 */}
+                      {/* 4단계 상세 음성 설명 전용 배너 버튼 */}
                       <div className="p-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 border border-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
                         <div className="text-foreground-950">
                           <div className="text-[11px] font-bold flex items-center gap-1">
                             <i className="ri-sound-module-line"></i> 어르신을 위한 맞춤 음성 안내
                           </div>
                           <div className="font-heading font-bold text-xs sm:text-sm">
-                            10단계 내용을 목소리로 들으시겠어요?
+                            이 4단계 맞춤 지원 내용을 목소리로 들으시겠어요?
                           </div>
                         </div>
                         <button
                           type="button"
-                          onClick={() => speakAll10Steps(m.id, m.ragResult!)}
+                          onClick={() => speakAll4Steps(m.id, m.ragResult!)}
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs shadow transition-all shrink-0 ${
                             speakingMsgId === `full-${m.id}`
                               ? "bg-rose-600 hover:bg-rose-700 text-white animate-pulse"
@@ -723,7 +716,7 @@ export default function ChatModal({
                           }`}
                         >
                           <i className={speakingMsgId === `full-${m.id}` ? "ri-stop-circle-fill text-sm" : "ri-volume-up-fill text-accent-300 text-sm"}></i>
-                          <span>{speakingMsgId === `full-${m.id}` ? "낭독 멈추기" : "10단계 전체 듣기"}</span>
+                          <span>{speakingMsgId === `full-${m.id}` ? "낭독 멈추기" : "4단계 전체 듣기"}</span>
                         </button>
                       </div>
 
@@ -745,48 +738,54 @@ export default function ChatModal({
                         </div>
                       )}
 
-                      {/* 10단계 스텝 카드 리스트 */}
-                      <div className="space-y-2">
-                        {(m.ragResult.groundedSteps || []).map((step) => {
-                          const isCurrentlyPlaying = speakingStepNum === step.stepNum;
-                          return (
-                            <div
-                              key={step.stepNum}
-                              className={`p-3 rounded-xl border transition-all ${
-                                isCurrentlyPlaying
-                                  ? "bg-amber-50/90 border-amber-400 ring-2 ring-amber-300 shadow-sm"
-                                  : "bg-primary-50/40 border-primary-100 hover:bg-primary-50/80"
-                              }`}
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-full bg-primary-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                                    {step.stepNum}
+                      {/* 4단계 스텝 카드 그리드 (2x2 직관적 카드) */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs sm:text-sm">
+                        {(m.ragResult.groundedSteps || []).map((st) => (
+                          <div
+                            key={st.stepNum}
+                            className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all shadow-xs ${
+                              speakingStepNum === st.stepNum
+                                ? "bg-amber-100/95 border-amber-500 ring-2 ring-amber-400 shadow-md"
+                                : st.stepNum === 1
+                                ? "bg-emerald-50/90 border-emerald-300"
+                                : st.stepNum === 2
+                                ? "bg-blue-50/90 border-blue-300"
+                                : st.stepNum === 3
+                                ? "bg-amber-50/90 border-amber-300 font-medium"
+                                : "bg-purple-50/90 border-purple-300"
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between font-bold text-foreground-950 mb-1.5">
+                                <span className="flex items-center gap-1.5 font-heading text-xs sm:text-sm">
+                                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-black shrink-0 ${
+                                    st.stepNum === 1 ? "bg-emerald-600" :
+                                    st.stepNum === 2 ? "bg-blue-600" :
+                                    st.stepNum === 3 ? "bg-amber-600" : "bg-purple-600"
+                                  }`}>
+                                    {st.stepNum}
                                   </span>
-                                  <h4 className="font-bold text-xs sm:text-sm text-primary-950">
-                                    {step.title}
-                                  </h4>
-                                </div>
+                                  <span>{st.title}</span>
+                                </span>
                                 <button
                                   type="button"
-                                  onClick={() => speakSingleStep(step.stepNum, step.title, step.content)}
-                                  className={`p-1 rounded text-xs font-bold transition-colors shrink-0 ${
-                                    isCurrentlyPlaying
+                                  onClick={() => speakSingleStep(st.stepNum, st.title, st.content)}
+                                  className={`p-1 rounded-lg text-xs font-bold transition-colors shadow-xs shrink-0 ${
+                                    speakingStepNum === st.stepNum
                                       ? "bg-rose-500 text-white animate-pulse"
-                                      : "bg-white text-primary-800 hover:bg-primary-100 border border-primary-200 shadow-xs"
+                                      : "bg-white hover:bg-gray-100 text-foreground-800 border border-gray-300"
                                   }`}
-                                  title="이 단계만 소리로 듣기"
+                                  title={`${st.stepNum}단계만 듣기`}
                                 >
-                                  <i className={isCurrentlyPlaying ? "ri-stop-fill" : "ri-volume-up-line"}></i>
+                                  <i className={speakingStepNum === st.stepNum ? "ri-stop-fill" : "ri-volume-up-line"}></i>
                                 </button>
                               </div>
-
-                              <p className="mt-1 text-xs sm:text-sm text-foreground-800 pl-6.5 leading-snug">
-                                {step.content}
-                              </p>
+                              <div className="text-foreground-900 whitespace-pre-line leading-relaxed text-xs">
+                                {st.content}
+                              </div>
                             </div>
-                          );
-                        })}
+                          </div>
+                        ))}
                       </div>
 
                       {/* 안내서 인쇄 & 도움 요청 액션 버튼 */}
