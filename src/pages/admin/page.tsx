@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "../home/components/Navbar";
 import Footer from "../home/components/Footer";
 import {
@@ -109,12 +110,28 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              to="/cases"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-white border border-primary-200 text-primary-900 hover:bg-primary-50 shadow-xs transition-colors"
+            >
+              <i className="ri-home-4-fill text-accent-500"></i>
+              실증 성과 (홈)
+            </Link>
+
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+            >
+              <i className="ri-chat-voice-fill text-accent-300"></i>
+              1:1 AI 상담창
+            </Link>
+
             <button
               onClick={refreshData}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs md:text-sm font-semibold rounded-xl bg-white border border-primary-200 text-primary-800 hover:bg-primary-50 shadow-sm transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl bg-white border border-primary-200 text-primary-800 hover:bg-primary-50 shadow-xs transition-colors"
             >
               <i className="ri-refresh-line"></i>
-              데이터 새로고침
+              새로고침
             </button>
           </div>
         </div>

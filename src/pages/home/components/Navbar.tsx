@@ -39,95 +39,68 @@ export default function Navbar() {
         </Link>
 
         {/* 데스크톱 메뉴 */}
-        <div className="hidden lg:flex items-center gap-1">
-          {isHome ? (
-            <>
-              <a
-                href="#intro"
-                className={`px-3.5 py-2 text-sm font-medium rounded-full transition-colors ${
-                  scrolled ? "text-foreground-800 hover:bg-primary-50" : "text-white/90 hover:bg-white/10"
-                }`}
-              >
-                서비스 소개
-              </a>
-              <a
-                href="#how"
-                className={`px-3.5 py-2 text-sm font-medium rounded-full transition-colors ${
-                  scrolled ? "text-foreground-800 hover:bg-primary-50" : "text-white/90 hover:bg-white/10"
-                }`}
-              >
-                이용 방법
-              </a>
-              <a
-                href="#categories"
-                className={`px-3.5 py-2 text-sm font-medium rounded-full transition-colors ${
-                  scrolled ? "text-foreground-800 hover:bg-primary-50" : "text-white/90 hover:bg-white/10"
-                }`}
-              >
-                지원 분야
-              </a>
-            </>
-          ) : (
-            <Link
-              to="/"
-              className="px-3.5 py-2 text-sm font-medium rounded-full text-foreground-800 hover:bg-primary-50"
-            >
-              홈
-            </Link>
-          )}
+        <div className="hidden lg:flex items-center gap-1.5">
+          <Link
+            to="/cases"
+            className={`px-4 py-2 text-sm font-bold rounded-full transition-colors flex items-center gap-1.5 ${
+              location.pathname === "/cases"
+                ? "bg-primary-800 text-accent-300 shadow-sm"
+                : "text-foreground-800 hover:bg-primary-50"
+            }`}
+          >
+            <i className="ri-home-4-fill text-accent-400"></i>
+            <span>실증 성과 보고 (홈)</span>
+          </Link>
+
+          <Link
+            to="/"
+            className={`px-4 py-2 text-sm font-bold rounded-full transition-colors flex items-center gap-1.5 ${
+              location.pathname === "/"
+                ? "bg-primary-800 text-accent-300 shadow-sm"
+                : "text-foreground-800 hover:bg-primary-50"
+            }`}
+          >
+            <i className="ri-chat-voice-fill text-emerald-600"></i>
+            <span>1:1 AI 상담창</span>
+          </Link>
 
           <Link
             to="/guide"
             className={`px-3.5 py-2 text-sm font-semibold rounded-full transition-colors ${
               location.pathname === "/guide"
                 ? "bg-primary-100 text-primary-800 font-bold"
-                : scrolled || !isHome
-                ? "text-foreground-800 hover:bg-primary-50"
-                : "text-white/90 hover:bg-white/10"
+                : "text-foreground-800 hover:bg-primary-50"
             }`}
           >
             자원 가이드
           </Link>
 
           <Link
-            to="/cases"
-            className={`px-3.5 py-2 text-sm font-semibold rounded-full transition-colors ${
-              location.pathname === "/cases"
-                ? "bg-primary-100 text-primary-800 font-bold"
-                : scrolled || !isHome
-                ? "text-foreground-800 hover:bg-primary-50"
-                : "text-white/90 hover:bg-white/10"
-            }`}
-          >
-            실증 사례
-          </Link>
-
-          <Link
             to="/admin"
-            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-full transition-colors ${
+            className={`px-3.5 py-2 text-sm font-semibold rounded-full transition-colors flex items-center gap-1 ${
               location.pathname === "/admin"
-                ? "bg-accent-500 text-foreground-950 shadow-sm"
-                : scrolled || !isHome
-                ? "bg-primary-50 text-primary-800 hover:bg-primary-100 border border-primary-200"
-                : "bg-white/20 text-white hover:bg-white/30"
+                ? "bg-primary-800 text-white font-bold shadow-sm"
+                : "text-foreground-800 hover:bg-primary-50"
             }`}
           >
-            <i className="ri-dashboard-line"></i>
-            마을관리자 대시보드
+            <i className="ri-shield-user-line"></i>
+            <span>관제 대시보드</span>
+          </Link>
+        </div>
+
+        {/* 우측 CTA: 1:1 상담 바로가기 버튼 */}
+        <div className="hidden lg:flex items-center gap-2">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95"
+          >
+            <i className="ri-chat-smile-2-fill text-base"></i>
+            <span>AI 무료 상담하기</span>
           </Link>
         </div>
 
         {/* 우측 도구: 상담 시작 버튼 */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => openChat()}
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 text-sm md:text-base font-bold rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all shadow hover:shadow-md whitespace-nowrap"
-          >
-            <i className="ri-chat-3-line"></i>
-            상담 시작
-          </button>
-
+        <div className="flex items-center gap-2 lg:hidden">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

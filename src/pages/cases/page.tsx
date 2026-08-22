@@ -1,11 +1,9 @@
+import { Link } from "react-router-dom";
 import Navbar from "../home/components/Navbar";
 import Footer from "../home/components/Footer";
 import { caseStudies, performanceMetrics } from "@/data/casesData";
-import { useChatWidget } from "@/hooks/useChatWidget";
 
 export default function CasesPage() {
-  const openChat = useChatWidget();
-
   return (
     <div className="bg-background-50 min-h-screen flex flex-col">
       <Navbar />
@@ -134,14 +132,13 @@ export default function CasesPage() {
           <p className="mt-2 text-sm md:text-base text-foreground-700">
             개인정보 없이, 주민의 상황에 꼭 맞는 지역사회 자원을 찾아드립니다.
           </p>
-          <button
-            type="button"
-            onClick={() => openChat()}
-            className="mt-6 inline-flex items-center gap-2 px-8 py-3.5 text-base font-bold rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all shadow-md"
+          <Link
+            to="/"
+            className="mt-6 inline-flex items-center gap-2 px-8 py-3.5 text-base font-bold rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg hover:shadow-xl transition-all active:scale-95"
           >
-            <i className="ri-chat-3-line"></i>
-            무료 AI 상담 시작하기
-          </button>
+            <i className="ri-chat-voice-fill text-xl text-accent-300"></i>
+            1:1 마을지기 AI 무료 상담 시작하기
+          </Link>
         </div>
       </main>
 

@@ -477,6 +477,16 @@ export default function Home() {
               <span className="inline-block px-1 bg-foreground-950 text-white rounded text-[10px]">{consultationHistory.length}</span>
             </button>
 
+            {/* [🏠 실증사례 및 소개 홈] 링크 버튼 */}
+            <Link
+              to="/cases"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition-colors shadow-xs"
+              title="실증 사례 및 사업 성과 보고서 (소개 홈)"
+            >
+              <i className="ri-home-4-fill text-accent-300 text-sm sm:text-base"></i>
+              <span className="hidden sm:inline">실증사례</span>
+            </Link>
+
             <button
               type="button"
               onClick={() => setIsInfoModalOpen(true)}
@@ -489,7 +499,7 @@ export default function Home() {
             <Link
               to="/admin"
               className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 text-white text-base transition-colors"
-              title="마을관리자 대시보드"
+              title="마을관리자 관제 대시보드"
             >
               <i className="ri-shield-user-line"></i>
             </Link>
