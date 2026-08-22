@@ -132,11 +132,11 @@ export default function CasesPage() {
                 2026 AI 공모전 핵심 시연 시나리오
               </span>
               <h2 className="font-heading text-xl md:text-3xl font-black text-amber-300 mt-2">
-                농촌 마을 외국인 주민의 복지 장벽 해소
+                지역사회 외국인·다문화 주민의 복지 장벽 해소
               </h2>
             </div>
             <span className="text-xs text-indigo-200 bg-black/30 px-3 py-1.5 rounded-xl border border-indigo-500">
-              검증 대상: 남양주시 수동면 송천리 외국인 주민
+              검증 대상: 남양주시 평내동 거주 외국인 주민
             </span>
           </div>
 
@@ -144,15 +144,15 @@ export default function CasesPage() {
             <div className="p-4 bg-white/10 rounded-2xl border border-white/10 space-y-2">
               <strong className="text-amber-300 block text-sm">💬 주민의 질문 (User):</strong>
               <p className="text-slate-100 italic font-medium">
-                "Tôi có con nhỏ đang nuôi tại làng Songcheon-ri. Có khoản hỗ trợ nào tôi có thể nhận được không?"<br />
-                (아이를 키우고 있는데 우리 마을에서 받을 수 있는 지원이 있나요?)
+                "Tôi có con nhỏ đang nuôi tại Pyeongnae-dong. Có khoản hỗ trợ nào tôi có thể nhận được không?"<br />
+                (아이를 키우고 있는데 평내동에서 받을 수 있는 지원이 있나요?)
               </p>
             </div>
 
             <div className="p-4 bg-emerald-950/80 rounded-2xl border border-emerald-500/50 space-y-2">
               <strong className="text-emerald-300 block text-sm">🤖 MAEUL AI의 실천적 해결:</strong>
               <p className="text-slate-100 font-medium">
-                1) 수동면 송천리 지역 확인 ➔ 2) 영유아 양육·다문화 바우처 탐색 ➔ 3) 9단계 표준 양식 구조화 ➔ 4) 베트남어 알기 쉬운 번역 ➔ 5) 수동면 복지팀 직통 연결
+                1) 남양주시 평내동 지역 확인 ➔ 2) 영유아 양육·다문화 바우처 탐색 ➔ 3) 9단계 표준 양식 구조화 ➔ 4) 베트남어 알기 쉬운 번역 ➔ 5) 평내동 복지팀(031-590-2605) 직통 연결
               </p>
             </div>
           </div>

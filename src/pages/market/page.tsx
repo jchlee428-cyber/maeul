@@ -16,40 +16,40 @@ interface LocalStore {
 const LOCAL_STORES: LocalStore[] = [
   {
     id: "s1",
-    name: "수동 송천 두부마을",
-    category: "한식 / 손두부",
-    address: "경기도 남양주시 수동면 송천리 128-4",
-    phone: "031-592-1142",
-    desc: "매일 아침 100% 국산 콩으로 직접 가마솥에 내리는 고소한 순두부와 청국장 전문점입니다.",
-    promo: "마을 어르신(65세 이상) 식사 시 1,000원 할인 및 비지 무료 나눔",
-    tags: ["어르신할인", "국산콩", "남양주지역화폐"]
+    name: "평내 장터 손칼국수 & 보리밥",
+    category: "한식 / 전통면",
+    address: "경기도 남양주시 평내로 29번길 14",
+    phone: "031-591-3320",
+    desc: "매일 직접 반죽한 쫄깃한 손칼국수와 구수한 보리밥 정식을 정직한 가격에 대접하는 평내동 대표 맛집입니다.",
+    promo: "마을 어르신(65세 이상) 및 다문화가정 1,000원 할인",
+    tags: ["착한가격", "어르신우대", "남양주사랑상품권"]
   },
   {
     id: "s2",
-    name: "물골안 농협 로컬푸드 직매장",
-    category: "지역 농산물 / 특산품",
-    address: "경기도 남양주시 수동면 운수리 75-2",
-    phone: "031-591-6200",
-    desc: "수동면 송천리 농가에서 당일 수확한 신선한 쌈채소, 유기농 딸기, 수동 잣을 판매합니다.",
-    promo: "남양주 땡큐페이 결제 시 10% 인센티브 적립",
-    tags: ["친환경", "당일수확", "수동잣"]
+    name: "호평 늘을마을 친환경 로컬마켓",
+    category: "친환경 로컬푸드",
+    address: "경기도 남양주시 호평로 46번길 8",
+    phone: "031-592-8811",
+    desc: "남양주 관내 농가에서 당일 수확한 신선한 무농약 쌈채소와 유기농 과일을 직거래 판매합니다.",
+    promo: "남양주 땡큐페이 결제 시 10% 추가 적립",
+    tags: ["당일수확", "친환경", "평내호평역인근"]
   },
   {
     id: "s3",
-    name: "송천 숲속 쉼터 카페",
-    category: "카페 / 베이커리",
-    address: "경기도 남양주시 수동면 송천리 45-1",
-    phone: "031-594-8833",
-    desc: "맑은 수동계곡 물소리를 들으며 유기농 빵과 잣 라떼를 즐길 수 있는 주민 사랑방입니다.",
-    promo: "다회용 텀블러 지참 시 음료 500원 할인",
-    tags: ["힐링", "주민쉼터", "반려동물동반"]
+    name: "금곡 홍유릉 쉼터 베이커리 카페",
+    category: "카페 / 디저트",
+    address: "경기도 남양주시 금곡동 홍유릉로 248",
+    phone: "031-593-7740",
+    desc: "역사 깊은 홍유릉 산책로 입구에서 갓 구운 천연발효 빵과 스페셜티 커피를 즐길 수 있는 주민 쉼터입니다.",
+    promo: "텀블러 지참 시 전 음료 500원 할인",
+    tags: ["홍유릉산책", "천연발효", "주민사랑방"]
   }
 ];
 
 export default function MarketPage() {
-  const [storeName, setStoreName] = useState("수동 송천 잣 막걸리 주막");
-  const [storeCategory, setStoreCategory] = useState("향토음식 / 전통주");
-  const [storeMemo, setStoreMemo] = useState("수동 잣으로 직접 빚은 신선한 생막걸리와 파전. 주말 봄맞이 20% 특별 할인 행사");
+  const [storeName, setStoreName] = useState("평내 메인프라자 도토리마을");
+  const [storeCategory, setStoreCategory] = useState("한식 / 묵요리 전문점");
+  const [storeMemo, setStoreMemo] = useState("100% 국산 도토리로 직접 쑨 도토리묵밥과 바삭한 해물파전. 봄맞이 주민 감사 15% 할인 행사");
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiPromoResult, setAiPromoResult] = useState<{
     intro: string;
@@ -94,10 +94,10 @@ export default function MarketPage() {
           </p>
         </div>
 
-        {/* 1. 송천리·수동면 동네 가게 목록 */}
+        {/* 1. 평내·호평·금곡 동네 가게 목록 */}
         <div className="mb-12">
           <h2 className="font-heading text-xl font-black text-slate-950 mb-4 flex items-center gap-2">
-            <span>📍 송천리·수동면 추천 동네 가게</span>
+            <span>📍 평내·호평·금곡 추천 동네 가게</span>
             <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">지역화폐 가맹점</span>
           </h2>
 

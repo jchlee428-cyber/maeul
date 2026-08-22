@@ -5,7 +5,7 @@ import Footer from "../home/components/Footer";
 import { AVAILABLE_REGIONS, getVillageData } from "@/services/localAreaService";
 
 export default function DashboardPage() {
-  const [selectedVillageCode, setSelectedVillageCode] = useState("songcheon");
+  const [selectedVillageCode, setSelectedVillageCode] = useState("pyeongnae");
   const village = getVillageData(selectedVillageCode);
 
   return (
@@ -20,7 +20,7 @@ export default function DashboardPage() {
               <span className="px-2 py-0.5 rounded-md bg-emerald-100 border border-emerald-300">
                 LOCAL FIRST
               </span>
-              <span>대한민국 ➔ 경기도 ➔ 남양주시 ➔ 수동면</span>
+              <span>대한민국 ➔ 경기도 ➔ 남양주시 ➔ 평내·호평·금곡</span>
             </div>
             <h1 className="font-heading text-2xl md:text-4xl font-black text-slate-950 mt-1 flex items-center gap-2">
               <span>🏡 우리 동네 대시보드</span>

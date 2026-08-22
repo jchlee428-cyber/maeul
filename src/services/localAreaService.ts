@@ -1,6 +1,7 @@
 /**
  * LOCAL FIRST 계층형 지역 서비스
- * 기준 파일럿: 대한민국 → 경기도 → 남양주시 → 수동면 → 송천리
+ * 기준 파일럿: 대한민국 → 경기도 → 남양주시 → 평내동
+ * 연계 지역: 호평동, 금곡동
  */
 
 export interface VillageInfo {
@@ -20,15 +21,15 @@ export interface RegionHierarchy {
   province: string;
   city: string;
   township: string; // 읍/면/동
-  village: string;  // 리/통
+  village: string;  // 통/리
 }
 
 export const PILOT_REGION: RegionHierarchy = {
   country: "대한민국",
   province: "경기도",
   city: "남양주시",
-  township: "수동면",
-  village: "송천리"
+  township: "평내동",
+  village: "평내동 전역"
 };
 
 export const AVAILABLE_REGIONS = [
@@ -37,56 +38,40 @@ export const AVAILABLE_REGIONS = [
     city: "남양주시",
     townships: [
       {
-        name: "수동면",
+        name: "평내·호평·금곡권역",
         villages: [
           {
-            code: "songcheon",
-            name: "송천리",
-            fullName: "경기도 남양주시 수동면 송천리",
-            representativeOrg: "수동면 종합행정복지센터 (수동면 운수리 73-1)",
-            communityCenterPhone: "031-590-2601",
+            code: "pyeongnae",
+            name: "평내동",
+            fullName: "경기도 남양주시 평내동",
+            representativeOrg: "평내동 주민자치센터 및 행정복지센터 (평내로 31)",
+            communityCenterPhone: "031-590-2605",
+            garbageDay: "일·화·목 일몰 후 배출 (월·수·금 수거)",
+            busInfo: "경춘선 평내호평역, 땡큐10번, 땡큐11번, 광역 M2323",
+            population: "약 38,500명 (다문화 및 어르신 가구 밀집)",
+            keyNotice: "2026 평내동 어르신 안심돌봄 및 저소득 위기가구 긴급복지 지원 접수 중"
+          },
+          {
+            code: "hopyeong",
+            name: "호평동",
+            fullName: "경기도 남양주시 호평동",
+            representativeOrg: "호평동 주민자치센터 및 행정복지센터 (늘을2로 67)",
+            communityCenterPhone: "031-590-2604",
             garbageDay: "월·수·금 일몰 후 배출 (화·목·토 수거)",
-            busInfo: "남양주 땡큐버스 30번, 33번 (송천리 마을회관 앞 수시 운행)",
-            population: "약 1,420명 (외국인 주민 약 85명 거주)",
-            keyNotice: "2026 어르신 병원안심동행 및 농촌 계절근로자 생활안정 특별지원 접수 중"
+            busInfo: "경춘선 평내호평역 환승센터, 땡큐10번, 땡큐12번, 직행 1000번",
+            population: "약 52,000명",
+            keyNotice: "호평동 주민자치센터 2분기 문화·복지 프로그램 및 청년 취업지원 안내"
           },
           {
-            code: "unsu",
-            name: "운수리",
-            fullName: "경기도 남양주시 수동면 운수리",
-            representativeOrg: "수동면 종합행정복지센터",
-            communityCenterPhone: "031-590-2601",
-            garbageDay: "월·수·금 일몰 후 배출",
-            busInfo: "땡큐버스 30번, 33번, 일반 330-1번",
-            population: "약 2,100명",
-            keyNotice: "수동면 주민자치센터 2분기 문화강좌 접수 안내"
-          },
-          {
-            code: "jidun",
-            name: "지둔리",
-            fullName: "경기도 남양주시 수동면 지둔리",
-            representativeOrg: "수동면 종합행정복지센터",
-            communityCenterPhone: "031-590-2601",
-            garbageDay: "화·목·일 일몰 후 배출",
-            busInfo: "마을버스 33-1번",
-            population: "약 890명",
-            keyNotice: "봄철 산불조심기간 영농부산물 파쇄 지원 안내"
-          }
-        ]
-      },
-      {
-        name: "화도읍",
-        villages: [
-          {
-            code: "masan",
-            name: "마석우리",
-            fullName: "경기도 남양주시 화도읍 마석우리",
-            representativeOrg: "화도읍 종합행정복지센터",
-            communityCenterPhone: "031-590-2602",
-            garbageDay: "일·화·목 일몰 후 배출",
-            busInfo: "경춘선 마석역, 광역버스 M2316",
-            population: "약 28,000명",
-            keyNotice: "화도 민방위 대피시설 점검 및 복지사각지대 발굴의 달"
+            code: "geumgok",
+            name: "금곡동",
+            fullName: "경기도 남양주시 금곡동",
+            representativeOrg: "금곡양정 행정복지센터 (홍유릉로 271)",
+            communityCenterPhone: "031-590-2603",
+            garbageDay: "일·화·목 일몰 후 배출 (월·수·금 수거)",
+            busInfo: "경춘선 금곡역, 땡큐10번, 땡큐20번, 시내버스 65번",
+            population: "약 19,800명",
+            keyNotice: "금곡 도시재생 주민공동체 지원사업 및 어르신 일자리 상담 창구 운영"
           }
         ]
       }

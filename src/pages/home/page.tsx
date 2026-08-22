@@ -89,7 +89,7 @@ const quickQueries = [
 ];
 
 export default function Home() {
-  const [selectedVillageCode, setSelectedVillageCode] = useState("songcheon");
+  const [selectedVillageCode, setSelectedVillageCode] = useState("pyeongnae");
   const [selectedLang, setSelectedLang] = useState("ko");
   const [isEasyKorean, setIsEasyKorean] = useState(false);
 

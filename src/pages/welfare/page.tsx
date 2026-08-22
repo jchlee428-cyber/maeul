@@ -34,21 +34,21 @@ export default function WelfareFinderPage() {
       benefit: "월 최대 334,810원 기초연금 지급 및 연간 본인부담상한 초과 병원비 100% 환급",
       amount: "월 최대 334,810원 (기초연금 기준)",
       period: "연중 수시 접수",
-      method: "수동면 종합행정복지센터 방문 또는 복지로(bokjiro.go.kr) 온라인 신청",
-      contact: "보건복지상담센터 📞 129 / 수동면 복지팀 📞 031-590-2601",
+      method: "평내동 종합행정복지센터 방문 또는 복지로(bokjiro.go.kr) 온라인 신청",
+      contact: "보건복지상담센터 📞 129 / 평내동 복지팀 📞 031-590-2605",
       source: "보건복지부 / 국민건강보험공단 (2026년 최신 기준)"
     },
     {
       id: "b2",
       name: "남양주시 독거어르신 인공지능(AI) 돌봄로봇 및 안심동행",
       category: "지자체 맞춤 돌봄",
-      whyMatched: "남양주시 수동면 거주 1인 독거 가구 특화 사업입니다.",
+      whyMatched: "남양주시 평내동 거주 1인 독거 가구 특화 사업입니다.",
       eligibility: "남양주시 관내 65세 이상 독거 및 만성질환 어르신",
       benefit: "24시간 AI 돌봄인형 지급, 응급상황 119 자동 호출, 병원 방문 시 동행 매니저 파견",
       amount: "전액 무료 (남양주시 전액 지원)",
       period: "매월 선착순 접수",
-      method: "동네 이장님 또는 수동면 행정복지센터 맞춤형복지팀 유선 신청",
-      contact: "남양주시 노인복지과 📞 031-590-4411",
+      method: "통장님 또는 평내동 행정복지센터 맞춤형복지팀 유선 신청",
+      contact: "남양주시 노인복지과 📞 031-590-4411 / 평내동 📞 031-590-2605",
       source: "남양주시청 노인복지과 공고 (2026-03)"
     },
     {
@@ -179,7 +179,7 @@ export default function WelfareFinderPage() {
                 ✨ 주민님께 해당될 가능성이 높은 지원사업 (총 {sampleResults.length}건)
               </h2>
               <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-                남양주시 수동면 송천리 기준 매칭
+                남양주시 평내동 기준 매칭
               </span>
             </div>
 
