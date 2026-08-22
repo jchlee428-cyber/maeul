@@ -11,6 +11,12 @@ import {
   deleteConsultationSession,
   type ConsultationRecord
 } from "@/services/consultationHistoryService";
+import {
+  SUPPORTED_LANGUAGES,
+  convertToEasyKorean,
+  translateTextToTargetLang
+} from "@/services/multilingualEngine";
+import { AVAILABLE_REGIONS, getVillageData } from "@/services/localAreaService";
 import CustomGuideSheet from "@/components/CustomGuideSheet";
 import HelpRequestModal from "@/components/HelpRequestModal";
 import SchemaOrg from "@/seo/SchemaOrg";
@@ -78,10 +84,15 @@ const quickQueries = [
   "🚌 남양주 땡큐버스 위치",
   "🏛️ 동주민센터 전화번호",
   "🏫 초·중·고교 직통 연락처",
-  "💼 취업 구직촉진수당"
+  "💼 취업 구직촉진수당",
+  "🌏 외국인 근로자 의료지원"
 ];
 
 export default function Home() {
+  const [selectedVillageCode, setSelectedVillageCode] = useState("songcheon");
+  const [selectedLang, setSelectedLang] = useState("ko");
+  const [isEasyKorean, setIsEasyKorean] = useState(false);
+
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isThinking, setIsThinking] = useState(false);
@@ -105,16 +116,14 @@ export default function Home() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [consultationHistory, setConsultationHistory] = useState<ConsultationRecord[]>([]);
 
-  // 안내/원칙 모달 상태
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
-
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const village = getVillageData(selectedVillageCode);
 
   const loadHistory = () => {
     setConsultationHistory(getConsultationHistory());
   };
 
-  // 초기 환영 메시지 (큰 글씨, 쉬운 말)
+  // 초기 환영 메시지 (LOCAL FIRST & 다국어 반영)
   const resetToWelcome = () => {
     if (activeAudioRef.current) {
       activeAudioRef.current.pause();
@@ -130,7 +139,7 @@ export default function Home() {
       {
         id: "welcome",
         sender: "bot",
-        text: "안녕하세요! 저는 우리 동네를 돕는 따뜻한 AI 이웃 도우미 **'마을지기'**예요. 😊\n\n병원비, 생계비, 어르신 돌봄, 버스나 주민센터 전화번호 등 무엇이든 편하게 물어보세요.\n\n이름이나 주민번호 같은 개인정보는 **절대 묻지 않으니** 안심하고 말씀하세요!"
+        text: `안녕하세요! 저는 **${village.fullName}**을 돕는 AI 행정복지사 **'마을지기'**예요. 😊\n\n병원비, 생계비, 어르신 돌봄, 버스나 주민센터 전화번호 등 무엇이든 편하게 물어보세요.\n\n이름이나 주민번호 같은 개인정보는 **절대 묻지 않으니** 안심하고 말씀하세요!`
       }
     ]);
   };
@@ -151,7 +160,7 @@ export default function Home() {
       const recognition = new SpeechRecognitionClass();
       recognition.continuous = false;
       recognition.interimResults = true;
-      recognition.lang = "ko-KR";
+      recognition.lang = selectedLang === "ko" ? "ko-KR" : selectedLang;
 
       recognition.onstart = () => setIsListening(true);
       recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -169,7 +178,7 @@ export default function Home() {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       if (activeAudioRef.current) activeAudioRef.current.pause();
     };
-  }, []);
+  }, [selectedVillageCode, selectedLang]);
 
   // 스크롤 자동 이동
   useEffect(() => {
@@ -214,7 +223,7 @@ export default function Home() {
     const playOnlineAudioFallback = () => {
       try {
         const encoded = encodeURIComponent(cleanText.slice(0, 200));
-        const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=ko&client=tw-ob`);
+        const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${selectedLang}&client=tw-ob`);
         activeAudioRef.current = audio;
         audio.onplay = onStart;
         audio.onended = () => { activeAudioRef.current = null; onEnd(); };
@@ -237,11 +246,11 @@ export default function Home() {
       setTimeout(() => {
         try {
           const utterance = new SpeechSynthesisUtterance(cleanText);
-          utterance.lang = "ko-KR";
-          utterance.rate = 0.88; // 어르신을 위해 조금 천천히 또박또박 낭독
+          utterance.lang = selectedLang === "ko" ? "ko-KR" : selectedLang;
+          utterance.rate = 0.88;
           const voices = window.speechSynthesis.getVoices();
-          const koVoice = voices.find((v) => v.lang.startsWith("ko"));
-          if (koVoice) utterance.voice = koVoice;
+          const voice = voices.find((v) => v.lang.startsWith(selectedLang));
+          if (voice) utterance.voice = voice;
 
           utterance.onstart = onStart;
           utterance.onend = onEnd;
@@ -318,14 +327,15 @@ export default function Home() {
     try {
       const simpleResponse = await checkAndHandleSimpleQueryAsync(query);
       if (simpleResponse && simpleResponse.isSimple) {
-        const reviewed = reviewAndRefineResponse(query, simpleResponse.replyText);
+        let reviewedText = reviewAndRefineResponse(query, simpleResponse.replyText).reviewedText;
+        if (isEasyKorean) reviewedText = convertToEasyKorean(reviewedText);
+        if (selectedLang !== "ko") reviewedText = translateTextToTargetLang(reviewedText, selectedLang);
 
         saveConsultationSession({
           userQuery: query,
           matchedServiceName: "간단 안내 및 교통/기관 정보",
           categoryLabel: "생활안내",
-          replyText: reviewed.reviewedText,
-          ragResult: reviewed.ragRefinement
+          replyText: reviewedText
         });
         loadHistory();
 
@@ -334,8 +344,7 @@ export default function Home() {
           {
             id: String(Date.now()),
             sender: "bot",
-            text: reviewed.reviewedText,
-            ragResult: reviewed.ragRefinement
+            text: reviewedText
           }
         ]);
         setIsThinking(false);
@@ -348,16 +357,22 @@ export default function Home() {
     setTimeout(() => {
       const rag = searchAndAnalyzePublicData(query);
       const matchedRes = communityResources.find((r) => r.category === rag.matchedPublicData.category) || communityResources[0];
-      const draftText = `말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 정보를 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요.`;
+      let draftText = `말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 정보를 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요.`;
 
+      if (isEasyKorean) draftText = convertToEasyKorean(draftText);
       const reviewed = reviewAndRefineResponse(query, draftText, rag);
       const finalRag = reviewed.ragRefinement || rag;
+
+      let finalText = reviewed.reviewedText;
+      if (selectedLang !== "ko") {
+        finalText = translateTextToTargetLang(finalText, selectedLang);
+      }
 
       saveConsultationSession({
         userQuery: query,
         matchedServiceName: finalRag.matchedPublicData.serviceName,
         categoryLabel: finalRag.matchedPublicData.categoryLabel,
-        replyText: reviewed.reviewedText,
+        replyText: finalText,
         ragResult: finalRag
       });
       loadHistory();
@@ -367,7 +382,7 @@ export default function Home() {
         {
           id: String(Date.now()),
           sender: "bot",
-          text: reviewed.reviewedText,
+          text: finalText,
           ragResult: finalRag,
           matchedResource: matchedRes
         }
@@ -430,72 +445,145 @@ export default function Home() {
     <>
       <SchemaOrg />
       <main className="w-full h-[100dvh] max-h-[100dvh] bg-slate-100 flex flex-col overflow-hidden text-slate-900">
-        {/* 상단 딥그린 고선명 헤더 (모바일 완벽 정렬) */}
-        <header className="w-full h-14 sm:h-16 px-2.5 sm:px-6 bg-emerald-900 text-white flex items-center justify-between shadow-md shrink-0 z-20">
-          {/* 좌측: 로고 (절대 줄바꿈 안 되게 고정) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
-            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-lg shadow shrink-0">
-              <i className="ri-heart-3-fill"></i>
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="font-heading font-black text-base sm:text-lg text-white tracking-tight whitespace-nowrap">
-                마을지기 AI
+        {/* 1. 상단 딥그린 헤더 (LOCAL FIRST 지역선택 & 다국어 & 쉬운 한국어 탑재) */}
+        <header className="w-full px-2.5 sm:px-6 py-2 sm:py-3 bg-emerald-900 text-white flex flex-col sm:flex-row items-center justify-between gap-2 shadow-md shrink-0 z-20">
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            {/* 좌측 로고 */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
+              <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-lg shadow shrink-0">
+                <i className="ri-heart-3-fill"></i>
               </span>
-              <span className="hidden xs:inline-block sm:inline-block px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0 whitespace-nowrap">
-                이웃도우미
-              </span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="font-heading font-black text-base sm:text-lg text-white tracking-tight whitespace-nowrap">
+                  마을지기 AI
+                </span>
+                <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0">
+                  {village.name}
+                </span>
+              </div>
+            </div>
+
+            {/* 모바일 우측 빠른 액션 */}
+            <div className="flex items-center gap-1 sm:hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("새 대화를 시작할까요?")) resetToWelcome();
+                }}
+                className="px-2.5 py-1 rounded-lg bg-emerald-700 text-white text-xs font-bold"
+              >
+                새 대화
+              </button>
+              <button
+                type="button"
+                onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
+                className="px-2 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold font-mono"
+              >
+                📁 {consultationHistory.length}
+              </button>
             </div>
           </div>
 
-          {/* 우측 상단 유틸리티 버튼 (크기와 간격 완벽 조화) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* [🔄 새 대화] 버튼 */}
+          {/* 중앙 & 우측: LOCAL FIRST 지역 선택기 + 10개국 다국어 + 쉬운한국어 스위치 */}
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end overflow-x-auto no-scrollbar">
+            {/* 지역 선택 */}
+            <select
+              value={selectedVillageCode}
+              onChange={(e) => setSelectedVillageCode(e.target.value)}
+              className="px-2.5 py-1 bg-emerald-950 text-emerald-200 border border-emerald-700 rounded-lg text-xs font-bold focus:outline-none shrink-0"
+              title="우리 동네 마을 선택"
+            >
+              {AVAILABLE_REGIONS[0].townships[0].villages.map((v) => (
+                <option key={v.code} value={v.code}>
+                  📍 {v.name}
+                </option>
+              ))}
+            </select>
+
+            {/* 10개 다국어 선택 */}
+            <select
+              value={selectedLang}
+              onChange={(e) => setSelectedLang(e.target.value)}
+              className="px-2.5 py-1 bg-emerald-950 text-amber-300 border border-emerald-700 rounded-lg text-xs font-bold focus:outline-none shrink-0"
+              title="언어 선택 (10개 다국어)"
+            >
+              {SUPPORTED_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.flag} {l.nativeName}
+                </option>
+              ))}
+            </select>
+
+            {/* 쉬운 한국어 토글 버튼 */}
             <button
               type="button"
-              onClick={() => {
-                if (confirm("현재 대화를 비우고 '새 대화'를 시작할까요?\n(기존 대화는 '상담기록'에 안전하게 보관되어 있습니다)")) {
-                  resetToWelcome();
-                }
-              }}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs sm:text-sm font-black shadow ring-1 ring-emerald-300/80 transition-all transform active:scale-95 shrink-0 whitespace-nowrap"
-              title="새 대화 시작"
+              onClick={() => setIsEasyKorean(!isEasyKorean)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all shrink-0 border ${
+                isEasyKorean
+                  ? "bg-amber-400 text-slate-950 border-amber-500 shadow-sm"
+                  : "bg-emerald-950/80 text-emerald-200 border-emerald-700 hover:bg-emerald-950"
+              }`}
+              title="어려운 행정용어를 쉬운 말로 풀어서 설명합니다"
             >
-              <i className="ri-refresh-line text-xs sm:text-sm font-black"></i>
-              <span>새 대화</span>
+              {isEasyKorean ? "✨ 쉬운말 ON" : "쉬운말 OFF"}
             </button>
 
-            {/* [📁 기록] 버튼 */}
-            <button
-              type="button"
-              onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
-              className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-black transition-colors shadow shrink-0 whitespace-nowrap"
-              title="저장된 상담 기록"
-            >
-              <i className="ri-folder-history-fill text-slate-900 text-sm"></i>
-              <span className="inline-block px-1.5 py-0.2 bg-slate-900 text-white rounded text-[10px] sm:text-xs font-mono">{consultationHistory.length}</span>
-            </button>
+            {/* 데스크톱 버튼 그룹 */}
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("현재 대화를 비우고 '새 대화'를 시작할까요?")) resetToWelcome();
+                }}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs font-black shadow ring-1 ring-emerald-300/80"
+              >
+                <i className="ri-refresh-line"></i>
+                <span>새 대화</span>
+              </button>
 
-            {/* [🏠 홈] 집모양 버튼 */}
-            <Link
-              to="/cases"
-              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-amber-300 hover:text-white transition-all shadow-xs shrink-0"
-              title="홈 (실증 성과 보고서)"
-            >
-              <i className="ri-home-4-fill text-base sm:text-lg"></i>
-            </Link>
+              <button
+                type="button"
+                onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow"
+              >
+                <i className="ri-folder-history-fill"></i>
+                <span className="font-mono">{consultationHistory.length}</span>
+              </button>
 
-            {/* [🛡️ 관리자] 버튼 (작은 모바일 화면에서는 공간 절약) */}
-            <Link
-              to="/admin"
-              className="w-8 h-8 sm:w-9 sm:h-9 hidden xs:flex sm:flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors shrink-0"
-              title="마을관리자 관제 대시보드"
-            >
-              <i className="ri-shield-user-line text-base sm:text-lg"></i>
-            </Link>
+              <Link
+                to="/dashboard"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white"
+                title="우리 동네 대시보드"
+              >
+                <i className="ri-dashboard-3-line text-base"></i>
+              </Link>
+            </div>
           </div>
         </header>
 
-        {/* 중앙 대화 스트림 영역 (밝고 선명한 큰 글씨 모드) */}
+        {/* 2. 5대 주요 서비스 원터치 바로가기 탭 바 */}
+        <div className="bg-emerald-800/90 text-white px-2.5 sm:px-6 py-1.5 shrink-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold">
+          <span className="text-amber-300 font-extrabold whitespace-nowrap mr-1">
+            <i className="ri-compass-3-line"></i> 바로가기:
+          </span>
+          <Link to="/dashboard" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+            📊 동네 대시보드
+          </Link>
+          <Link to="/welfare" className="px-2.5 py-1 rounded-md bg-blue-900/80 hover:bg-blue-900 whitespace-nowrap text-blue-200">
+            🎯 맞춤 지원 자가진단
+          </Link>
+          <Link to="/docs" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+            📄 공문서 쉽게 보기
+          </Link>
+          <Link to="/market" className="px-2.5 py-1 rounded-md bg-amber-950/80 hover:bg-amber-950 whitespace-nowrap text-amber-300">
+            🏪 동네 가게 & AI 홍보
+          </Link>
+          <Link to="/guide" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+            📋 자원 가이드
+          </Link>
+        </div>
+
+        {/* 3. 중앙 대화 스트림 영역 */}
         <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6 space-y-4 bg-slate-100 overscroll-y-contain">
           <div className="max-w-4xl mx-auto space-y-4 pb-2">
             {messages.map((m) => (
@@ -531,14 +619,14 @@ export default function Home() {
                     )}
                   </div>
 
-                  {/* 공공데이터 4단계 결과 카드 영역 (어르신 눈높이 초대형 카드) */}
+                  {/* 공공데이터 9단계 표준 답변 카드 영역 (Section 6 & 16) */}
                   {m.ragResult && (
                     <div className="mt-4 pt-4 border-t-2 border-slate-200 space-y-3.5">
-                      {/* 4단계 음성 안내 배너 */}
+                      {/* 음성 안내 배너 */}
                       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 border-2 border-amber-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm">
                         <div className="text-slate-950">
                           <div className="text-xs sm:text-sm font-extrabold flex items-center gap-1 text-amber-950">
-                            <i className="ri-sound-module-line"></i> 어르신 맞춤 음성 안내
+                            <i className="ri-sound-module-line"></i> 4단계 맞춤 음성 안내
                           </div>
                           <div className="font-heading font-black text-sm sm:text-base mt-0.5">
                             4단계 안내를 목소리로 들으시겠어요?
@@ -558,25 +646,25 @@ export default function Home() {
                         </button>
                       </div>
 
-                      {/* 공식 출처 배지 */}
+                      {/* 공식 출처 및 확인일 배지 (Section 5 필수) */}
                       {m.ragResult.sources && (
                         <div className="p-3 rounded-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                           <div>
                             <span className="font-extrabold text-slate-900 flex items-center gap-1">
                               <i className="ri-verified-badge-fill text-emerald-600"></i>
-                              공식 출처: {m.ragResult.sources.sourceApi || "공공데이터포털"}
+                              공식 출처: {m.ragResult.sources.sourceApi || "공공데이터포털 / 남양주시청"}
                             </span>
                             <span className="text-slate-600 block text-xs mt-0.5">
-                              소관: {m.ragResult.sources.department || "정부 및 지자체"}
+                              소관: {m.ragResult.sources.department || "남양주시 수동면 종합행정복지센터"} (확인일: 2026-08-20)
                             </span>
                           </div>
                           <span className="text-xs sm:text-sm px-2.5 py-1 bg-white border border-slate-300 text-emerald-900 rounded-lg font-bold">
-                            📞 문의: {m.ragResult.sources.inquiryContact || "129 / 031-590-2114"}
+                            📞 문의: {m.ragResult.sources.inquiryContact || village.communityCenterPhone}
                           </span>
                         </div>
                       )}
 
-                      {/* 4단계 스텝 카드 그리드 (모바일 1열 시원한 큰 글씨) */}
+                      {/* 4단계 스텝 카드 그리드 */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm sm:text-base">
                         {(m.ragResult.groundedSteps || []).map((st) => (
                           <div
@@ -619,14 +707,14 @@ export default function Home() {
                                 </button>
                               </div>
                               <div className="text-slate-900 whitespace-pre-line leading-relaxed text-sm sm:text-base font-medium">
-                                {st.content}
+                                {isEasyKorean ? convertToEasyKorean(st.content) : st.content}
                               </div>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* 안내서 인쇄 & 도움 요청 액션 바 */}
+                      {/* 원클릭 도움 요청 & 인쇄 액션 바 */}
                       <div className="mt-3.5 pt-3 border-t-2 border-slate-200 flex flex-col sm:flex-row gap-2.5">
                         {m.ragResult.matchedPublicData && (
                           <button
@@ -659,13 +747,13 @@ export default function Home() {
             {isThinking && (
               <div className="flex items-center gap-2.5 text-slate-700 text-sm sm:text-base p-4 bg-white rounded-2xl border-2 border-emerald-200 w-fit shadow-md">
                 <span className="w-3 h-3 rounded-full bg-emerald-600 animate-ping"></span>
-                <span className="font-bold">공공데이터에서 알기 쉬운 맞춤 정보를 찾고 있어요...</span>
+                <span className="font-bold">[{village.name}] 공공데이터에서 알기 쉬운 맞춤 정보를 찾고 있어요...</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* 실시간 음성 듣기 상태 바 */}
+        {/* 음성 인식 중 표시 바 */}
         {isListening && (
           <div className="px-4 py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white flex items-center justify-between text-xs sm:text-sm font-bold shrink-0 shadow-inner z-10">
             <div className="flex items-center gap-2 truncate">
@@ -682,18 +770,15 @@ export default function Home() {
           </div>
         )}
 
-        {/* 빠른 추천 질문 바 (가로 스크롤, 큰 글씨 칩) */}
-        <div className="px-3 sm:px-6 py-2.5 bg-emerald-50 border-t-2 border-emerald-200 shrink-0 z-10">
+        {/* 빠른 추천 질문 바 */}
+        <div className="px-3 sm:px-6 py-2 bg-emerald-50 border-t-2 border-emerald-200 shrink-0 z-10">
           <div className="max-w-4xl mx-auto">
-            <div className="text-xs sm:text-sm font-extrabold text-emerald-950 mb-1.5 flex items-center gap-1">
-              <i className="ri-flashlight-fill text-amber-500"></i> 자주 찾는 공공 지원 질문:
-            </div>
             <div className="flex gap-2 overflow-x-auto pb-1 text-xs sm:text-sm no-scrollbar">
               {quickQueries.map((qq) => (
                 <button
                   key={qq}
                   onClick={() => handleSendMessage(qq)}
-                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-emerald-100 border-2 border-emerald-300 text-slate-900 font-bold whitespace-nowrap transition-all shadow-xs active:scale-95"
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-100 border-2 border-emerald-300 text-slate-900 font-bold whitespace-nowrap transition-all shadow-xs active:scale-95"
                 >
                   {qq}
                 </button>
@@ -702,10 +787,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 하단 2단 스마트 입력 영역 (어르신/아이 눈높이 큰 글씨 및 대형 마이크 버튼) */}
+        {/* 하단 2단 스마트 입력 영역 */}
         <div className="p-3 sm:p-5 bg-white border-t-2 border-emerald-300 shrink-0 shadow-2xl z-10 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="max-w-4xl mx-auto space-y-2.5">
-            {/* 1단: 선명한 텍스트 입력창 (높이 50px, 글자 16px) + 상담하기 버튼 */}
+            {/* 1단: 텍스트 입력창 + 상담하기 전송 버튼 */}
             <div className="flex items-center gap-2">
               <div className="relative flex-1 flex items-center min-w-0">
                 <span className="absolute left-3.5 text-emerald-700 text-lg flex items-center pointer-events-none">
@@ -721,7 +806,7 @@ export default function Home() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : "질문을 적어주세요 (예: 수술비 지원, 땡큐버스)"}
+                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : `[${village.name}] 질문을 적어주세요 (예: 수술비 지원, 땡큐버스)`}
                   className={`w-full pl-10 pr-10 py-3 sm:py-3.5 bg-white border-2 rounded-2xl text-base font-bold text-slate-950 placeholder:text-slate-400 focus:outline-none transition-all shadow-sm ${
                     isListening
                       ? "border-rose-500 bg-rose-50 ring-4 ring-rose-200"
@@ -741,7 +826,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* [상담하기] 전송 버튼 */}
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
@@ -752,7 +836,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 2단: 어르신/아이용 [🎙️ 목소리로 말하기] 초대형 54px 풀-너비 버튼 */}
+            {/* 2단: 어르신용 [🎙️ 목소리로 말하기] 초대형 54px 풀-너비 버튼 */}
             <button
               type="button"
               onClick={toggleListening}
