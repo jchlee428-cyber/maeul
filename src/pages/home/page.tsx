@@ -430,27 +430,27 @@ export default function Home() {
     <>
       <SchemaOrg />
       <main className="w-full h-[100dvh] bg-background-100 flex flex-col overflow-hidden">
-        {/* 상단 통합 헤더 바 */}
-        <header className="h-14 sm:h-16 px-3 sm:px-6 bg-primary-800 text-white flex items-center justify-between shadow-md shrink-0 z-20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-base sm:text-lg shadow">
+        {/* 상단 통합 헤더 바 (모바일 반응형 최적화) */}
+        <header className="h-13 sm:h-16 px-2.5 sm:px-6 bg-primary-800 text-white flex items-center justify-between shadow-md shrink-0 z-20">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
+            <span className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-sm sm:text-lg shadow shrink-0">
               <i className="ri-heart-3-fill"></i>
             </span>
-            <div>
-              <h1 className="font-heading font-black text-sm sm:text-lg flex items-center gap-1.5 leading-tight">
-                <span>마을지기 AI</span>
-                <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold bg-primary-950 text-accent-300 rounded border border-accent-300/30">
-                  대화형 이웃도우미
+            <div className="min-w-0 truncate">
+              <h1 className="font-heading font-black text-xs sm:text-lg flex items-center gap-1 sm:gap-1.5 leading-tight truncate">
+                <span className="truncate">마을지기 AI</span>
+                <span className="px-1 sm:px-1.5 py-0.2 sm:py-0.5 text-[8px] sm:text-[10px] font-bold bg-primary-950 text-accent-300 rounded border border-accent-300/30 shrink-0">
+                  대화형
                 </span>
               </h1>
-              <p className="text-[10px] sm:text-xs text-primary-200 truncate">
+              <p className="text-[9px] sm:text-xs text-primary-200 truncate hidden xs:block sm:block">
                 개인정보 없이 · 공공데이터 4단계 맞춤 안내
               </p>
             </div>
           </div>
 
           {/* 우측 상단 유틸리티 버튼 */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* 눈에 잘 띄는 선명한 [새 대화] 버튼 */}
             <button
               type="button"
@@ -712,14 +712,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 하단 2단 스마트 입력 영역 (시인성 극대화) */}
-        <div className="p-3 sm:p-5 bg-white border-t-2 border-primary-100 shrink-0 shadow-2xl z-10">
-          <div className="max-w-4xl mx-auto space-y-2.5 pb-1 sm:pb-2">
+        {/* 하단 2단 스마트 입력 영역 (모바일 Safe Area 및 시인성 극대화) */}
+        <div className="p-2.5 sm:p-5 bg-white border-t-2 border-primary-100 shrink-0 shadow-2xl z-10 pb-[max(0.6rem,env(safe-area-inset-bottom))]">
+          <div className="max-w-4xl mx-auto space-y-2 sm:space-y-2.5">
             {/* 1단: 눈에 확 띄는 고대비 텍스트 입력창 + 상담하기 버튼 */}
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 flex items-center">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="relative flex-1 flex items-center min-w-0">
                 {/* 좌측 안내 아이콘 */}
-                <span className="absolute left-3.5 text-primary-600 text-lg flex items-center pointer-events-none">
+                <span className="absolute left-3 sm:left-3.5 text-primary-600 text-base sm:text-lg flex items-center pointer-events-none">
                   <i className="ri-edit-2-fill"></i>
                 </span>
 
@@ -732,8 +732,8 @@ export default function Home() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : "여기에 질문을 적어주세요 (예: 수술비 지원, 땡큐버스, 주민센터)"}
-                  className={`w-full pl-10 pr-10 py-3 sm:py-3.5 bg-white border-2 rounded-2xl text-sm sm:text-base font-bold text-foreground-950 placeholder:text-gray-400 focus:outline-none transition-all shadow-md ${
+                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : "질문을 적어주세요 (예: 수술비 지원, 버스)"}
+                  className={`w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2.5 sm:py-3.5 bg-white border-2 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-foreground-950 placeholder:text-gray-400 focus:outline-none transition-all shadow-sm sm:shadow-md ${
                     isListening
                       ? "border-rose-500 bg-rose-50/70 ring-4 ring-rose-200"
                       : "border-primary-500 hover:border-primary-600 focus:border-primary-700 focus:ring-4 focus:ring-primary-200/80"
@@ -745,7 +745,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setInput("")}
-                    className="absolute right-3 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-xs transition-colors"
+                    className="absolute right-2.5 w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-xs transition-colors"
                     title="지우기"
                   >
                     <i className="ri-close-line"></i>
@@ -757,9 +757,9 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
-                className="inline-flex items-center justify-center gap-1.5 px-5 sm:px-7 py-3 sm:py-3.5 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 hover:from-primary-800 hover:to-primary-950 active:scale-95 text-white font-black rounded-2xl transition-all text-sm sm:text-base whitespace-nowrap shadow-lg ring-2 ring-primary-300/70 shrink-0"
+                className="inline-flex items-center justify-center gap-1 px-3.5 sm:px-7 py-2.5 sm:py-3.5 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 hover:from-primary-800 hover:to-primary-950 active:scale-95 text-white font-black rounded-xl sm:rounded-2xl transition-all text-xs sm:text-base whitespace-nowrap shadow-md sm:shadow-lg ring-2 ring-primary-300/70 shrink-0"
               >
-                <i className="ri-send-plane-fill text-base sm:text-lg"></i>
+                <i className="ri-send-plane-fill text-sm sm:text-lg"></i>
                 <span className="font-black tracking-tight">상담하기</span>
               </button>
             </div>
@@ -768,25 +768,25 @@ export default function Home() {
             <button
               type="button"
               onClick={toggleListening}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform active:scale-98 ${
+              className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform active:scale-98 ${
                 isListening
                   ? "bg-gradient-to-r from-rose-500 to-red-600 text-white ring-4 ring-rose-300 animate-pulse"
                   : "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 text-foreground-950 ring-1 ring-amber-300"
               }`}
               title={isListening ? "음성 인식 중지" : "마이크로 말하기"}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm ${
+              <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs shadow-sm shrink-0 ${
                 isListening ? "bg-white text-rose-600 animate-bounce" : "bg-white text-orange-600"
               }`}>
                 <i className={isListening ? "ri-mic-fill" : "ri-mic-2-fill"}></i>
               </span>
-              <span className="tracking-tight">
+              <span className="tracking-tight truncate">
                 {isListening ? "말씀 듣는 중... (터치하면 전송)" : "🎙️ 글씨 쓰기 힘드시면 [목소리로 말하기]를 눌러보세요"}
               </span>
             </button>
 
-            <p className="text-center text-[10px] sm:text-[11px] text-gray-500 leading-tight">
-              🔒 개인정보는 일체 저장되지 않습니다. 위급한 응급 상황은 즉시 <strong>119 · 112</strong>로 연락하세요.
+            <p className="text-center text-[9px] sm:text-[11px] text-gray-500 leading-tight">
+              🔒 개인정보는 일체 저장되지 않습니다. 위급 상황 시 <strong>119 · 112</strong>
             </p>
           </div>
         </div>

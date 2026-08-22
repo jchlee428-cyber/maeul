@@ -120,76 +120,66 @@ export default function Navbar() {
       {/* 모바일 드로어 */}
       {open && (
         <div className="lg:hidden bg-white border-t border-gray-200 px-4 py-4 flex flex-col gap-1 shadow-lg max-h-[80vh] overflow-y-auto">
-          {isHome ? (
-            <>
-              <a
-                href="#intro"
-                onClick={() => setOpen(false)}
-                className="px-4 py-2.5 text-sm font-medium text-foreground-900 rounded-lg hover:bg-primary-50"
-              >
-                서비스 소개
-              </a>
-              <a
-                href="#how"
-                onClick={() => setOpen(false)}
-                className="px-4 py-2.5 text-sm font-medium text-foreground-900 rounded-lg hover:bg-primary-50"
-              >
-                이용 방법
-              </a>
-              <a
-                href="#categories"
-                onClick={() => setOpen(false)}
-                className="px-4 py-2.5 text-sm font-medium text-foreground-900 rounded-lg hover:bg-primary-50"
-              >
-                지원 분야
-              </a>
-            </>
-          ) : (
-            <Link
-              to="/"
-              onClick={() => setOpen(false)}
-              className="px-4 py-2.5 text-sm font-medium text-foreground-900 rounded-lg hover:bg-primary-50"
-            >
-              마을지기 홈
-            </Link>
-          )}
+          <Link
+            to="/cases"
+            onClick={() => setOpen(false)}
+            className={`px-4 py-3 text-sm font-bold rounded-xl flex items-center gap-2 ${
+              location.pathname === "/cases"
+                ? "bg-primary-800 text-accent-300"
+                : "text-foreground-900 hover:bg-primary-50"
+            }`}
+          >
+            <i className="ri-home-4-fill text-accent-500 text-lg"></i>
+            <span>실증 성과 보고 (홈)</span>
+          </Link>
+
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className={`px-4 py-3 text-sm font-bold rounded-xl flex items-center gap-2 ${
+              location.pathname === "/"
+                ? "bg-primary-800 text-accent-300"
+                : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+            }`}
+          >
+            <i className="ri-chat-voice-fill text-emerald-600 text-lg"></i>
+            <span>1:1 AI 대화형 상담창</span>
+          </Link>
 
           <Link
             to="/guide"
             onClick={() => setOpen(false)}
-            className="px-4 py-2.5 text-sm font-semibold text-primary-800 rounded-lg hover:bg-primary-50"
+            className={`px-4 py-3 text-sm font-semibold rounded-xl flex items-center gap-2 ${
+              location.pathname === "/guide"
+                ? "bg-primary-100 text-primary-800 font-bold"
+                : "text-foreground-800 hover:bg-primary-50"
+            }`}
           >
-            자원 가이드 (8대 분야)
-          </Link>
-
-          <Link
-            to="/cases"
-            onClick={() => setOpen(false)}
-            className="px-4 py-2.5 text-sm font-semibold text-primary-800 rounded-lg hover:bg-primary-50"
-          >
-            실증 사례 및 성과
+            <i className="ri-book-read-line text-primary-600 text-lg"></i>
+            <span>자원 가이드 (8대 분야)</span>
           </Link>
 
           <Link
             to="/admin"
             onClick={() => setOpen(false)}
-            className="px-4 py-2.5 text-sm font-bold text-accent-700 bg-accent-50 rounded-lg"
+            className={`px-4 py-3 text-sm font-bold rounded-xl flex items-center gap-2 ${
+              location.pathname === "/admin"
+                ? "bg-primary-800 text-white"
+                : "text-primary-800 hover:bg-primary-50"
+            }`}
           >
-            <i className="ri-dashboard-line mr-1"></i>
-            AI 마을관리자 대시보드 (/admin)
+            <i className="ri-shield-user-line text-primary-600 text-lg"></i>
+            <span>마을관리자 관제 대시보드</span>
           </Link>
 
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              openChat();
-            }}
-            className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-full bg-primary-600 text-white shadow"
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md"
           >
-            <i className="ri-chat-3-line"></i>
-            무료 AI 상담 시작
-          </button>
+            <i className="ri-chat-smile-2-fill text-base"></i>
+            <span>1:1 AI 무료 상담 바로가기</span>
+          </Link>
         </div>
       )}
     </header>
