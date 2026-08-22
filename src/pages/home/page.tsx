@@ -430,23 +430,24 @@ export default function Home() {
     <>
       <SchemaOrg />
       <main className="w-full h-[100dvh] max-h-[100dvh] bg-slate-100 flex flex-col overflow-hidden text-slate-900">
-        {/* 상단 딥그린 고선명 헤더 (모바일 가로 100% 풀 반응형) */}
-        <header className="w-full h-14 sm:h-16 px-3 sm:px-6 bg-emerald-900 text-white flex items-center justify-between shadow-md shrink-0 z-20">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-xl shadow shrink-0">
+        {/* 상단 딥그린 고선명 헤더 (모바일 완벽 정렬) */}
+        <header className="w-full h-14 sm:h-16 px-2.5 sm:px-6 bg-emerald-900 text-white flex items-center justify-between shadow-md shrink-0 z-20">
+          {/* 좌측: 로고 (절대 줄바꿈 안 되게 고정) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-lg shadow shrink-0">
               <i className="ri-heart-3-fill"></i>
             </span>
-            <div className="min-w-0">
-              <h1 className="font-heading font-black text-sm sm:text-lg flex items-center gap-1.5 leading-tight">
-                <span>마을지기 AI</span>
-                <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0">
-                  이웃도우미
-                </span>
-              </h1>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="font-heading font-black text-base sm:text-lg text-white tracking-tight whitespace-nowrap">
+                마을지기 AI
+              </span>
+              <span className="hidden xs:inline-block sm:inline-block px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0 whitespace-nowrap">
+                이웃도우미
+              </span>
             </div>
           </div>
 
-          {/* 우측 상단 유틸리티 버튼 (크고 선명하게 3개 중심 배치) */}
+          {/* 우측 상단 유틸리티 버튼 (크기와 간격 완벽 조화) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* [🔄 새 대화] 버튼 */}
             <button
@@ -456,41 +457,40 @@ export default function Home() {
                   resetToWelcome();
                 }
               }}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs sm:text-sm font-black shadow-md ring-2 ring-emerald-300 transition-all transform active:scale-95 shrink-0"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs sm:text-sm font-black shadow ring-1 ring-emerald-300/80 transition-all transform active:scale-95 shrink-0 whitespace-nowrap"
               title="새 대화 시작"
             >
-              <i className="ri-refresh-line text-sm sm:text-base font-black"></i>
-              <span className="font-bold">새 대화</span>
+              <i className="ri-refresh-line text-xs sm:text-sm font-black"></i>
+              <span>새 대화</span>
             </button>
 
             {/* [📁 기록] 버튼 */}
             <button
               type="button"
               onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-black transition-colors shadow"
+              className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-black transition-colors shadow shrink-0 whitespace-nowrap"
               title="저장된 상담 기록"
             >
-              <i className="ri-folder-history-fill text-slate-900"></i>
-              <span className="hidden xs:inline sm:inline">기록</span>
+              <i className="ri-folder-history-fill text-slate-900 text-sm"></i>
               <span className="inline-block px-1.5 py-0.2 bg-slate-900 text-white rounded text-[10px] sm:text-xs font-mono">{consultationHistory.length}</span>
             </button>
 
             {/* [🏠 홈] 집모양 버튼 */}
             <Link
               to="/cases"
-              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-amber-300 hover:text-white transition-all shadow-xs"
+              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-amber-300 hover:text-white transition-all shadow-xs shrink-0"
               title="홈 (실증 성과 보고서)"
             >
-              <i className="ri-home-4-fill text-lg sm:text-xl"></i>
+              <i className="ri-home-4-fill text-base sm:text-lg"></i>
             </Link>
 
-            {/* [🛡️ 관리자] 버튼 */}
+            {/* [🛡️ 관리자] 버튼 (작은 모바일 화면에서는 공간 절약) */}
             <Link
               to="/admin"
-              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 hidden xs:flex sm:flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors shrink-0"
               title="마을관리자 관제 대시보드"
             >
-              <i className="ri-shield-user-line text-lg"></i>
+              <i className="ri-shield-user-line text-base sm:text-lg"></i>
             </Link>
           </div>
         </header>
@@ -768,8 +768,8 @@ export default function Home() {
               }`}>
                 <i className={isListening ? "ri-mic-fill" : "ri-mic-2-fill"}></i>
               </span>
-              <span className="tracking-tight truncate font-extrabold">
-                {isListening ? "말씀 듣는 중... (터치하면 전송됩니다)" : "🎙️ 글씨 쓰기 힘드시면 [여기를 누르고 말씀하세요]"}
+              <span className="tracking-tight truncate font-extrabold text-sm sm:text-base">
+                {isListening ? "말씀 듣는 중... (누르면 전송)" : "🎙️ [목소리로 말하기] 눌러서 질문하기"}
               </span>
             </button>
 
