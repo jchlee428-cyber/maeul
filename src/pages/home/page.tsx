@@ -13,6 +13,10 @@ import {
 } from "@/services/consultationHistoryService";
 import {
   SUPPORTED_LANGUAGES,
+  UI_TRANSLATIONS,
+  getMultilingualWelcome,
+  translateStepTitle,
+  translateStepContent,
   convertToEasyKorean,
   translateTextToTargetLang
 } from "@/services/multilingualEngine";
@@ -124,7 +128,7 @@ export default function Home() {
   };
 
   // 초기 환영 메시지 (LOCAL FIRST & 다국어 반영)
-  const resetToWelcome = () => {
+  const resetToWelcome = (targetLang = selectedLang) => {
     if (activeAudioRef.current) {
       activeAudioRef.current.pause();
       activeAudioRef.current = null;
@@ -139,7 +143,7 @@ export default function Home() {
       {
         id: "welcome",
         sender: "bot",
-        text: `안녕하세요! 저는 **${village.fullName}**을 돕는 AI 행정복지사 **'마을지기'**예요. 😊\n\n병원비, 생계비, 어르신 돌봄, 버스나 주민센터 전화번호 등 무엇이든 편하게 물어보세요.\n\n이름이나 주민번호 같은 개인정보는 **절대 묻지 않으니** 안심하고 말씀하세요!`
+        text: getMultilingualWelcome(village.name, village.fullName, targetLang)
       }
     ]);
   };
@@ -626,10 +630,10 @@ export default function Home() {
                       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 border-2 border-amber-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm">
                         <div className="text-slate-950">
                           <div className="text-xs sm:text-sm font-extrabold flex items-center gap-1 text-amber-950">
-                            <i className="ri-sound-module-line"></i> 4단계 맞춤 음성 안내
+                            <i className="ri-sound-module-line"></i> {UI_TRANSLATIONS.stepAudioBannerTitle?.[selectedLang] || "4단계 맞춤 음성 안내"}
                           </div>
                           <div className="font-heading font-black text-sm sm:text-base mt-0.5">
-                            4단계 안내를 목소리로 들으시겠어요?
+                            {UI_TRANSLATIONS.stepAudioBannerDesc?.[selectedLang] || "4단계 안내를 목소리로 들으시겠어요?"}
                           </div>
                         </div>
                         <button
@@ -642,7 +646,7 @@ export default function Home() {
                           }`}
                         >
                           <i className={speakingMsgId === `full-${m.id}` ? "ri-stop-circle-fill text-base" : "ri-volume-up-fill text-amber-300 text-base"}></i>
-                          <span>{speakingMsgId === `full-${m.id}` ? "낭독 멈춤" : "4단계 전체 듣기"}</span>
+                          <span>{speakingMsgId === `full-${m.id}` ? (UI_TRANSLATIONS.audioStop?.[selectedLang] || "낭독 멈춤") : (UI_TRANSLATIONS.listenAll4Steps?.[selectedLang] || "4단계 전체 듣기")}</span>
                         </button>
                       </div>
 
@@ -652,66 +656,71 @@ export default function Home() {
                           <div>
                             <span className="font-extrabold text-slate-900 flex items-center gap-1">
                               <i className="ri-verified-badge-fill text-emerald-600"></i>
-                              공식 출처: {m.ragResult.sources.sourceApi || "공공데이터포털 / 남양주시청"}
+                              {UI_TRANSLATIONS.officialSourceLabel?.[selectedLang] || "공식 출처"}: {m.ragResult.sources.sourceApi || "공공데이터포털 / 남양주시청"}
                             </span>
                             <span className="text-slate-600 block text-xs mt-0.5">
-                              소관: {m.ragResult.sources.department || "남양주시 수동면 종합행정복지센터"} (확인일: 2026-08-20)
+                              소관: {m.ragResult.sources.department || "남양주시 평내동 종합행정복지센터"} (확인일: 2026-08-20)
                             </span>
                           </div>
                           <span className="text-xs sm:text-sm px-2.5 py-1 bg-white border border-slate-300 text-emerald-900 rounded-lg font-bold">
-                            📞 문의: {m.ragResult.sources.inquiryContact || village.communityCenterPhone}
+                            📞 {UI_TRANSLATIONS.inquiryContactLabel?.[selectedLang] || "문의"}: {m.ragResult.sources.inquiryContact || village.communityCenterPhone}
                           </span>
                         </div>
                       )}
 
                       {/* 4단계 스텝 카드 그리드 */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm sm:text-base">
-                        {(m.ragResult.groundedSteps || []).map((st) => (
-                          <div
-                            key={st.stepNum}
-                            className={`p-4 rounded-2xl border-2 flex flex-col justify-between transition-all shadow-sm ${
-                              speakingStepNum === st.stepNum
-                                ? "bg-amber-100 border-amber-500 ring-4 ring-amber-300"
-                                : st.stepNum === 1
-                                ? "bg-emerald-50 border-emerald-300"
-                                : st.stepNum === 2
-                                ? "bg-blue-50 border-blue-300"
-                                : st.stepNum === 3
-                                ? "bg-amber-50 border-amber-300"
-                                : "bg-purple-50 border-purple-300"
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-center justify-between font-extrabold text-slate-950 mb-2">
-                                <span className="flex items-center gap-2 font-heading text-sm sm:text-base">
-                                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs text-white font-black shrink-0 ${
-                                    st.stepNum === 1 ? "bg-emerald-600" :
-                                    st.stepNum === 2 ? "bg-blue-600" :
-                                    st.stepNum === 3 ? "bg-amber-600" : "bg-purple-600"
-                                  }`}>
-                                    {st.stepNum}
+                        {(m.ragResult.groundedSteps || []).map((st) => {
+                          const translatedTitle = translateStepTitle(st.title, selectedLang);
+                          const translatedContent = translateStepContent(st.content, st.stepNum, selectedLang);
+
+                          return (
+                            <div
+                              key={st.stepNum}
+                              className={`p-4 rounded-2xl border-2 flex flex-col justify-between transition-all shadow-sm ${
+                                speakingStepNum === st.stepNum
+                                  ? "bg-amber-100 border-amber-500 ring-4 ring-amber-300"
+                                  : st.stepNum === 1
+                                  ? "bg-emerald-50 border-emerald-300"
+                                  : st.stepNum === 2
+                                  ? "bg-blue-50 border-blue-300"
+                                  : st.stepNum === 3
+                                  ? "bg-amber-50 border-amber-300"
+                                  : "bg-purple-50 border-purple-300"
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center justify-between font-extrabold text-slate-950 mb-2">
+                                  <span className="flex items-center gap-2 font-heading text-sm sm:text-base">
+                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs text-white font-black shrink-0 ${
+                                      st.stepNum === 1 ? "bg-emerald-600" :
+                                      st.stepNum === 2 ? "bg-blue-600" :
+                                      st.stepNum === 3 ? "bg-amber-600" : "bg-purple-600"
+                                    }`}>
+                                      {st.stepNum}
+                                    </span>
+                                    <span>{translatedTitle}</span>
                                   </span>
-                                  <span>{st.title}</span>
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => speakSingleStep(st.stepNum, st.title, st.content)}
-                                  className={`p-1.5 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 ${
-                                    speakingStepNum === st.stepNum
-                                      ? "bg-rose-500 text-white animate-pulse"
-                                      : "bg-white hover:bg-slate-100 text-slate-800 border border-slate-300"
-                                  }`}
-                                  title={`${st.stepNum}단계 소리로 듣기`}
-                                >
-                                  <i className={speakingStepNum === st.stepNum ? "ri-stop-fill text-sm" : "ri-volume-up-fill text-sm text-emerald-700"}></i>
-                                </button>
-                              </div>
-                              <div className="text-slate-900 whitespace-pre-line leading-relaxed text-sm sm:text-base font-medium">
-                                {isEasyKorean ? convertToEasyKorean(st.content) : st.content}
+                                  <button
+                                    type="button"
+                                    onClick={() => speakSingleStep(st.stepNum, translatedTitle, translatedContent)}
+                                    className={`p-1.5 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 ${
+                                      speakingStepNum === st.stepNum
+                                        ? "bg-rose-500 text-white animate-pulse"
+                                        : "bg-white hover:bg-slate-100 text-slate-800 border border-slate-300"
+                                    }`}
+                                    title={`${st.stepNum}단계 소리로 듣기`}
+                                  >
+                                    <i className={speakingStepNum === st.stepNum ? "ri-stop-fill text-sm" : "ri-volume-up-fill text-sm text-emerald-700"}></i>
+                                  </button>
+                                </div>
+                                <div className="text-slate-900 whitespace-pre-line leading-relaxed text-sm sm:text-base font-medium">
+                                  {isEasyKorean ? convertToEasyKorean(translatedContent) : translatedContent}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {/* 원클릭 도움 요청 & 인쇄 액션 바 */}
@@ -723,7 +732,7 @@ export default function Home() {
                             className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-2xl text-sm sm:text-base shadow-md transition-all active:scale-98"
                           >
                             <i className="ri-hand-heart-fill text-lg"></i>
-                            <span>이 지원에 도움 요청하기 (마을관리자 연계)</span>
+                            <span>{UI_TRANSLATIONS.helpRequestAction?.[selectedLang] || "이 지원에 도움 요청하기 (마을관리자 연계)"}</span>
                           </button>
                         )}
 
@@ -734,7 +743,7 @@ export default function Home() {
                             className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-2xl text-xs sm:text-sm shadow transition-colors"
                           >
                             <i className="ri-printer-line text-base"></i>
-                            <span>A4 안내서 인쇄</span>
+                            <span>{UI_TRANSLATIONS.printA4Guide?.[selectedLang] || "A4 안내서 인쇄"}</span>
                           </button>
                         )}
                       </div>
@@ -806,7 +815,7 @@ export default function Home() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder={isListening ? "🎙️ 말씀하시는 중입니다..." : `[${village.name}] 질문을 적어주세요 (예: 수술비 지원, 땡큐버스)`}
+                  placeholder={isListening ? (UI_TRANSLATIONS.voiceListening?.[selectedLang] || "🎙️ 말씀하시는 중입니다...") : `[${village.name}] ${UI_TRANSLATIONS.askInputPlaceholder?.[selectedLang] || "질문을 적어주세요"}`}
                   className={`w-full pl-10 pr-10 py-3 sm:py-3.5 bg-white border-2 rounded-2xl text-base font-bold text-slate-950 placeholder:text-slate-400 focus:outline-none transition-all shadow-sm ${
                     isListening
                       ? "border-rose-500 bg-rose-50 ring-4 ring-rose-200"
@@ -832,7 +841,7 @@ export default function Home() {
                 className="inline-flex items-center justify-center gap-1.5 px-5 sm:px-7 py-3 sm:py-3.5 bg-emerald-800 hover:bg-emerald-900 active:scale-95 text-white font-black rounded-2xl transition-all text-sm sm:text-base whitespace-nowrap shadow-md ring-2 ring-emerald-300 shrink-0"
               >
                 <i className="ri-send-plane-fill text-base sm:text-lg text-amber-300"></i>
-                <span className="font-black">상담하기</span>
+                <span className="font-black">{UI_TRANSLATIONS.sendButton?.[selectedLang] || "상담하기"}</span>
               </button>
             </div>
 
@@ -853,12 +862,12 @@ export default function Home() {
                 <i className={isListening ? "ri-mic-fill" : "ri-mic-2-fill"}></i>
               </span>
               <span className="tracking-tight truncate font-extrabold text-sm sm:text-base">
-                {isListening ? "말씀 듣는 중... (누르면 전송)" : "🎙️ [목소리로 말하기] 눌러서 질문하기"}
+                {isListening ? (UI_TRANSLATIONS.voiceListening?.[selectedLang] || "말씀 듣는 중...") : (UI_TRANSLATIONS.voiceButton?.[selectedLang] || "🎙️ [목소리로 말하기] 눌러서 질문하기")}
               </span>
             </button>
 
             <p className="text-center text-xs text-slate-600 font-medium leading-tight">
-              🔒 개인정보는 일체 저장되지 않습니다. 위급 상황 시 <strong>119 · 112</strong>
+              {UI_TRANSLATIONS.privacyNotice?.[selectedLang] || "🔒 개인정보는 일체 저장되지 않습니다. 위급 상황 시 119 · 112"}
             </p>
           </div>
         </div>
