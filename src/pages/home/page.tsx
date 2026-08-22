@@ -451,18 +451,19 @@ export default function Home() {
 
           {/* 우측 상단 유틸리티 버튼 */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* 눈에 잘 띄는 선명한 [새 대화] 버튼 */}
             <button
               type="button"
               onClick={() => {
-                if (confirm("대화를 초기화하고 처음부터 다시 시작할까요?")) {
+                if (confirm("현재 대화 내용을 비우고 '새 대화'를 시작할까요?\n(기존 대화는 '상담기록'에 안전하게 보관되어 있습니다)")) {
                   resetToWelcome();
                 }
               }}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-colors"
-              title="새 대화 시작"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs sm:text-sm font-black shadow-md hover:shadow-lg ring-2 ring-emerald-300/60 transition-all transform active:scale-95 shrink-0"
+              title="대화 초기화하고 처음부터 다시 시작하기"
             >
-              <i className="ri-refresh-line"></i>
-              <span className="hidden sm:inline">새 대화</span>
+              <i className="ri-refresh-line text-sm sm:text-base font-bold"></i>
+              <span className="font-bold tracking-tight">새 대화</span>
             </button>
 
             <button

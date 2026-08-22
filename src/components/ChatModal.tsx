@@ -619,15 +619,15 @@ export default function ChatModal({
 
             {/* 우측 상단 도구: 초기화 & 지난 기록 & 닫기 */}
             <div className="flex items-center gap-1 shrink-0">
-              {/* 대화 내용 초기화 버튼 */}
+              {/* 눈에 잘 띄는 선명한 [새 대화] 버튼 */}
               <button
                 type="button"
                 onClick={handleResetChat}
-                className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-[11px] sm:text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-[11px] sm:text-xs font-black shadow-md ring-2 ring-emerald-300/50 transition-all transform active:scale-95 shrink-0"
                 title="상담 내용 초기화 (새 대화 시작)"
               >
-                <i className="ri-refresh-line"></i>
-                <span className="hidden sm:inline">초기화</span>
+                <i className="ri-refresh-line font-bold"></i>
+                <span className="font-bold tracking-tight">새 대화</span>
               </button>
 
               {/* 지난 상담 기록 모달 열기 버튼 */}
