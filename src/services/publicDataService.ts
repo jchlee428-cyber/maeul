@@ -258,46 +258,67 @@ export async function fetchPublicDataAPITest(pageNo: number = 1, numOfRows: numb
 export function matchPublicDataRecord(userQuery: string): PublicDataRecord | null {
   const q = userQuery.toLowerCase().trim();
 
-  // 1. 외출·동행·이동지원·드림콜
+  // 1. 외출·동행·이동지원·드림콜 (종교/병원/외출/거동불편)
   if (
     q.includes("교회") || q.includes("성당") || q.includes("절") || q.includes("외출") ||
-    q.includes("동행") || q.includes("거동") || q.includes("휠체어") ||
-    q.includes("드림콜") || q.includes("이동지원") || q.includes("나들이") || q.includes("보행")
+    q.includes("동행") || q.includes("거동") || q.includes("휠체어") || q.includes("보행") ||
+    q.includes("드림콜") || q.includes("이동지원") || q.includes("나들이") || q.includes("외출도움") ||
+    q.includes("혼자 걷기") || q.includes("병원 동행")
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-003") || null;
   }
 
-  // 2. 어르신 식사·반찬·독거노인 돌봄
-  if ((q.includes("노인") || q.includes("어르신") || q.includes("독거")) && (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥"))) {
+  // 2. 어르신 식사·반찬·독거노인 돌봄 (식사/밥/반찬/고독사/돌봄)
+  if (
+    (q.includes("노인") || q.includes("어르신") || q.includes("독거") || q.includes("할머니") || q.includes("할아버지") || q.includes("혼자")) &&
+    (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥") || q.includes("끼니") || q.includes("굶") || q.includes("안부"))
+  ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-002") || null;
   }
 
-  // 3. 의료비·수술비·병원비 환급·재난적의료비
-  if (q.includes("수술비") || q.includes("재난적의료비") || (q.includes("병원") && q.includes("지원")) || (q.includes("의료") && q.includes("환급")) || q.includes("치료비") || q.includes("약값")) {
+  // 3. 의료비·수술비·병원비 환급·재난적의료비 (병원/수술/치료/약값/간병/입원)
+  if (
+    q.includes("수술비") || q.includes("재난적의료비") || q.includes("본인부담상한제") ||
+    (q.includes("병원") && (q.includes("지원") || q.includes("돈") || q.includes("비용") || q.includes("비싸") || q.includes("환급") || q.includes("도움"))) ||
+    (q.includes("의료") && (q.includes("환급") || q.includes("지원") || q.includes("바우처") || q.includes("비용"))) ||
+    q.includes("치료비") || q.includes("약값") || q.includes("입원비") || q.includes("간병비") || q.includes("수술")
+  ) {
     return publicDataRepository.find((p) => p.id === "PUB-NHIS-001") || null;
   }
 
-  // 4. 긴급 생계비·월세 체납·실직 위기
+  // 4. 긴급 생계비·월세 체납·실직 위기·생활고 (돈이 없음/막막함/긴급지원)
   if (
-    q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비") ||
-    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("막막"))) ||
-    (q.includes("실직") && q.includes("생계")) || q.includes("굶") || q.includes("쌀이 없")
+    q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비") || q.includes("생활비") ||
+    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("막막") || q.includes("내기 힘들") || q.includes("못 내"))) ||
+    (q.includes("실직") && (q.includes("생계") || q.includes("도움") || q.includes("막막"))) ||
+    q.includes("굶") || q.includes("쌀이 없") || q.includes("먹고 살") || q.includes("돈이 없") ||
+    (q.includes("도와") && (q.includes("막막") || q.includes("살기") || q.includes("위기") || q.includes("힘들")))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
   }
 
   // 5. 국민취업지원제도 / 구직촉진수당 / 일자리 지원금
-  if (q.includes("구직촉진수당") || q.includes("국민취업지원") || (q.includes("취업") && q.includes("수당")) || (q.includes("구직") && q.includes("지원금"))) {
+  if (
+    q.includes("구직촉진수당") || q.includes("국민취업지원") ||
+    (q.includes("취업") && (q.includes("수당") || q.includes("지원금") || q.includes("패키지"))) ||
+    (q.includes("구직") && (q.includes("지원금") || q.includes("수당") || q.includes("급여"))) ||
+    (q.includes("일자리") && (q.includes("지원금") || q.includes("수당")))
+  ) {
     return publicDataRepository.find((p) => p.id === "PUB-MOEL-001") || null;
   }
 
-  // 6. 맞춤형 주거급여 / 월세 지원
-  if ((q.includes("주거급여") || q.includes("월세지원") || q.includes("집수리 지원")) && !q.includes("공공요금")) {
+  // 6. 맞춤형 주거급여 / 월세 지원 / 집수리 지원
+  if ((q.includes("주거급여") || q.includes("월세지원") || q.includes("집수리 지원") || q.includes("보증금 지원")) && !q.includes("공공요금")) {
     return publicDataRepository.find((p) => p.id === "PUB-MOLIT-001") || null;
   }
 
-  // 7. 에너지바우처 / 난방비·전기요금 감면
-  if (q.includes("에너지바우처") || (q.includes("난방비") && q.includes("지원")) || (q.includes("가스비") && q.includes("감면")) || (q.includes("전기요금") && q.includes("감면"))) {
+  // 7. 에너지바우처 / 난방비·전기요금 감면 / 가스비
+  if (
+    q.includes("에너지바우처") || (q.includes("난방비") && (q.includes("지원") || q.includes("감면") || q.includes("신청"))) ||
+    (q.includes("가스비") && (q.includes("감면") || q.includes("지원"))) ||
+    (q.includes("전기요금") && (q.includes("감면") || q.includes("지원"))) ||
+    (q.includes("연탄") && q.includes("바우처"))
+  ) {
     return publicDataRepository.find((p) => p.id === "PUB-MOTIE-001") || null;
   }
 
@@ -311,7 +332,7 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
     return publicDataRepository.find((p) => p.id === "PUB-NYJ-FEES-001") || null;
   }
 
-  // 일반 개괄 질문이거나 매칭되지 않는 경우 null 반환 (3순위 OpenAI 자유 마크다운 처리로 이관)
+  // 일반 개괄 질문이거나 매칭되지 않는 경우 null 반환 (2순위 로컬/교통 또는 3순위 OpenAI 스마트 검색으로 라우팅)
   return null;
 }
 
@@ -346,7 +367,7 @@ export function searchAndAnalyzePublicData(userQuery: string): RAGAnalysisResult
     {
       stepNum: 4,
       title: "안심 확인 & 사람 연결 (마을관리자)",
-      content: `⚠️ 최신 지원 기준 및 소득 산정은 관할 관공서의 최종 확인이 필요합니다.\n💡 혼자 신청하기 어려우시면 아래 [이 서비스에 도움 요청하기]를 눌러주세요. 마을관리자가 직접 관할 기관에 연결해드립니다.`,
+      content: `⚠️ 최신 지원 기준 및 소득 산정은 관할 관공서의 최종 확인이 필요합니다.\n💡 혼자 고민하지 마시고 아래 [🤝 이 지원에 도움 요청하기] 버튼을 꼭 눌러주세요! 마을관리자와 관할 행정복지센터 복지팀에서 서류 준비부터 방문 접수까지 친절하게 함께 해결해 드립니다.`,
       sourceCited: "마을지기 연계 시스템"
     }
   ];

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { communityResources, type CommunityResource } from "@/data/communityResources";
-import { searchAndAnalyzePublicData, type RAGAnalysisResult, type PublicDataRecord } from "@/services/publicDataService";
+import { searchAndAnalyzePublicData, publicDataRepository, type RAGAnalysisResult, type PublicDataRecord } from "@/services/publicDataService";
 import { checkAndHandleSimpleQueryAsync } from "@/services/simpleQueryService";
 import { reviewAndRefineResponse, classifyUserIntent } from "@/services/geminiReviewEngine";
 import { generateAISearchFallbackReply } from "@/services/aiSearchFallbackService";
@@ -898,6 +898,26 @@ export default function Home() {
                     )}
                   </div>
 
+                  {/* 단순 질의 / AI 스마트 검색 응답 시에도 마을관리자 원스톱 도움 요청 버튼 노출 */}
+                  {m.sender === "bot" && !m.ragResult && m.id !== "welcome" && (
+                    <div className="mt-4 pt-3.5 border-t-2 border-emerald-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-emerald-50/80 p-3.5 rounded-2xl border border-emerald-300 shadow-xs">
+                      <div className="text-xs sm:text-sm text-emerald-950 font-medium leading-snug">
+                        🤝 <strong>신청이 막막하거나 도움이 더 필요하신가요?</strong><br />
+                        <span className="text-[11px] sm:text-xs text-emerald-800">
+                          마을관리자와 관할 행정복지센터 복지팀에서 친절하게 상담을 도와드립니다.
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openHelpRequest(publicDataRepository[0], m.text)}
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-md transition-all active:scale-95 shrink-0 whitespace-nowrap"
+                      >
+                        <i className="ri-hand-heart-fill text-emerald-900 text-base"></i>
+                        <span>마을관리자 도움 요청하기</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* 공공데이터 9단계 표준 답변 카드 영역 (Section 6 & 16) */}
                   {m.ragResult && (
                     <div className="mt-4 pt-4 border-t-2 border-slate-200 space-y-3.5">
@@ -1012,9 +1032,9 @@ export default function Home() {
                           <button
                             type="button"
                             onClick={() => openHelpRequest(m.ragResult!.matchedPublicData, m.text)}
-                            className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-2xl text-sm sm:text-base shadow-md transition-all active:scale-98"
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black rounded-2xl text-sm sm:text-base shadow-lg hover:shadow-xl transition-all active:scale-98 border-2 border-amber-500"
                           >
-                            <i className="ri-hand-heart-fill text-lg"></i>
+                            <i className="ri-hand-heart-fill text-xl text-emerald-950"></i>
                             <span>{UI_TRANSLATIONS.helpRequestAction?.[selectedLang] || "이 지원에 도움 요청하기 (마을관리자 연계)"}</span>
                           </button>
                         )}
