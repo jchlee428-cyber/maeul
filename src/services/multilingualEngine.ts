@@ -482,49 +482,397 @@ export function convertToEasyKorean(text: string): string {
   return result;
 }
 
+export interface AdminDocReport {
+  summary: string[];
+  terms: { term: string; explanation: string }[];
+  dates: string;
+  target: string;
+  documents: string[];
+  whereToApply: string;
+  contact: string;
+}
+
+export const MULTILINGUAL_DOC_ANALYSIS: { [docKey: string]: { [lang: string]: AdminDocReport } } = {
+  emergency: {
+    ko: {
+      summary: [
+        "갑작스러운 경제적 어려움에 처한 주민에게 3개월간 월 71만 원의 긴급 생계비를 지원합니다.",
+        "어려운 이웃뿐 아니라 독거 어르신도 난방 연료비 추가 감면과 함께 지원받을 수 있습니다.",
+        "평내동 종합행정복지센터 복지팀에 신분증과 통장을 가지고 방문하시면 됩니다."
+      ],
+      terms: [
+        { term: "기준중위소득 75%", explanation: "대한민국 전체 가구를 소득 순서대로 줄 세웠을 때 75% 수준 이하인 기준입니다." },
+        { term: "기초생활보장 수급권자", explanation: "소득이나 재산이 적어 국가에서 생계비나 의료비를 매달 보조받는 자격입니다." },
+        { term: "차상위계층", explanation: "기초수급자 바로 윗 단계로, 형편이 어렵지만 일부 감면 혜택을 받는 분들입니다." }
+      ],
+      dates: "2026년 4월 30일(목) 오후 6시까지 (마감 전 신청 필요)",
+      target: "남양주시에 거주하는 기초수급자, 차상위계층 및 위기 독거어르신 가구",
+      documents: ["신분증 (주민등록증 또는 운전면허증)", "통장 사본 (본인 명의)", "금융정보제공동의서 (주민센터 구비)", "월세 계약서 (해당자)"],
+      whereToApply: "평내동 종합행정복지센터 맞춤형복지팀 (방문 접수)",
+      contact: "평내동 복지팀 (031-590-2605) / 보건복지상담센터 (129)"
+    },
+    en: {
+      summary: [
+        "Provides emergency living support of 713,100 KRW/month for 3 months to households facing sudden economic crises.",
+        "Vulnerable neighbors and seniors living alone will also receive additional winter heating fuel discounts.",
+        "Visit the Custom Welfare Team at Pyeongnae-dong Community Center with your ID card and bankbook copy."
+      ],
+      terms: [
+        { term: "Median Income 75% (기준중위소득 75%)", explanation: "Income threshold below 75% when ranking all Korean households by income." },
+        { term: "Basic Livelihood Recipient (기초생활보장 수급권자)", explanation: "Eligibility for monthly government subsidies for living and medical costs." },
+        { term: "Near-Poverty Class (차상위계층)", explanation: "Households slightly above basic welfare who still qualify for essential government discounts." }
+      ],
+      dates: "By April 30, 2026 (Thu) 18:00 (Apply before deadline)",
+      target: "Basic recipients, near-poverty households, and seniors living alone in Namyangju City",
+      documents: ["ID Card (Resident Card or Driver's License)", "Bankbook Copy (Under applicant's name)", "Financial Information Consent Form (Available at Center)", "Lease Agreement (if applicable)"],
+      whereToApply: "Pyeongnae-dong Integrated Community Service Center - Custom Welfare Team (In-person)",
+      contact: "Pyeongnae Welfare Team (031-590-2605) / Ministry of Health & Welfare (129)"
+    },
+    zh: {
+      summary: [
+        "为面临突发经济危机的居民提供为期 3 个月、每月 713,100 韩元的紧急生活费补助。",
+        "除困难家庭外，独居老人还可额外享受冬季取暖燃料费减免。",
+        "请携带身份证和存折复印件，前往坪内洞综合行政福利中心定制福利组办理申请。"
+      ],
+      terms: [
+        { term: "基准中位收入 75% (기준중위소득 75%)", explanation: "按全国家庭收入排序时处于 75% 水平以下的收入标准。" },
+        { term: "基础生活保障受惠人 (기초생활수급권자)", explanation: "因收入或财产较少而每月享受国家生活费及医疗费补助的资格。" },
+        { term: "次上位阶层 (차상위계층)", explanation: "处于低保边缘、但仍可享受各项民生减免优惠的困难家庭。" }
+      ],
+      dates: "截至 2026年 4月 30日(周四) 18:00 (请在截止日前申请)",
+      target: "居住在南杨州市的低保户、次上位阶层及独居老人困难家庭",
+      documents: ["身份证 (外国人登入证或驾照)", "本人存折复印件", "金融信息提供同意书 (福利中心备有)", "房屋租赁合同 (适用者)"],
+      whereToApply: "坪内洞综合行政福利中心 定制福利组 (现场办理)",
+      contact: "坪内洞福利组 (031-590-2605) / 保健福利咨询热线 (129)"
+    },
+    vi: {
+      summary: [
+        "Hỗ trợ chi phí sinh hoạt khẩn cấp 713.100 KRW/tháng trong 3 tháng cho các hộ gia đình gặp khó khăn kinh tế đột xuất.",
+        "Ngoài hộ khó khăn, người cao tuổi neo đơn còn được giảm thêm tiền nhiên liệu sưởi ấm mùa đông.",
+        "Hãy mang theo CCCD/hộ chiếu và bản sao sổ ngân hàng đến Đội Phúc lợi Tùy biến tại Trung tâm Hành chính Phúc lợi Pyeongnae-dong."
+      ],
+      terms: [
+        { term: "75% Thu nhập trung vị chuẩn (기준중위소득 75%)", explanation: "Mức thu nhập dưới 75% khi xếp hạng tất cả các hộ gia đình tại Hàn Quốc theo thu nhập." },
+        { term: "Đối tượng thụ hưởng bảo trợ cơ bản (기초생활수급권자)", explanation: "Người có thu nhập thấp được nhà nước trợ cấp sinh hoạt phí và y tế hàng tháng." },
+        { term: "Hộ cận nghèo (차상위계층)", explanation: "Nhóm ngay trên diện hộ nghèo, vẫn được hưởng các ưu đãi miễn giảm dịch vụ công thiết yếu." }
+      ],
+      dates: "Đến 18:00 thứ Năm, ngày 30 tháng 4 năm 2026 (Cần nộp trước hạn)",
+      target: "Hộ hưởng bảo trợ cơ bản, cận nghèo và người già neo đơn cư trú tại TP Namyangju",
+      documents: ["Thẻ chứng minh/hộ chiếu", "Bản sao sổ ngân hàng chính chủ", "Giấy đồng ý cung cấp thông tin tài chính (có tại trung tâm)", "Hợp đồng thuê nhà (nếu có)"],
+      whereToApply: "Đội Phúc lợi Tùy biến - Trung tâm Hành chính Phúc lợi Tổng hợp Pyeongnae-dong (Đến nộp trực tiếp)",
+      contact: "Đội Phúc lợi Pyeongnae (031-590-2605) / Tổng đài Phúc lợi Y tế (129)"
+    },
+    ja: {
+      summary: [
+        "突発的な経済危機に直面した住民へ、3ヶ月間月額713,100ウォンの緊急生計費を支援します。",
+        "生活困難な世帯だけでなく、独居高齢者の方も冬季暖房費の追加減免を受けられます。",
+        "身分証と通帳コピーを持参し、坪内洞総合行政福祉センターの福祉チームへご訪問ください。"
+      ],
+      terms: [
+        { term: "基準中位数所得 75%", explanation: "韓国全世帯を所得順に並べた際に75%以下に位置する所得基準です。" },
+        { term: "国民基礎生活保障受給権者", explanation: "所得・財産が基準以下で、国から毎月生計費や医療費の補助を受ける資格です。" },
+        { term: "準困窮層（次上位階層）", explanation: "基礎受給者の直上に位置し、各種公共料金の減免恩恵を受けられる世帯です。" }
+      ],
+      dates: "2026年4月30日(木) 18:00まで（締切前申請必須）",
+      target: "南楊州市在住の基礎受給者、次上位階層、および危機独居高齢者世帯",
+      documents: ["身分証明書", "本人名義の通帳コピー", "金融情報提供同意書（センター備え付け）", "賃貸借契約書（該当者）"],
+      whereToApply: "坪内洞総合行政福祉センター カスタム福祉チーム（訪問受付）",
+      contact: "坪内洞福祉チーム (031-590-2605) / 保健福祉相談センター (129)"
+    },
+    th: {
+      summary: [
+        "มอบเงินช่วยเหลือค่าครองชีพฉุกเฉิน 713,100 วอน/เดือน เป็นเวลา 3 เดือน สำหรับครอบครัวที่ประสบวิกฤตเศรษฐกิจกะทันหัน",
+        "นอกจากครอบครัวยากไร้แล้ว ผู้สูงอายุที่อาศัยอยู่คนเดียวยังได้รับส่วนลดค่าเชื้อเพลิงทำความร้อนในฤดูหนาวเพิ่มเติมด้วย",
+        "กรุณานำบัตรประชาชนและสมุดบัญชีธนาคารไปยื่นที่ศูนย์บริการสวัสดิการชุมชนพยองแนดง"
+      ],
+      terms: [
+        { term: "รายได้มัธยฐาน 75% (기준중위소득 75%)", explanation: "เกณฑ์รายได้ที่ต่ำกว่า 75% เมื่อจัดอันดับรายได้ของทุกครัวเรือนในเกาหลีใต้" },
+        { term: "ผู้ได้รับสิทธิสวัสดิการขั้นพื้นฐาน (수급권자)", explanation: "ผู้มีสิทธิ์ได้รับเงินช่วยเหลือค่าครองชีพและการรักษาพยาบาลรายเดือนจากรัฐบาล" },
+        { term: "กลุ่มเกือบยากจน (차상위계층)", explanation: "กลุ่มที่มีรายได้สูงกว่าผู้รับสวัสดิการขั้นพื้นฐานเล็กน้อย แต่ยังได้รับส่วนลดค่าบริการต่างๆ" }
+      ],
+      dates: "ภายในวันที่ 30 เมษายน 2026 (พฤหัสบดี) เวลา 18:00 น.",
+      target: "ผู้รับสวัสดิการขั้นพื้นฐาน, ครัวเรือนเกือบยากจน และผู้สูงอายุอยู่ลำพังในเมืองนัมยังจู",
+      documents: ["บัตรประชาชน/หนังสือเดินทาง", "สำเนาสมุดบัญชีธนาคาร", "หนังสือยินยอมให้ข้อมูลทางการเงิน", "สัญญาเช่าบ้าน (ถ้ามี)"],
+      whereToApply: "ศูนย์บริการชุมชนพยองแนดง ทีมสวัสดิการแบบปรับแต่ง (ยื่นด้วยตนเอง)",
+      contact: "ทีมสวัสดิการพยองแน (031-590-2605) / สายด่วนสวัสดิการ (129)"
+    },
+    tl: {
+      summary: [
+        "Nagbibigay ng emergency living support na 713,100 KRW/buwan hanggang 3 buwan para sa mga pamilyang nahaharap sa biglaang krisis pinansyal.",
+        "Makakatanggap din ng karagdagang diskwento sa pampainit sa taglamig ang mga kapus-palad at mag-isang matatanda.",
+        "Pumunta lamang sa Custom Welfare Team ng Pyeongnae-dong Community Center dala ang iyong ID at kopya ng bankbook."
+      ],
+      terms: [
+        { term: "Median Income 75% (기준중위소득 75%)", explanation: "Pamantayan sa kita na mas mababa sa 75% kapag inihanay ang lahat ng sambahayan sa Korea." },
+        { term: "Basic Livelihood Recipient (수급권자)", explanation: "Kwalipikasyon para sa buwanang tulong pinansyal at medikal mula sa gobyerno dahil sa mababang kita." },
+        { term: "Near-Poverty Class (차상위계층)", explanation: "Medyo mas mataas sa basic welfare ngunit kwalipikado pa rin sa mga diskwento ng gobyerno." }
+      ],
+      dates: "Hanggang Abril 30, 2026 (Huwebes) 18:00 (Mag-apply bago matapos)",
+      target: "Mga benepisyaryo ng welfare, near-poverty, at mag-isang matatanda sa Namyangju",
+      documents: ["ID Card / Passport", "Kopya ng Bankbook", "Financial Information Consent Form", "Kontrata sa Pagpapaupa (kung mayroon)"],
+      whereToApply: "Pyeongnae-dong Community Center - Custom Welfare Team (Personal na pagpunta)",
+      contact: "Pyeongnae Welfare Team (031-590-2605) / Welfare Hotline (129)"
+    },
+    id: {
+      summary: [
+        "Memberikan bantuan biaya hidup darurat sebesar 713.100 KRW/bulan selama 3 bulan bagi keluarga yang mengalami krisis ekonomi mendadak.",
+        "Selain keluarga kurang mampu, lansia yang tinggal sendirian juga mendapat potongan biaya pemanas musim dingin.",
+        "Kunjungi Tim Kesejahteraan Khusus di Pusat Komunitas Pyeongnae-dong dengan membawa KTP/Paspor dan salinan buku tabungan."
+      ],
+      terms: [
+        { term: "Pendapatan Median 75% (기준중위소득 75%)", explanation: "Batas pendapatan di bawah 75% dari seluruh rumah tangga di Korea Selatan." },
+        { term: "Penerima Jaminan Hidup Dasar (수급권자)", explanation: "Status penerima subsidi biaya hidup dan medis bulanan dari pemerintah karena berpenghasilan rendah." },
+        { term: "Golongan Hampir Miskin (차상위계층)", explanation: "Satu tingkat di atas penerima bantuan dasar yang masih berhak atas potongan tarif layanan publik." }
+      ],
+      dates: "Hingga 30 April 2026 (Kamis) 18:00 (Ajukan sebelum tenggat waktu)",
+      target: "Penerima bantuan dasar, golongan hampir miskin, dan lansia sebatang kara di Kota Namyangju",
+      documents: ["Kartu Identitas / Paspor", "Salinan Buku Tabungan", "Formulir Persetujuan Informasi Keuangan", "Surat Kontrak Sewa Rumah (jika ada)"],
+      whereToApply: "Pusat Layanan Terpadu Pyeongnae-dong - Tim Kesejahteraan Khusus (Datang langsung)",
+      contact: "Tim Kesejahteraan Pyeongnae (031-590-2605) / Hotline Kesejahteraan (129)"
+    },
+    mn: {
+      summary: [
+        "Гэнэтийн эдийн засгийн хямралд орсон өрхөд 3 сарын турш сар бүр 713,100 воны яаралтай амьжиргааны тэтгэмж олгоно.",
+        "Хүнд нөхцөлтэй өрхүүдээс гадна ганц бие өндөр настнуудад өвлийн халаалтын түлшний нэмэлт хөнгөлөлт үзүүлнэ.",
+        "Иргэний үнэмлэх болон банкны дэвтрийн хуулбартайгаа Пённэ-донгийн Захиргааны төвийн Халамжийн баг дээр очиж бүртгүүлнэ үү."
+      ],
+      terms: [
+        { term: "Суурь дундаж орлого 75% (기준중위소득 75%)", explanation: "Солонгосын нийт өрхийг орлогоор нь эрэмбэлэхэд 75%-иас доош түвшинд хамаарах орлогын стандарт." },
+        { term: "Амьжиргааны үндсэн баталгаа хүлээн авагч (수급권자)", explanation: "Орлого, эд хөрөнгө бага тул улсаас сар бүр амьжиргаа, эрүүл мэндийн тэтгэмж авах эрх." },
+        { term: "Нэн ядуугийн өмнөх давхарга (차상위계층)", explanation: "Үндсэн тэтгэмж авагчаас арай дээгүүр боловч төрийн зарим хөнгөлөлт авах эрхтэй иргэд." }
+      ],
+      dates: "2026 оны 4-р сарын 30-ны (Пүрэв) 18:00 цаг хүртэл (Хугацаанаас өмнө бүртгүүлэх шаардлагатай)",
+      target: "Намъянжү хотод оршин суудаг үндсэн тэтгэмж авагчид, ядуугийн өмнөх давхарга болон ганц бие өндөр настнууд",
+      documents: ["Иргэний үнэмлэх / Гадаад иргэний үнэмлэх", "Банкны дансны хуулбар", "Санхүүгийн мэдээлэл өгөх зөвшөөрлийн хуудас", "Түрээсийн гэрээ (хэрэв байгаа бол)"],
+      whereToApply: "Пённэ-донгийн Захиргааны нэгдсэн төв - Тусгай халамжийн баг (Биечлэн очих)",
+      contact: "Пённэ халамжийн баг (031-590-2605) / Эрүүл мэнд, халамжийн зөвлөгөөний төв (129)"
+    },
+    ru: {
+      summary: [
+        "Предоставление экстренной помощи на проживание в размере 713 100 вон/мес. на срок до 3 месяцев семьям в кризисной ситуации.",
+        "Помимо малообеспеченных граждан, одинокие пожилые люди получат дополнительную скидку на отопление в зимний период.",
+        "Обратитесь в Отдел адресной социальной помощи центра Пхённэ-дон с удостоверением личности и копией банковской книжки."
+      ],
+      terms: [
+        { term: "75% медианного дохода (기준중위소득 75%)", explanation: "Порог дохода ниже 75% от среднего уровня всех домохозяйств Республики Корея." },
+        { term: "Получатель базовой соцпомощи (수급권자)", explanation: "Статус граждан с низким доходом, дающий право на ежемесячные выплаты и медицинские субсидии." },
+        { term: "Малообеспеченный класс (차상위계층)", explanation: "Категория граждан чуть выше уровня бедности, имеющая право на ряд льгот." }
+      ],
+      dates: "До 30 апреля 2026 г. (Чт) 18:00 (Подать до истечения срока)",
+      target: "Получатели базовых пособий, малообеспеченные граждане и одинокие пожилые люди в г. Намъянджу",
+      documents: ["Удостоверение личности / Паспорт", "Копия банковской книжки заявителя", "Согласие на обработку финансовых данных", "Договор аренды жилья (при наличии)"],
+      whereToApply: "Комплексный центр обслуживания Пхённэ-дон - Отдел адресной помощи (Личный визит)",
+      contact: "Отдел соцзащиты Пхённэ (031-590-2605) / Горячая линия Минздрава (129)"
+    }
+  },
+  medical: {
+    ko: {
+      summary: [
+        "남양주시에 등록된 외국인 근로자 및 다문화가족에게 무료 건강검진과 독감 예방접종을 지원합니다.",
+        "흉부 X-ray, 혈액검사, 당뇨 검사 등 기본 건강검진을 전액 무료로 받으실 수 있습니다.",
+        "외국인등록증이나 여권을 지참하여 남양주시 보건소 또는 평내건강생활지원센터를 방문하시면 됩니다."
+      ],
+      terms: [
+        { term: "계절근로자", explanation: "농번기 등에 일정 기간 농가에서 일하도록 허가받은 외국인 근로자입니다." },
+        { term: "인플루엔자 예방접종", explanation: "독감 바이러스 감염을 예방하기 위한 백신 주사입니다." }
+      ],
+      dates: "2026년 4월 매주 수요일 오전 09:00 ~ 12:00",
+      target: "남양주시 관내 사업장 및 농가에 등록된 외국인 등록증 소지자",
+      documents: ["외국인등록증 (또는 여권)"],
+      whereToApply: "남양주시 보건소 및 평내건강생활지원센터",
+      contact: "남양주시 보건행정과 (031-590-8000)"
+    },
+    en: {
+      summary: [
+        "Free health checkups and flu vaccinations for registered foreign workers and multicultural families in Namyangju.",
+        "Covers chest X-ray, blood test, blood pressure, and diabetes screening completely free of charge.",
+        "Visit Namyangju Public Health Center or Pyeongnae Health Support Center with your Alien Registration Card or Passport."
+      ],
+      terms: [
+        { term: "Seasonal Worker (계절근로자)", explanation: "Foreign workers officially permitted to work on farms during peak farming seasons." },
+        { term: "Influenza Vaccination (인플루엔자 예방접종)", explanation: "Vaccine injection to prevent infection from the influenza (flu) virus." }
+      ],
+      dates: "Every Wednesday in April 2026, 09:00 - 12:00",
+      target: "Foreign registration holders employed at workplaces/farms in Namyangju",
+      documents: ["Alien Registration Card (or Passport)"],
+      whereToApply: "Namyangju Public Health Center & Pyeongnae Community Health Center",
+      contact: "Namyangju Public Health Administration (031-590-8000)"
+    },
+    zh: {
+      summary: [
+        "为在南杨州市登记的外国劳动者及多文化家庭提供免费健康体检与流感疫苗接种。",
+        "胸部 X 光、血液检查、血压及血糖等基础体检项目费用全免。",
+        "请携带外国人登录证或护照，前往南杨州市保健所或坪内健康生活支援中心。"
+      ],
+      terms: [
+        { term: "季节性劳动者 (계절근로자)", explanation: "获准在农忙时节在农场短期务工的外国劳动者。" },
+        { term: "流感疫苗接种 (인플루엔자 예방접종)", explanation: "预防流行性感冒病毒感染的疫苗注射。" }
+      ],
+      dates: "2026年 4月 每周三 上午 09:00 ~ 12:00",
+      target: "在南杨州市内企业及农户登记的外国人登录证持有者",
+      documents: ["外国人登录证 (或护照)"],
+      whereToApply: "南杨州市保健所及坪内健康生活支援中心",
+      contact: "南杨州市保健行政科 (031-590-8000)"
+    },
+    vi: {
+      summary: [
+        "Cung cấp khám sức khỏe miễn phí và tiêm phòng cúm cho lao động nước ngoài và gia đình đa văn hóa tại TP Namyangju.",
+        "Miễn phí toàn bộ chụp X-quang phổi, xét nghiệm máu, đo huyết áp và kiểm tra đường huyết cơ bản.",
+        "Hãy mang theo Thẻ đăng ký người nước ngoài hoặc Hộ chiếu đến Trung tâm Y tế Namyangju hoặc Trung tâm Hỗ trợ Sức khỏe Pyeongnae."
+      ],
+      terms: [
+        { term: "Lao động thời vụ (계절근로자)", explanation: "Lao động nước ngoài được phép làm việc tại các trang trại vào mùa cao điểm nông nghiệp." },
+        { term: "Tiêm phòng cúm mùa (인플루엔자 예방접종)", explanation: "Mũi tiêm vắc xin phòng ngừa virus cúm mùa hàng năm." }
+      ],
+      dates: "Thứ Tư hàng tuần trong tháng 4 năm 2026, từ 09:00 đến 12:00",
+      target: "Người có Thẻ đăng ký người nước ngoài đang làm việc tại các cơ sở/nông trại ở Namyangju",
+      documents: ["Thẻ đăng ký người nước ngoài (hoặc Hộ chiếu)"],
+      whereToApply: "Trung tâm Y tế Công cộng Namyangju & Trung tâm Sức khỏe Pyeongnae",
+      contact: "Phòng Quản trị Y tế Namyangju (031-590-8000)"
+    },
+    ja: {
+      summary: [
+        "南楊州市に登録された外国人労働者および多文化家族へ無料健康診断とインフルエンザ予防接種を支援します。",
+        "胸部レントゲン、血液検査、血圧・血糖検査などの基本検診を全額無料で受診いただけます。",
+        "外国人登録証またはパスポートを持参の上、南楊州市保健所または坪内健康生活支援センターへご来所ください。"
+      ],
+      terms: [
+        { term: "季節労働者", explanation: "農繁期などに一定期間農家で就労を許可された外国人労働者です。" },
+        { term: "インフルエンザ予防接種", explanation: "インフルエンザウイルスの感染を防ぐためのワクチン注射です。" }
+      ],
+      dates: "2026年4月 毎週水曜日 午前09:00〜12:00",
+      target: "南楊州市内の事業所および農家に登録された外国人登録証所持者",
+      documents: ["外国人登録証（またはパスポート）"],
+      whereToApply: "南楊州市保健所および坪内健康生活支援センター",
+      contact: "南楊州市保健行政課 (031-590-8000)"
+    },
+    th: {
+      summary: [
+        "ตรวจสุขภาพฟรีและฉีดวัคซีนป้องกันไข้หวัดใหญ่สำหรับแรงงานต่างชาติและครอบครัวพหุวัฒนธรรมในเมืองนัมยังจู",
+        "ตรวจเอกซเรย์ทรวงอก, ตรวจเลือด, ความดันโลหิต และเบาหวานฟรีทั้งหมด",
+        "กรุณานำบัตรประจำตัวคนต่างด้าวหรือหนังสือเดินทางไปที่ศูนย์สาธารณสุขนัมยังจู"
+      ],
+      terms: [
+        { term: "แรงงานตามฤดูกาล (계절근로자)", explanation: "แรงงานต่างชาติที่ได้รับอนุญาตให้ทำงานในฟาร์มในช่วงฤดูเก็บเกี่ยว" },
+        { term: "การฉีดวัคซีนไข้หวัดใหญ่ (인플루엔자 예방접종)", explanation: "การฉีดวัคซีนเพื่อป้องกันการติดเชื้อไวรัสไข้หวัดใหญ่" }
+      ],
+      dates: "ทุกวันพุธในเดือนเมษายน 2026 เวลา 09:00 - 12:00 น.",
+      target: "ผู้ถือบัตรประจำตัวคนต่างด้าวที่ทำงานในสถานประกอบการ/ฟาร์มในนัมยังจู",
+      documents: ["บัตรประจำตัวคนต่างด้าว (หรือหนังสือเดินทาง)"],
+      whereToApply: "ศูนย์สาธารณสุขนัมยังจู และศูนย์ส่งเสริมสุขภาพพยองแน",
+      contact: "ฝ่ายบริหารสาธารณสุขนัมยังจู (031-590-8000)"
+    },
+    tl: {
+      summary: [
+        "Libreng medical check-up at bakuna sa trangkaso para sa mga rehistradong dayuhang manggagawa at pamilyang multikultural sa Namyangju.",
+        "Ganap na libreng Chest X-ray, pagsusuri sa dugo, presyon ng dugo, at diabetes test.",
+        "Pumunta sa Namyangju Public Health Center o Pyeongnae Health Center dala ang iyong Alien Card o Pasaporte."
+      ],
+      terms: [
+        { term: "Seasonal Worker (계절근로자)", explanation: "Mga dayuhang manggagawa na may pahintulot magtrabaho sa sakahan tuwing panahon ng pag-aani." },
+        { term: "Flu Vaccination (인플루엔자 예방접종)", explanation: "Bakuna laban sa impeksyon ng influenza virus." }
+      ],
+      dates: "Tuwing Miyerkules sa Abril 2026, 09:00 - 12:00 ng umaga",
+      target: "Mga dayuhang may Alien Card na nagtatrabaho sa Namyangju",
+      documents: ["Alien Registration Card (o Pasaporte)"],
+      whereToApply: "Namyangju Public Health Center at Pyeongnae Health Center",
+      contact: "Namyangju Health Administration (031-590-8000)"
+    },
+    id: {
+      summary: [
+        "Pemeriksaan kesehatan gratis dan vaksin flu bagi pekerja asing terdaftar dan keluarga multikultural di Kota Namyangju.",
+        "Mencakup Rontgen dada, tes darah, tekanan darah, dan gula darah secara gratis.",
+        "Kunjungi Puskesmas Namyangju atau Pusat Kesehatan Pyeongnae dengan membawa Kartu Izin Tinggal Asing (ARC) atau Paspor."
+      ],
+      terms: [
+        { term: "Pekerja Musiman (계절근로자)", explanation: "Tenaga kerja asing yang diizinkan bekerja di sektor pertanian saat musim panen." },
+        { term: "Vaksinasi Influenza (인플루엔자 예방접종)", explanation: "Suntikan vaksin untuk mencegah penularan virus flu musiman." }
+      ],
+      dates: "Setiap hari Rabu di bulan April 2026, pukul 09:00 - 12:00",
+      target: "Pemegang ARC yang terdaftar di tempat kerja/pertanian di Namyangju",
+      documents: ["Alien Registration Card (atau Paspor)"],
+      whereToApply: "Puskesmas Namyangju & Pusat Kesehatan Komunitas Pyeongnae",
+      contact: "Dinas Administrasi Kesehatan Namyangju (031-590-8000)"
+    },
+    mn: {
+      summary: [
+        "Намъянжү хотод бүртгэлтэй гадаад ажилчид болон олон соёлт гэр бүлд зориулсан эрүүл мэндийн үнэгүй үзлэг, ханиадны вакцинжуулалт.",
+        "Цээжний рентген, цусны шинжилгээ, даралт болон чихрийн шижингийн үзлэгийг бүрэн үнэ төлбөргүй хийнэ.",
+        "Гадаад иргэний үнэмлэх эсвэл паспортоо аваад Намъянжү хотын Эрүүл мэндийн төвд очно уу."
+      ],
+      terms: [
+        { term: "Улирлын чанартай ажилчин (계절근로자)", explanation: "Хөдөө аж ахуйн оргил үед фермд ажиллах зөвшөөрөл авсан гадаад иргэд." },
+        { term: "Ханиадны вакцинжуулалт (인플루엔자 예방접종)", explanation: "Ханиадны вирусээс урьдчилан сэргийлэх дархлаажуулалтын тарилга." }
+      ],
+      dates: "2026 оны 4-р сарын Лхагва гараг бүр, 09:00 - 12:00 цагт",
+      target: "Намъянжү хотын аж ахуйн нэгж, фермд бүртгэлтэй гадаад иргэний үнэмлэх эзэмшигчид",
+      documents: ["Гадаад иргэний үнэмлэх (эсвэл паспорт)"],
+      whereToApply: "Намъянжү хотын Эрүүл мэндийн төв ба Пённэ Эрүүл мэндийн төв",
+      contact: "Намъянжү хотын Эрүүл мэндийн захиргааны хэлтэс (031-590-8000)"
+    },
+    ru: {
+      summary: [
+        "Бесплатный медосмотр и вакцинация против гриппа для зарегистрированных иностранных рабочих и мультикультурных семей в г. Намъянджу.",
+        "Включает флюорографию, анализ крови, измерение давления и уровня сахара полностью бесплатно.",
+        "Посетите Центр общественного здоровья Намъянджу или Центр Пхённэ с регистрационной картой иностранца или паспортом."
+      ],
+      terms: [
+        { term: "Сезонный рабочий (계절근로자)", explanation: "Иностранные работники, допущенные к временной работе на фермах в пик сельхозсезона." },
+        { term: "Вакцинация против гриппа (인플루엔자 예방접종)", explanation: "Прививка для предотвращения заражения вирусом сезонного гриппа." }
+      ],
+      dates: "Каждую среду в апреле 2026 г. с 09:00 до 12:00",
+      target: "Владельцы карт иностранца, занятые на предприятиях и фермах в г. Намъянджу",
+      documents: ["Регистрационная карта иностранца (или загранпаспорт)"],
+      whereToApply: "Центр здоровья Намъянджу и Центр поддержки здоровья Пхённэ",
+      contact: "Отдел управления здравоохранением Намъянджу (031-590-8000)"
+    }
+  }
+};
+
 /**
- * 주어진 텍스트를 선택된 언어로 실시간 요약 번역 반환 (외국인 주민을 위한 10대 다국어 RAG 번역 헬퍼)
+ * 주어진 텍스트를 선택된 언어로 깔끔하고 자연스럽게 번역 (불필요한 헤더/푸터 태그 없이)
  */
 export function translateTextToTargetLang(text: string, targetLang: string): string {
-  if (targetLang === "ko") return text;
+  if (targetLang === "ko" || !text) return text;
 
-  const headerMap: { [lang: string]: { summary: string; target: string; content: string; apply: string; source: string } } = {
-    en: { summary: "📌 Summary at a Glance", target: "👤 Eligibility", content: "🎁 Benefits", apply: "📝 How to Apply", source: "🏛️ Official Source Verified" },
-    zh: { summary: "📌 一目了然", target: "👤 申请对象", content: "🎁 支援内容", apply: "📝 申请方法", source: "🏛️ 官方出处已验证" },
-    vi: { summary: "📌 Tóm tắt nhanh", target: "👤 Đối tượng áp dụng", content: "🎁 Nội dung hỗ trợ", apply: "📝 Cách đăng ký", source: "🏛️ Đã xác minh nguồn chính thức" },
-    ja: { summary: "📌 概要", target: "👤 対象者", content: "🎁 支援内容", apply: "📝 申請方法", source: "🏛️ 公式出典確認済み" },
-    th: { summary: "📌 สรุปอย่างย่อ", target: "👤 คุณสมบัติผู้สมัคร", content: "🎁 สิทธิประโยชน์", apply: "📝 วิธีการสมัคร", source: "🏛️ ตรวจสอบแหล่งที่มาอย่างเป็นทางการแล้ว" },
-    tl: { summary: "📌 Buod sa Isang Tingin", target: "👤 Sino ang Pwede", content: "🎁 Mga Benepisyo", apply: "📝 Paano Mag-apply", source: "🏛️ Na-verify na Opisyal na Pinagmulan" },
-    id: { summary: "📌 Ringkasan Singkat", target: "👤 Kriteria Penerima", content: "🎁 Bantuan yang Diterima", apply: "📝 Cara Mendaftar", source: "🏛️ Sumber Resmi Terverifikasi" },
-    mn: { summary: "📌 Товч дүгнэлт", target: "👤 Хамрагдах хүмүүс", content: "🎁 Дэмжлэгийн агуулга", apply: "📝 Хэрхэн бүртгүүлэх", source: "🏛️ Албан ёсны эх сурвалж баталгаажсан" },
-    ru: { summary: "📌 Краткое резюме", target: "👤 Кто имеет право", content: "🎁 Меры поддержки", apply: "📝 Как подать заявку", source: "🏛️ Официальный источник проверен" }
-  };
+  // Check in dictionary
+  for (const docKey of ["emergency", "medical"] as const) {
+    const koReport = MULTILINGUAL_DOC_ANALYSIS[docKey].ko;
+    const targetReport = MULTILINGUAL_DOC_ANALYSIS[docKey][targetLang] || MULTILINGUAL_DOC_ANALYSIS[docKey].en;
 
-  const headers = headerMap[targetLang] || headerMap.en;
-
-  let translatedBody = text;
-  if (targetLang === "en") {
-    translatedBody = translatedBody
-      .replace(/말씀해주셔서 정말 감사해요/g, "Thank you very much for sharing your situation with us.")
-      .replace(/힘드신 이야기를 편하게 나눠주셔서 고마워요/g, "We are here to support you through your difficulties.")
-      .replace(/공공데이터포털 연계/g, "Linked with Public Data Portal")
-      .replace(/공식 정보를 확인하여/g, "We verified official administrative guidelines")
-      .replace(/어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요/g, "and structured the essential support into 4 easy-to-understand steps for you.");
-  } else if (targetLang === "vi") {
-    translatedBody = translatedBody
-      .replace(/말씀해주셔서 정말 감사해요/g, "Cảm ơn bạn rất nhiều vì đã chia sẻ hoàn cảnh với chúng tôi.")
-      .replace(/힘드신 이야기를 편하게 나눠주셔서 고마워요/g, "Chúng tôi luôn sẵn sàng hỗ trợ bạn vượt qua khó khăn.")
-      .replace(/공공데이터포털 연계/g, "Kết nối với Cổng dữ liệu công cộng quốc gia")
-      .replace(/공식 정보를 확인하여/g, "Chúng tôi đã xác minh thông tin chính thức từ cơ quan hành chính")
-      .replace(/어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요/g, "và tổng hợp thành 4 bước dễ hiểu dành riêng cho bạn.");
-  } else if (targetLang === "zh") {
-    translatedBody = translatedBody
-      .replace(/말씀해주셔서 정말 감사해요/g, "非常感谢您向我们倾诉您的情况。")
-      .replace(/힘드신 이야기를 편하게 나눠주셔서 고마워요/g, "我们随时为您排忧解难。")
-      .replace(/공공데이터포털 연계/g, "对接公共数据门户")
-      .replace(/공식 정보를 확인하여/g, "已确认官方行政指南")
-      .replace(/어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요/g, "并为您整理成通俗易懂的 4 个阶段。");
+    // Check summary items
+    for (let i = 0; i < koReport.summary.length; i++) {
+      if (text === koReport.summary[i] && targetReport.summary[i]) {
+        return targetReport.summary[i];
+      }
+    }
+    // Check dates
+    if (text === koReport.dates) return targetReport.dates;
+    // Check target
+    if (text === koReport.target) return targetReport.target;
+    // Check whereToApply
+    if (text === koReport.whereToApply) return targetReport.whereToApply;
+    // Check contact
+    if (text === koReport.contact) return targetReport.contact;
+    // Check documents
+    for (let i = 0; i < koReport.documents.length; i++) {
+      if (text === koReport.documents[i] && targetReport.documents[i]) {
+        return targetReport.documents[i];
+      }
+    }
   }
 
-  return `[${headers.summary}]\n${translatedBody}\n\n💡 (${headers.source}: MAEUL AI)`;
+  // Fallback for general phrases
+  if (targetLang === "en") {
+    return text
+      .replace(/갑작스러운 어려움에 처한 주민에게 3개월간 월 71만 원의 긴급 생계비를 지원합니다\./g, "Provides emergency living support of 713,100 KRW/month for up to 3 months to households facing sudden economic crises.")
+      .replace(/어려운 이웃뿐 아니라 독거 어르신도 난방비와 함께 지원받을 수 있습니다\./g, "Vulnerable neighbors and seniors living alone will also receive additional winter heating fuel discounts.")
+      .replace(/평내동 종합행정복지센터 복지팀에 신분증과 통장을 가지고 방문하시면 됩니다\./g, "Visit the Custom Welfare Team at Pyeongnae-dong Community Center with your ID card and bankbook copy.")
+      .replace(/말씀해주셔서 정말 감사해요/g, "Thank you very much for sharing your situation with us.")
+      .replace(/공공데이터포털 연계/g, "Linked with Public Data Portal")
+      .replace(/공식 정보를 확인하여/g, "We verified official administrative guidelines");
+  }
+
+  return text;
 }
+
