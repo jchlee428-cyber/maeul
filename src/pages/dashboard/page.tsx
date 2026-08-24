@@ -16,17 +16,17 @@ export default function DashboardPage() {
         {/* 상단 브레드크럼 및 지역 선택기 */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 bg-white p-5 rounded-3xl border-2 border-emerald-200 shadow-sm">
           <div>
-            <div className="flex items-center gap-2 text-xs md:text-sm font-extrabold text-emerald-800">
-              <span className="px-2 py-0.5 rounded-md bg-emerald-100 border border-emerald-300">
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-xs md:text-sm font-extrabold text-emerald-800 break-keep flex-wrap">
+              <span className="px-2 py-0.5 rounded-md bg-emerald-100 border border-emerald-300 shrink-0">
                 LOCAL FIRST
               </span>
-              <span>대한민국 ➔ 경기도 ➔ 남양주시 ➔ 평내·호평·금곡</span>
+              <span className="break-keep">대한민국 ➔ 경기도 ➔ 남양주시 ➔ 평내·호평·금곡</span>
             </div>
-            <h1 className="font-heading text-[1.25rem] sm:text-2xl md:text-4xl font-black text-slate-950 mt-1 flex items-center gap-1 sm:gap-2 flex-nowrap tracking-[-0.08em] sm:tracking-normal break-keep">
-              <span className="shrink-0">🏡 우리 동네 대시보드</span>
-              <span className="text-emerald-700 tracking-[-0.08em] sm:tracking-normal shrink-0">[{village.name}]</span>
+            <h1 className="font-heading text-lg sm:text-2xl md:text-4xl font-black text-slate-950 mt-1.5 flex flex-wrap items-center gap-1 sm:gap-2 break-keep tracking-tight">
+              <span className="shrink-0 whitespace-nowrap">🏡 우리 동네 대시보드</span>
+              <span className="text-emerald-700 shrink-0 whitespace-nowrap">[{village.name}]</span>
             </h1>
-            <p className="text-sm md:text-base text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 mt-1 break-keep">
               {village.fullName} 주민과 외국인을 위한 실시간 행정·복지·생활 종합 현황판입니다.
             </p>
           </div>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
             <select
               value={selectedVillageCode}
               onChange={(e) => setSelectedVillageCode(e.target.value)}
-              className="px-4 py-2.5 bg-slate-50 border-2 border-emerald-400 rounded-2xl text-sm font-black text-slate-900 focus:outline-none focus:ring-4 focus:ring-emerald-200"
+              className="px-4 py-2.5 bg-slate-50 border-2 border-emerald-400 rounded-2xl text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:ring-4 focus:ring-emerald-200"
             >
               {AVAILABLE_REGIONS[0].townships[0].villages.map((v) => (
                 <option key={v.code} value={v.code}>
@@ -52,19 +52,19 @@ export default function DashboardPage() {
         <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white shadow-lg mb-8 border border-emerald-700">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-xs font-black animate-pulse">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] sm:text-xs font-black animate-pulse shrink-0 whitespace-nowrap">
                   🔔 오늘 우리 동네 주요 공지
                 </span>
-                <span className="text-xs text-emerald-200">
+                <span className="text-[11px] sm:text-xs text-emerald-200 shrink-0 whitespace-nowrap">
                   행정복지센터 공식 연동
                 </span>
               </div>
-              <h2 className="text-lg md:text-xl font-black text-amber-200">
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-amber-200 break-keep leading-snug">
                 {village.keyNotice}
               </h2>
-              <p className="text-xs md:text-sm text-emerald-100">
-                📍 관할: {village.representativeOrg} | 📞 전화: {village.communityCenterPhone}
+              <p className="text-xs md:text-sm text-emerald-100 break-keep">
+                📍 관할: {village.representativeOrg} | 📞 전화: <a href={`tel:${village.communityCenterPhone.replace(/[^0-9]/g, "")}`} className="underline font-bold hover:text-amber-300">{village.communityCenterPhone}</a>
               </p>
             </div>
 
