@@ -236,20 +236,6 @@ function FormattedMessageText({ text }: { text: string }) {
   );
 }
 
-const quickQueries = [
-  "🏛️ 평내 주민자치센터 강좌 (pyeongnae.co.kr)",
-  "🏛️ 남양주시청 누리집 (nyj.go.kr)",
-  "⏱️ 전철/지하철 열차시간표 (data.go.kr)",
-  "👵 어르신 식사·돌봄 지원",
-  "🏥 수술비·병원비 돌려받기",
-  "🏠 월세·생계비 긴급 지원",
-  "🚌 남양주 땡큐버스 위치",
-  "🏛️ 동주민센터 전화번호",
-  "🏫 초·중·고교 직통 연락처",
-  "💼 취업 구직촉진수당",
-  "🌏 외국인 근로자 의료지원"
-];
-
 export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -1006,23 +992,6 @@ export default function Home() {
             </button>
           </div>
         )}
-
-        {/* 빠른 추천 질문 바 */}
-        <div className="px-3 sm:px-6 py-2 bg-emerald-50 border-t-2 border-emerald-200 shrink-0 z-10">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-2 overflow-x-auto pb-1 text-xs sm:text-sm no-scrollbar">
-              {quickQueries.map((qq) => (
-                <button
-                  key={qq}
-                  onClick={() => handleSendMessage(qq)}
-                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-100 border-2 border-emerald-300 text-slate-900 font-bold whitespace-nowrap transition-all shadow-xs active:scale-95"
-                >
-                  {qq}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* 하단 2단 스마트 입력 영역 */}
         <div className="p-3 sm:p-5 bg-white border-t-2 border-emerald-300 shrink-0 shadow-2xl z-10 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
