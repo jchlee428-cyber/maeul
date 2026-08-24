@@ -14,10 +14,10 @@ export default function CasesPage() {
           <span className="inline-block px-4 py-1.5 text-sm font-bold rounded-full bg-accent-500 text-foreground-950 mb-3">
             실증 사업 성과 보고
           </span>
-          <h1 className="font-heading text-3xl md:text-5xl font-bold text-primary-800 leading-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl font-bold text-primary-800 leading-tight break-keep tracking-[-0.05em] sm:tracking-normal">
             실제 주민과 함께 만든 변화
           </h1>
-          <p className="mt-4 text-base md:text-lg text-foreground-700 leading-relaxed">
+          <p className="mt-4 text-base md:text-lg text-foreground-700 leading-relaxed break-keep">
             마을지기는 단순한 기술 아이디어가 아닌, 지역사회 현장에서 실제 주민 3명에게 적용하여
             <br className="hidden md:inline" />
             100% 공식자료 검증과 복지·행정 서비스 연결을 달성한 실증 모델입니다.
@@ -27,7 +27,7 @@ export default function CasesPage() {
         {/* 성과 지표 대시보드 (사업계획서 9장) */}
         <div className="bg-primary-900 text-white rounded-3xl p-6 md:p-8 shadow-xl mb-12">
           <div className="text-center max-w-xl mx-auto mb-6">
-            <h2 className="font-heading text-2xl font-bold text-accent-300">
+            <h2 className="font-heading text-xl sm:text-2xl font-bold text-accent-300 tracking-[-0.08em] sm:tracking-normal break-keep">
               1차 실증 사업 성과 지표
             </h2>
             <p className="text-xs text-primary-200 mt-1">
