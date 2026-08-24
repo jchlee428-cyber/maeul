@@ -364,73 +364,143 @@ export default function Home() {
     }
   };
 
-  // 모바일 & 인앱 브라우저 호환 하이브리드 TTS
+  const activeUtterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
+  const isSpeakingCancelledRef = useRef(false);
+
+  // 음성 낭독 즉시 정지
+  const stopSpeaking = () => {
+    isSpeakingCancelledRef.current = true;
+    if ("speechSynthesis" in window && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {
+        console.warn("Speech cancel error", e);
+      }
+    }
+    setSpeakingMsgId(null);
+    setSpeakingStepNum(null);
+  };
+
+  // 모바일(iOS, 안드로이드, 카카오톡 웹뷰 등) 100% 호환 전역 TTS 엔진
   const playMobileTTS = (text: string, onStart: () => void, onEnd: () => void) => {
-    if (activeAudioRef.current) {
-      activeAudioRef.current.pause();
-      activeAudioRef.current = null;
+    isSpeakingCancelledRef.current = false;
+
+    if (!("speechSynthesis" in window) || !window.speechSynthesis) {
+      alert("사용 중이신 브라우저에서 음성 합성(TTS)이 지원되지 않거나 음소거 상태일 수 있습니다. 미디어 볼륨을 켜주시거나 크롬/사파리 브라우저를 이용해주세요.");
+      onEnd();
+      return;
+    }
+
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      window.speechSynthesis.cancel();
+    } catch (e) {
+      console.warn("speechSynthesis reset error", e);
     }
 
     const cleanText = text
       .replace(/[#*`💡📌📞🛡️🔒📍🚊🚆🚌🚕🚑👮🏛️🏫•👵🏥🏠💼]/g, " ")
       .replace(/➔/g, "에서 ")
+      .replace(/&nbsp;/g, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    if (!cleanText) return;
+    if (!cleanText) {
+      onEnd();
+      return;
+    }
 
-    const playOnlineAudioFallback = () => {
+    // 모바일 브라우저의 15초 타임아웃 방지를 위해 문장 단위로 분할
+    const rawChunks = cleanText.match(/[^.!?\n]+[.!?\n]*/g) || [cleanText];
+    const chunks = rawChunks.map((c) => c.trim()).filter((c) => c.length > 0);
+
+    if (chunks.length === 0) {
+      onEnd();
+      return;
+    }
+
+    const langMap: Record<string, string> = {
+      ko: "ko-KR",
+      en: "en-US",
+      zh: "zh-CN",
+      vi: "vi-VN",
+      ja: "ja-JP",
+      th: "th-TH",
+      tl: "fil-PH",
+      id: "id-ID",
+      mn: "mn-MN",
+      ru: "ru-RU"
+    };
+
+    const targetLangCode = langMap[selectedLang] || "ko-KR";
+    activeUtterancesRef.current = [];
+    let currentIdx = 0;
+
+    onStart();
+
+    const speakNextChunk = () => {
+      if (isSpeakingCancelledRef.current || currentIdx >= chunks.length) {
+        onEnd();
+        return;
+      }
+
       try {
-        const encoded = encodeURIComponent(cleanText.slice(0, 200));
-        const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${selectedLang}&client=tw-ob`);
-        activeAudioRef.current = audio;
-        audio.onplay = onStart;
-        audio.onended = () => { activeAudioRef.current = null; onEnd(); };
-        audio.onerror = () => { activeAudioRef.current = null; onEnd(); };
-        audio.play().catch(() => onEnd());
-      } catch {
+        const chunkText = chunks[currentIdx];
+        const utterance = new SpeechSynthesisUtterance(chunkText);
+        utterance.lang = targetLangCode;
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // 음성 목록에서 해당 언어 음성 자동 매칭 (사용 가능한 경우)
+        try {
+          const voices = window.speechSynthesis.getVoices();
+          if (voices && voices.length > 0) {
+            const matchedVoice = voices.find(
+              (v) => v.lang === targetLangCode || v.lang.startsWith(selectedLang)
+            );
+            if (matchedVoice) utterance.voice = matchedVoice;
+          }
+        } catch {
+          // getVoices fallback
+        }
+
+        // 모바일 가비지 컬렉션(GC)으로 인한 침묵 방지
+        activeUtterancesRef.current.push(utterance);
+        (window as unknown as { __activeUtterance?: SpeechSynthesisUtterance }).__activeUtterance = utterance;
+
+        utterance.onend = () => {
+          if (!isSpeakingCancelledRef.current) {
+            currentIdx++;
+            speakNextChunk();
+          }
+        };
+
+        utterance.onerror = (e) => {
+          console.warn("TTS utterance error", e);
+          if (!isSpeakingCancelledRef.current) {
+            currentIdx++;
+            speakNextChunk();
+          }
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.error("speechSynthesis.speak failed", err);
         onEnd();
       }
     };
 
-    if (!("speechSynthesis" in window) || !window.speechSynthesis) {
-      playOnlineAudioFallback();
-      return;
-    }
-
-    try {
-      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-      window.speechSynthesis.cancel();
-
-      setTimeout(() => {
-        try {
-          const utterance = new SpeechSynthesisUtterance(cleanText);
-          utterance.lang = selectedLang === "ko" ? "ko-KR" : selectedLang;
-          utterance.rate = 0.88;
-          const voices = window.speechSynthesis.getVoices();
-          const voice = voices.find((v) => v.lang.startsWith(selectedLang));
-          if (voice) utterance.voice = voice;
-
-          utterance.onstart = onStart;
-          utterance.onend = onEnd;
-          utterance.onerror = () => playOnlineAudioFallback();
-
-          window.speechSynthesis.speak(utterance);
-        } catch {
-          playOnlineAudioFallback();
-        }
-      }, 50);
-    } catch {
-      playOnlineAudioFallback();
-    }
+    // 사용자의 클릭 제스처 컨텍스트에서 즉시 동기 실행 (setTimeout 사용 안 함)
+    speakNextChunk();
   };
 
   // 4단계 전체 낭독
   const speakAll4Steps = (msgId: string, rag: RAGAnalysisResult) => {
     if (speakingMsgId === `full-${msgId}`) {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-      setSpeakingMsgId(null);
-      setSpeakingStepNum(null);
+      stopSpeaking();
       return;
     }
 
@@ -452,9 +522,7 @@ export default function Home() {
   // 단일 스텝 낭독
   const speakSingleStep = (stepNum: number, title: string, content: string) => {
     if (speakingStepNum === stepNum) {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-      setSpeakingStepNum(null);
-      setSpeakingMsgId(null);
+      stopSpeaking();
       return;
     }
 
@@ -462,15 +530,14 @@ export default function Home() {
     playMobileTTS(
       text,
       () => { setSpeakingStepNum(stepNum); setSpeakingMsgId(`step-${stepNum}`); },
-      () => setSpeakingStepNum(null)
+      () => { setSpeakingStepNum(null); setSpeakingMsgId(null); }
     );
   };
 
   // 단순 챗봇 멘트 낭독
   const speakSimpleMessage = (msgId: string, textToSpeak: string) => {
     if (speakingMsgId === msgId) {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-      setSpeakingMsgId(null);
+      stopSpeaking();
       return;
     }
     playMobileTTS(
