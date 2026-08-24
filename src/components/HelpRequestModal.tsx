@@ -7,6 +7,7 @@ interface HelpRequestModalProps {
   onClose: () => void;
   publicData: PublicDataRecord | null;
   userQuery: string;
+  defaultRegion?: string;
   onSuccess: (newCase: CommunityCase) => void;
 }
 
@@ -15,9 +16,10 @@ export default function HelpRequestModal({
   onClose,
   publicData,
   userQuery,
+  defaultRegion = "경기도 남양주시 평내동",
   onSuccess
 }: HelpRequestModalProps) {
-  const [region, setRegion] = useState("서울시 관악구 신림동");
+  const [region, setRegion] = useState(defaultRegion || "경기도 남양주시 평내동");
   const [situation, setSituation] = useState(userQuery || "");
   const [contact, setContact] = useState("");
   const [agreed, setAgreed] = useState(true);
@@ -134,7 +136,7 @@ export default function HelpRequestModal({
                 required
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                placeholder="예: 서울시 관악구 신림동, 부산시 해운대구 우동"
+                placeholder="예: 경기도 남양주시 평내동"
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
               />
               <p className="text-[11px] text-gray-500 mt-1">관할 주민센터와 복지관을 매칭하기 위해 필요합니다.</p>

@@ -1234,6 +1234,7 @@ export default function Home() {
         onClose={() => setIsHelpModalOpen(false)}
         publicData={targetPublicData}
         userQuery={currentQueryContext}
+        defaultRegion={village.fullName || "경기도 남양주시 평내동"}
         onSuccess={() => {}}
       />
 
