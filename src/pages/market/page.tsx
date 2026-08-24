@@ -86,17 +86,17 @@ export default function MarketPage() {
           <span className="px-3.5 py-1 text-xs font-black rounded-full bg-amber-100 text-amber-900 border border-amber-300">
             LOCAL BUSINESS & COMMUNITY
           </span>
-          <h1 className="font-heading text-2xl md:text-4xl font-black text-slate-950 mt-2">
+          <h1 className="font-heading text-xl sm:text-2xl md:text-4xl font-black text-slate-950 mt-2 tracking-[-0.08em] sm:tracking-normal break-keep">
             🏪 우리 동네 가게 & AI 홍보
           </h1>
-          <p className="text-sm md:text-base text-slate-600 mt-2">
+          <p className="text-sm md:text-base text-slate-600 mt-2 break-keep">
             주민에게는 따뜻한 동네 가게를 소개하고, 소상공인 사장님께는 <strong>AI가 홍보 문구와 다국어 포스터를 무료로 제작</strong>해드립니다.
           </p>
         </div>
 
         {/* 1. 평내·호평·금곡 동네 가게 목록 */}
         <div className="mb-12">
-          <h2 className="font-heading text-xl font-black text-slate-950 mb-4 flex items-center gap-2">
+          <h2 className="font-heading text-lg sm:text-xl font-black text-slate-950 mb-4 flex flex-wrap items-center gap-2 tracking-[-0.05em] sm:tracking-normal break-keep">
             <span>📍 평내·호평·금곡 추천 동네 가게</span>
             <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">지역화폐 가맹점</span>
           </h2>
@@ -112,7 +112,14 @@ export default function MarketPage() {
                     <span className="px-2.5 py-0.5 rounded-md text-xs font-black bg-amber-100 text-amber-900">
                       {s.category}
                     </span>
-                    <span className="text-xs text-slate-400 font-mono">📞 {s.phone}</span>
+                    <a
+                      href={`tel:${s.phone.replace(/[^0-9]/g, "")}`}
+                      className="text-xs text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-300 font-bold font-mono inline-flex items-center gap-1 active:scale-95 transition-transform"
+                      title="전화 걸기"
+                    >
+                      <span>📞</span>
+                      <span>{s.phone}</span>
+                    </a>
                   </div>
                   <h3 className="font-heading font-black text-lg text-slate-900">{s.name}</h3>
                   <p className="text-xs text-slate-500 mt-0.5">{s.address}</p>
