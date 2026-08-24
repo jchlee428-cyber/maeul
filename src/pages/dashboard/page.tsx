@@ -22,9 +22,9 @@ export default function DashboardPage() {
               </span>
               <span>대한민국 ➔ 경기도 ➔ 남양주시 ➔ 평내·호평·금곡</span>
             </div>
-            <h1 className="font-heading text-2xl md:text-4xl font-black text-slate-950 mt-1 flex items-center gap-2">
-              <span>🏡 우리 동네 대시보드</span>
-              <span className="text-emerald-700">[{village.name}]</span>
+            <h1 className="font-heading text-[1.25rem] sm:text-2xl md:text-4xl font-black text-slate-950 mt-1 flex items-center gap-1 sm:gap-2 flex-nowrap tracking-[-0.08em] sm:tracking-normal break-keep">
+              <span className="shrink-0">🏡 우리 동네 대시보드</span>
+              <span className="text-emerald-700 tracking-[-0.08em] sm:tracking-normal shrink-0">[{village.name}]</span>
             </h1>
             <p className="text-sm md:text-base text-slate-600 mt-1">
               {village.fullName} 주민과 외국인을 위한 실시간 행정·복지·생활 종합 현황판입니다.
