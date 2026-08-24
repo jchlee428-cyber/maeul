@@ -11,6 +11,7 @@ const DashboardPage = lazy(() => import("../pages/dashboard/page"));
 const WelfareFinderPage = lazy(() => import("../pages/welfare/page"));
 const EasyDocsPage = lazy(() => import("../pages/docs/page"));
 const MarketPage = lazy(() => import("../pages/market/page"));
+const FAQPage = lazy(() => import("../pages/faq/page"));
 
 function PageLoader() {
   return (
@@ -81,6 +82,14 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<PageLoader />}>
         <AdminPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/faq",
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <FAQPage />
       </Suspense>
     ),
   },

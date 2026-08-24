@@ -60,12 +60,12 @@ export default function Footer() {
             <Link to="/admin" className="text-accent-300 hover:text-white font-semibold transition-colors">
               마을관리자 시스템
             </Link>
-            <a href="/#intro" className="text-white/90 hover:text-accent-300 transition-colors">
+            <Link to="/guide" className="text-white/90 hover:text-accent-300 transition-colors">
               서비스 소개
-            </a>
-            <a href="/#faq" className="text-white/90 hover:text-accent-300 transition-colors">
+            </Link>
+            <Link to="/faq" className="text-white/90 hover:text-accent-300 transition-colors">
               자주 묻는 질문
-            </a>
+            </Link>
           </nav>
         </div>
 

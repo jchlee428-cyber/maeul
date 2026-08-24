@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { communityResources, type CommunityResource } from "@/data/communityResources";
 import { searchAndAnalyzePublicData, type RAGAnalysisResult, type PublicDataRecord } from "@/services/publicDataService";
 import { checkAndHandleSimpleQueryAsync } from "@/services/simpleQueryService";
-import { reviewAndRefineResponse } from "@/services/geminiReviewEngine";
+import { reviewAndRefineResponse, classifyUserIntent } from "@/services/geminiReviewEngine";
+import { generateAISearchFallbackReply } from "@/services/aiSearchFallbackService";
 import {
   saveConsultationSession,
   getConsultationHistory,
@@ -57,23 +58,132 @@ interface Message {
 
 function FormattedMessageText({ text }: { text: string }) {
   const lines = text.split("\n");
-  return (
-    <div className="space-y-2">
-      {lines.map((line, idx) => {
-        if (!line.trim()) return <div key={idx} className="h-2" />;
-        const parts = line.split(/(\*\*.*?\*\*)/g);
+
+  const renderInline = (lineContent: string) => {
+    // Regex matches: [link](url), **bold**, `code`
+    const regex = /(\[.*?\]\(https?:\/\/.*?\)|\*\*.*?\*\*|`.*?`)/g;
+    const parts = lineContent.split(regex);
+
+    return parts.map((part, pIdx) => {
+      if (!part) return null;
+
+      // Link: [title](url)
+      const linkMatch = part.match(/^\[(.*?)\]\((https?:\/\/.*?)\)$/);
+      if (linkMatch) {
         return (
-          <p key={idx} className="leading-relaxed text-slate-900">
-            {parts.map((part, pIdx) => {
-              if (part.startsWith("**") && part.endsWith("**")) {
-                return (
-                  <strong key={pIdx} className="font-extrabold text-emerald-950 bg-emerald-100/70 px-1 py-0.5 rounded">
-                    {part.slice(2, -2)}
-                  </strong>
-                );
-              }
-              return <span key={pIdx}>{part}</span>;
-            })}
+          <a
+            key={pIdx}
+            href={linkMatch[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-900 underline underline-offset-2 hover:bg-emerald-50 px-1 py-0.5 rounded transition-colors"
+          >
+            <span>{linkMatch[1]}</span>
+            <i className="ri-external-link-line text-xs"></i>
+          </a>
+        );
+      }
+
+      // Bold: **text**
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={pIdx} className="font-extrabold text-emerald-950 bg-emerald-100/70 px-1 py-0.5 rounded">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+
+      // Code: `code`
+      if (part.startsWith("`") && part.endsWith("`")) {
+        return (
+          <code key={pIdx} className="px-1.5 py-0.5 bg-slate-100 text-emerald-800 font-mono text-xs rounded border border-slate-200">
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+
+      return <span key={pIdx}>{part}</span>;
+    });
+  };
+
+  return (
+    <div className="space-y-2 text-slate-900 text-sm sm:text-base leading-relaxed">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={idx} className="h-1.5" />;
+
+        // Horizontal Rule: ---
+        if (trimmed === "---" || trimmed === "***") {
+          return <hr key={idx} className="my-3 border-t border-slate-200" />;
+        }
+
+        // Headers: #, ##, ###, ####
+        if (trimmed.startsWith("#### ")) {
+          return (
+            <h5 key={idx} className="font-extrabold text-sm text-emerald-900 mt-2 mb-1">
+              {renderInline(trimmed.slice(5))}
+            </h5>
+          );
+        }
+        if (trimmed.startsWith("### ")) {
+          return (
+            <h4 key={idx} className="font-extrabold text-base text-emerald-950 mt-3 mb-1 flex items-center gap-1.5">
+              <span className="w-1.5 h-4 bg-emerald-600 rounded-full inline-block shrink-0"></span>
+              <span>{renderInline(trimmed.slice(4))}</span>
+            </h4>
+          );
+        }
+        if (trimmed.startsWith("## ")) {
+          return (
+            <h3 key={idx} className="font-black text-lg text-emerald-950 mt-4 mb-1.5 border-b border-emerald-100 pb-1">
+              {renderInline(trimmed.slice(3))}
+            </h3>
+          );
+        }
+        if (trimmed.startsWith("# ")) {
+          return (
+            <h2 key={idx} className="font-black text-xl text-emerald-950 mt-4 mb-2">
+              {renderInline(trimmed.slice(2))}
+            </h2>
+          );
+        }
+
+        // Blockquotes: >
+        if (trimmed.startsWith("> ")) {
+          return (
+            <blockquote key={idx} className="border-l-4 border-emerald-500 pl-3 py-1 bg-emerald-50/60 rounded-r-lg my-1.5 italic text-slate-800 text-sm">
+              {renderInline(trimmed.slice(2))}
+            </blockquote>
+          );
+        }
+
+        // Bullet Lists: - or *
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-2 my-0.5">
+              <span className="text-emerald-600 font-bold mt-1 text-xs shrink-0">•</span>
+              <div className="flex-1">{renderInline(trimmed.slice(2))}</div>
+            </div>
+          );
+        }
+
+        // Numbered Lists: 1. 2.
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-2 my-0.5">
+              <span className="font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.2 rounded text-xs shrink-0 mt-0.5">
+                {numMatch[1]}
+              </span>
+              <div className="flex-1">{renderInline(numMatch[2])}</div>
+            </div>
+          );
+        }
+
+        // Normal paragraph
+        return (
+          <p key={idx} className="leading-relaxed">
+            {renderInline(line)}
           </p>
         );
       })}
@@ -82,6 +192,9 @@ function FormattedMessageText({ text }: { text: string }) {
 }
 
 const quickQueries = [
+  "🏛️ 평내 주민자치센터 강좌 (pyeongnae.co.kr)",
+  "🏛️ 남양주시청 누리집 (nyj.go.kr)",
+  "⏱️ 전철/지하철 열차시간표 (data.go.kr)",
   "👵 어르신 식사·돌봄 지원",
   "🏥 수술비·병원비 돌려받기",
   "🏠 월세·생계비 긴급 지원",
@@ -93,9 +206,18 @@ const quickQueries = [
 ];
 
 export default function Home() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [selectedVillageCode, setSelectedVillageCode] = useState("pyeongnae");
   const [selectedLang, setSelectedLang] = useState("ko");
   const [isEasyKorean, setIsEasyKorean] = useState(false);
+
+  useEffect(() => {
+    if (location.hash === "#faq") {
+      navigate("/faq", { replace: true });
+    }
+  }, [location.hash, navigate]);
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -328,6 +450,60 @@ export default function Home() {
   const analyzeAndRespond = async (query: string) => {
     setIsThinking(true);
 
+    const intent = classifyUserIntent(query);
+    const isWelfareDomain = ["care_mobility", "welfare_emergency", "medical_health", "housing_energy", "job_income"].includes(intent.category);
+    const hasWelfareKeyword = (
+      query.includes("신청") || query.includes("지원") || query.includes("급여") || query.includes("생계") ||
+      query.includes("수술") || query.includes("병원") || query.includes("월세") || query.includes("실직") ||
+      query.includes("돌봄") || query.includes("바우처") || query.includes("어르신") || query.includes("도움") ||
+      query.includes("어려") || query.includes("힘들") || query.includes("막막") || query.includes("수당")
+    ) && !query.includes("버스") && !query.includes("지하철") && !query.includes("강좌") && !query.includes("수강신청") && !query.includes("pyeongnae") && !query.includes("nyj.go.kr") && !query.includes("남양주시청");
+
+    // =========================================================================
+    // 1순위 (최우선): [복지·생계·의료·돌봄·주거·긴급지원 공공데이터 RAG 맞춤 분석]
+    // =========================================================================
+    const matchedRag = searchAndAnalyzePublicData(query);
+    if (matchedRag) {
+      setTimeout(() => {
+        const matchedRes = communityResources.find((r) => r.category === matchedRag.matchedPublicData.category) || communityResources[0];
+        let draftText = `말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${matchedRag.matchedPublicData.serviceName}] 공식 정보를 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요.`;
+
+        if (isEasyKorean) draftText = convertToEasyKorean(draftText);
+        const reviewed = reviewAndRefineResponse(query, draftText, matchedRag);
+        const finalRag = reviewed.ragRefinement || matchedRag;
+
+        let finalText = reviewed.reviewedText;
+        if (selectedLang !== "ko") {
+          finalText = translateTextToTargetLang(finalText, selectedLang);
+        }
+
+        saveConsultationSession({
+          userQuery: query,
+          matchedServiceName: finalRag.matchedPublicData.serviceName,
+          categoryLabel: finalRag.matchedPublicData.categoryLabel,
+          replyText: finalText,
+          ragResult: finalRag
+        });
+        loadHistory();
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: String(Date.now()),
+            sender: "bot",
+            text: finalText,
+            ragResult: finalRag,
+            matchedResource: matchedRes
+          }
+        ]);
+        setIsThinking(false);
+      }, 350);
+      return;
+    }
+
+    // =========================================================================
+    // 2순위: [평내동 주민자치센터(pyeongnae.co.kr), 실시간 교통(버스/지하철), 관공서 연락처]
+    // =========================================================================
     try {
       const simpleResponse = await checkAndHandleSimpleQueryAsync(query);
       if (simpleResponse && simpleResponse.isSimple) {
@@ -337,7 +513,7 @@ export default function Home() {
 
         saveConsultationSession({
           userQuery: query,
-          matchedServiceName: "간단 안내 및 교통/기관 정보",
+          matchedServiceName: "생활안내 및 평내동/교통/기관 정보",
           categoryLabel: "생활안내",
           replyText: reviewedText
         });
@@ -355,29 +531,27 @@ export default function Home() {
         return;
       }
     } catch (e) {
-      console.warn("Simple query lookup fallback", e);
+      console.warn("Simple query lookup error", e);
     }
 
-    setTimeout(() => {
-      const rag = searchAndAnalyzePublicData(query);
-      const matchedRes = communityResources.find((r) => r.category === rag.matchedPublicData.category) || communityResources[0];
-      let draftText = `말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${rag.matchedPublicData.serviceName}] 공식 정보를 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 4단계로 정리해드렸어요.`;
+    // =========================================================================
+    // 3순위: [기존 도구로 찾기 어려운 복합 질문 / 일반 질문 ➔ OpenAI (GPT-4o-mini) 스마트 검색]
+    // =========================================================================
+    try {
+      const aiFallbackText = await generateAISearchFallbackReply(query, {
+        userVillage: village.fullName,
+        userLang: selectedLang
+      });
 
-      if (isEasyKorean) draftText = convertToEasyKorean(draftText);
-      const reviewed = reviewAndRefineResponse(query, draftText, rag);
-      const finalRag = reviewed.ragRefinement || rag;
-
-      let finalText = reviewed.reviewedText;
-      if (selectedLang !== "ko") {
-        finalText = translateTextToTargetLang(finalText, selectedLang);
-      }
+      let reviewedText = aiFallbackText;
+      if (isEasyKorean) reviewedText = convertToEasyKorean(reviewedText);
+      if (selectedLang !== "ko") reviewedText = translateTextToTargetLang(reviewedText, selectedLang);
 
       saveConsultationSession({
         userQuery: query,
-        matchedServiceName: finalRag.matchedPublicData.serviceName,
-        categoryLabel: finalRag.matchedPublicData.categoryLabel,
-        replyText: finalText,
-        ragResult: finalRag
+        matchedServiceName: "AI 스마트 검색 (OpenAI 연계)",
+        categoryLabel: "AI 스마트검색",
+        replyText: reviewedText
       });
       loadHistory();
 
@@ -386,13 +560,14 @@ export default function Home() {
         {
           id: String(Date.now()),
           sender: "bot",
-          text: finalText,
-          ragResult: finalRag,
-          matchedResource: matchedRes
+          text: reviewedText
         }
       ]);
+    } catch (err) {
+      console.error("AI Fallback execution error", err);
+    } finally {
       setIsThinking(false);
-    }, 350);
+    }
   };
 
   const handleSendMessage = (textToSend?: string) => {

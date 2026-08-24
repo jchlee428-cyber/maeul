@@ -155,20 +155,22 @@ export function reviewAndRefineResponse(
   // [자가 수정 실행 (Self-Correction)]
   if (isMismatch || (!existingRagResult && intent.targetServiceId)) {
     const refinedRag = searchAndAnalyzePublicData(userQuery);
-    const correctedText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${refinedRag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 10단계로 정리해드렸어요.`;
+    if (refinedRag) {
+      const correctedText = `오늘 말씀해주셔서 정말 감사해요. 힘드신 이야기를 편하게 나눠주셔서 고마워요.\n\n공공데이터포털 연계 [${refinedRag.matchedPublicData.serviceName}] 공식 원문을 확인하여 어르신과 주민의 눈높이에 맞춰 알기 쉽게 정리해드렸어요.`;
 
-    return {
-      isApproved: true,
-      reviewedText: correctedText,
-      intentCategory: intent.category,
-      intentSummary: intent.summary,
-      reviewNotes: [
-        "Google Gemini Intent Classifier 의도 분석 완료",
-        ...notes,
-        "최종 공공데이터 10단계 맞춤 플랜 검토 승인 완료"
-      ],
-      ragRefinement: refinedRag
-    };
+      return {
+        isApproved: true,
+        reviewedText: correctedText,
+        intentCategory: intent.category,
+        intentSummary: intent.summary,
+        reviewNotes: [
+          "Google Gemini Intent Classifier 의도 분석 완료",
+          ...notes,
+          "최종 공공데이터 4단계 맞춤 플랜 검토 승인 완료"
+        ],
+        ragRefinement: refinedRag
+      };
+    }
   }
 
   // 정상 통과

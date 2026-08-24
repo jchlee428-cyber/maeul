@@ -1,8 +1,10 @@
 import { findSchoolInfo } from "@/data/schoolsDirectory";
 import { findCommunityCenterInfo } from "@/data/communityCentersDirectory";
-import { getSubwayArrivalInfo, localSubwayStations } from "./seoulSubwayService";
+import { getSubwayArrivalInfo, getSubwayTimetableInfo, isSubwayTimetableQuery, localSubwayStations } from "./seoulSubwayService";
 import { getRealtimeBusInfo, localBusRoutes } from "./precisionBusService";
 import { generateAISearchFallbackReply } from "./aiSearchFallbackService";
+import { isPyeongnaeCenterQuery, searchPyeongnaeCenterWeb } from "./pyeongnaeCenterService";
+import { isNamyangjuCityHallQuery, searchNamyangjuCityHallWeb } from "./namyangjuCityHallService";
 
 export interface SimpleQueryResponse {
   isSimple: boolean;
@@ -55,6 +57,24 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     return null;
   }
 
+  // 0-1. [남양주시청 공식 누리집(https://www.nyj.go.kr/www/index.do) 웹페이지 정밀 검색 및 안내]
+  if (isNamyangjuCityHallQuery(rawQ)) {
+    const nyjReply = searchNamyangjuCityHallWeb(rawQ);
+    return {
+      isSimple: true,
+      replyText: nyjReply
+    };
+  }
+
+  // 0-2. [평내동 주민자치센터(http://pyeongnae.co.kr) 웹페이지 정밀 검색 및 안내]
+  if (isPyeongnaeCenterQuery(rawQ)) {
+    const pyeongnaeReply = searchPyeongnaeCenterWeb(rawQ);
+    return {
+      isSimple: true,
+      replyText: pyeongnaeReply
+    };
+  }
+
   // 1. [초정밀 버스 실시간 위치 및 노선/구간 질의 - 1순위 최우선 처리]
   if (
     q.includes("버스") || q.includes("정류장") || q.includes("정류소") ||
@@ -69,7 +89,15 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     };
   }
 
-  // 2. [지하철 / 전철 / 역 도착정보 질의]
+  // 2. [지하철 / 전철 시간표 및 실시간 도착정보 질의]
+  if (isSubwayTimetableQuery(rawQ)) {
+    const timetableReply = await getSubwayTimetableInfo(rawQ);
+    return {
+      isSimple: true,
+      replyText: timetableReply
+    };
+  }
+
   if (
     q.includes("지하철") || q.includes("전철") || q.includes("열차") || q.includes("기차") ||
     q.includes("별내선") || q.includes("진접선") || q.includes("경춘선") || q.includes("경의중앙선") ||
@@ -160,6 +188,22 @@ ${matchedSchool.adminPhone ? `- 📞 **행정실**: **${matchedSchool.adminPhone
 export function checkAndHandleSimpleQuery(userQuery: string): SimpleQueryResponse | null {
   const q = userQuery.trim().toLowerCase();
   const rawQ = userQuery.trim();
+
+  // 0-1. 남양주시청 공식 누리집 (https://www.nyj.go.kr/www/index.do) 정밀 검색
+  if (isNamyangjuCityHallQuery(rawQ)) {
+    return {
+      isSimple: true,
+      replyText: searchNamyangjuCityHallWeb(rawQ)
+    };
+  }
+
+  // 0-2. 평내동 주민자치센터 (http://pyeongnae.co.kr) 웹페이지 정밀 검색
+  if (isPyeongnaeCenterQuery(rawQ)) {
+    return {
+      isSimple: true,
+      replyText: searchPyeongnaeCenterWeb(rawQ)
+    };
+  }
 
   // 1. 행정복지센터 동기 매칭
   const matchedCenter = findCommunityCenterInfo(rawQ);

@@ -253,38 +253,75 @@ export async function fetchPublicDataAPITest(pageNo: number = 1, numOfRows: numb
 }
 
 /**
- * 공공데이터 검색 기반 RAG 파이프라인 실행기
+ * 사용자의 질의가 특정 공공데이터 지원 제도와 정확히 일치하는지 정밀 판별
  */
-export function searchAndAnalyzePublicData(userQuery: string): RAGAnalysisResult {
-  const q = userQuery.toLowerCase();
-  let matched: PublicDataRecord = publicDataRepository[0];
+export function matchPublicDataRecord(userQuery: string): PublicDataRecord | null {
+  const q = userQuery.toLowerCase().trim();
 
+  // 1. 외출·동행·이동지원·드림콜
   if (
     q.includes("교회") || q.includes("성당") || q.includes("절") || q.includes("외출") ||
-    q.includes("동행") || q.includes("혼자") || q.includes("거동") || q.includes("휠체어") ||
-    q.includes("드림콜") || q.includes("이동지원") || q.includes("장애") || q.includes("나들이") || q.includes("보행")
+    q.includes("동행") || q.includes("거동") || q.includes("휠체어") ||
+    q.includes("드림콜") || q.includes("이동지원") || q.includes("나들이") || q.includes("보행")
   ) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-BOKJI-003") || publicDataRepository[0];
-  } else if (q.includes("남양주") && (q.includes("기관") || q.includes("단체") || q.includes("복지관") || q.includes("협회") || q.includes("재단") || q.includes("봉사센터") || q.includes("연락처") || q.includes("주소") || q.includes("희망케어"))) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-NYJ-ORGS-001") || publicDataRepository[0];
-  } else if (q.includes("남양주") || q.includes("물가") || q.includes("수도") || q.includes("가스료") || q.includes("버스요금") || q.includes("택시요금") || q.includes("공공요금") || q.includes("종량제") || q.includes("정화조") || q.includes("생활요금")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-NYJ-FEES-001") || publicDataRepository[0];
-  } else if (q.includes("노인") || q.includes("어르신") || q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("독거")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-BOKJI-002") || publicDataRepository[0];
-  } else if (q.includes("병원") || q.includes("의료") || q.includes("수술") || q.includes("치료") || q.includes("질병") || q.includes("환급")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-NHIS-001") || publicDataRepository[0];
-  } else if (q.includes("일자리") || q.includes("취업") || q.includes("구직") || q.includes("수당") || q.includes("청년")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-MOEL-001") || publicDataRepository[0];
-  } else if (q.includes("월세") || q.includes("주거") || q.includes("집") || q.includes("임대") || q.includes("수리")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-MOLIT-001") || publicDataRepository[0];
-  } else if (q.includes("난방") || q.includes("전기") || q.includes("가스") || q.includes("에너지") || q.includes("생활비")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-MOTIE-001") || publicDataRepository[0];
-  } else if (q.includes("교육") || q.includes("학교") || q.includes("학습") || q.includes("학생") || q.includes("자녀")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-MOE-001") || publicDataRepository[0];
-  } else if (q.includes("공공") || q.includes("기관") || q.includes("재정") || q.includes("정부")) {
-    matched = publicDataRepository.find((p) => p.id === "PUB-MOEF-001") || publicDataRepository[0];
-  } else {
-    matched = publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || publicDataRepository[0];
+    return publicDataRepository.find((p) => p.id === "PUB-BOKJI-003") || null;
+  }
+
+  // 2. 어르신 식사·반찬·독거노인 돌봄
+  if ((q.includes("노인") || q.includes("어르신") || q.includes("독거")) && (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥"))) {
+    return publicDataRepository.find((p) => p.id === "PUB-BOKJI-002") || null;
+  }
+
+  // 3. 의료비·수술비·병원비 환급·재난적의료비
+  if (q.includes("수술비") || q.includes("재난적의료비") || (q.includes("병원") && q.includes("지원")) || (q.includes("의료") && q.includes("환급")) || q.includes("치료비") || q.includes("약값")) {
+    return publicDataRepository.find((p) => p.id === "PUB-NHIS-001") || null;
+  }
+
+  // 4. 긴급 생계비·월세 체납·실직 위기
+  if (
+    q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비") ||
+    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("막막"))) ||
+    (q.includes("실직") && q.includes("생계")) || q.includes("굶") || q.includes("쌀이 없")
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
+  }
+
+  // 5. 국민취업지원제도 / 구직촉진수당 / 일자리 지원금
+  if (q.includes("구직촉진수당") || q.includes("국민취업지원") || (q.includes("취업") && q.includes("수당")) || (q.includes("구직") && q.includes("지원금"))) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOEL-001") || null;
+  }
+
+  // 6. 맞춤형 주거급여 / 월세 지원
+  if ((q.includes("주거급여") || q.includes("월세지원") || q.includes("집수리 지원")) && !q.includes("공공요금")) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOLIT-001") || null;
+  }
+
+  // 7. 에너지바우처 / 난방비·전기요금 감면
+  if (q.includes("에너지바우처") || (q.includes("난방비") && q.includes("지원")) || (q.includes("가스비") && q.includes("감면")) || (q.includes("전기요금") && q.includes("감면"))) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOTIE-001") || null;
+  }
+
+  // 8. 남양주시 공공기관 및 복지관 디렉토리
+  if (q.includes("남양주") && (q.includes("복지관") || q.includes("희망케어") || q.includes("복지재단") || q.includes("자원봉사센터"))) {
+    return publicDataRepository.find((p) => p.id === "PUB-NYJ-ORGS-001") || null;
+  }
+
+  // 9. 남양주시 공공요금 감면 고시
+  if (q.includes("공공요금 감면") || q.includes("상하수도 감면") || q.includes("종량제봉투 무료")) {
+    return publicDataRepository.find((p) => p.id === "PUB-NYJ-FEES-001") || null;
+  }
+
+  // 일반 개괄 질문이거나 매칭되지 않는 경우 null 반환 (3순위 OpenAI 자유 마크다운 처리로 이관)
+  return null;
+}
+
+/**
+ * 공공데이터 검색 기반 RAG 파이프라인 실행기 (정밀 일치하는 공공 제도가 있을 때만 4단계 플랜 반환)
+ */
+export function searchAndAnalyzePublicData(userQuery: string): RAGAnalysisResult | null {
+  const matched = matchPublicDataRecord(userQuery);
+  if (!matched) {
+    return null;
   }
 
   const groundedSteps = [

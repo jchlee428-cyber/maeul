@@ -1,7 +1,33 @@
 /**
- * 행정안전부 한국지역정보개발원 초정밀버스 위치 실시간 정보 API 서비스 (보안 내부 모듈)
- * 엄격한 정규식 기반 노선번호 정확 매칭(Exact Matching) 엔진 탑재
+ * 공공데이터포털 경기도_버스위치정보 조회 REST API 설정 (개발계정 승인 완료)
+ * 엔드포인트: https://apis.data.go.kr/6410000/buslocationservice/v2
+ * 활용기간: 2026-08-24 ~ 2028-08-24
  */
+export const GYEONGGI_BUS_LOCATION_CONFIG = {
+  apiKey: import.meta.env.VITE_GYEONGGI_BUS_LOCATION_API_KEY || "U4Uj9B%2FSbdoJOUWofNmOeC2%2FrrxzwsTiZeXdBO0naKEj0z6MvKAbddVeeIAUsiPjrhQ%2BE1YyMTf%2B5qKFjM6BXA%3D%3D",
+  endPoint: import.meta.env.VITE_GYEONGGI_BUS_LOCATION_API_ENDPOINT || "https://apis.data.go.kr/6410000/buslocationservice/v2",
+  serviceName: "경기도_버스위치정보 조회",
+  format: "JSON+XML",
+  validPeriod: "2026-08-24 ~ 2028-08-24"
+};
+
+/**
+ * 경기도 버스 실시간 위치 API 호출기
+ */
+export async function fetchGyeonggiBusLocation(routeId: string) {
+  try {
+    const serviceKey = encodeURIComponent(GYEONGGI_BUS_LOCATION_CONFIG.apiKey);
+    const url = `${GYEONGGI_BUS_LOCATION_CONFIG.endPoint}/getBusLocationList?serviceKey=${serviceKey}&routeId=${routeId}&format=json`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch (err) {
+    console.warn("Gyeonggi bus location API fetch fallback:", err);
+    return null;
+  }
+}
 
 export interface BusRouteInfo {
   routeNo: string; // 노선번호 (예: 165번, 65번, 땡큐10)
