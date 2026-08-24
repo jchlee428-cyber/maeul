@@ -128,7 +128,7 @@ export default function Navbar() {
                 : "text-foreground-800 hover:bg-primary-50"
             }`}
           >
-            <i className="ri-shield-user-line"></i>
+            <i className="ri-lock-2-fill text-amber-500"></i>
             <span>관제</span>
           </Link>
         </div>
@@ -244,8 +244,8 @@ export default function Navbar() {
               location.pathname === "/admin" ? "bg-primary-900 text-white" : "text-slate-800 hover:bg-slate-100"
             }`}
           >
-            <i className="ri-shield-user-fill text-lg text-slate-700"></i>
-            <span>AI 마을관리자 관제 대시보드</span>
+            <i className="ri-lock-2-fill text-lg text-amber-600"></i>
+            <span>🔒 마을관리자 관제 시스템</span>
           </Link>
         </div>
       )}

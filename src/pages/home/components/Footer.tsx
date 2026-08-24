@@ -57,8 +57,8 @@ export default function Footer() {
             <Link to="/cases" className="text-white/90 hover:text-accent-300 transition-colors">
               실증 사례 & 성과
             </Link>
-            <Link to="/admin" className="text-accent-300 hover:text-white font-semibold transition-colors">
-              마을관리자 시스템
+            <Link to="/admin" className="text-accent-300 hover:text-white font-semibold transition-colors flex items-center gap-1">
+              <span>🔒 마을관리자 관제</span>
             </Link>
             <Link to="/intro" className="text-white/90 hover:text-accent-300 transition-colors">
               서비스 소개

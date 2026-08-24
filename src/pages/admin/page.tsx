@@ -20,6 +20,12 @@ import {
 const processSteps: ProcessStatus[] = ["접수", "AI 분석", "검증", "기관 연결", "완료"];
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => sessionStorage.getItem("maeul_admin_auth") === "true"
+  );
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState(false);
+
   const [cases, setCases] = useState<CommunityCase[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     todayConsultations: 0,
@@ -46,8 +52,28 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    refreshData();
-  }, []);
+    if (isAuthenticated) {
+      refreshData();
+    }
+  }, [isAuthenticated]);
+
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pinInput.trim() === "2026") {
+      sessionStorage.setItem("maeul_admin_auth", "true");
+      setIsAuthenticated(true);
+      setPinError(false);
+    } else {
+      setPinError(true);
+      setPinInput("");
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("maeul_admin_auth");
+    setIsAuthenticated(false);
+    setPinInput("");
+  };
 
   const runAPITest = async () => {
     setApiTestLoading(true);
@@ -85,6 +111,73 @@ export default function AdminPage() {
     return matchType && matchStatus && matchKeyword;
   });
 
+  // 관리자 미인증 시 잠금 화면 (PIN 번호 2026 입력 모달)
+  if (!isAuthenticated) {
+    return (
+      <div className="bg-slate-900 min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-100">
+        <div className="w-full max-w-md bg-slate-800 border-2 border-emerald-500/60 rounded-3xl p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
+          <div className="w-20 h-20 rounded-full bg-emerald-950 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center text-4xl mx-auto shadow-inner">
+            🔒
+          </div>
+
+          <div>
+            <span className="px-3 py-1 bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 rounded-full text-xs font-black uppercase tracking-wider">
+              Restricted Area
+            </span>
+            <h1 className="font-heading text-2xl font-black text-white mt-2">
+              마을관리자 전용 관제 시스템
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
+              본 시스템은 사회복지사 및 마을관리자 전담 관제 화면입니다.<br />
+              <strong>관리자 보안 PIN 번호(4자리)</strong>를 입력해주세요.
+            </p>
+          </div>
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <input
+                type="password"
+                maxLength={8}
+                autoFocus
+                value={pinInput}
+                onChange={(e) => {
+                  setPinInput(e.target.value);
+                  if (pinError) setPinError(false);
+                }}
+                placeholder="PIN 번호 입력"
+                className={`w-full text-center text-2xl tracking-[0.4em] py-3.5 px-4 bg-slate-900 border-2 rounded-2xl text-white font-mono focus:outline-none transition-all ${
+                  pinError
+                    ? "border-rose-500 ring-4 ring-rose-500/20 animate-shake"
+                    : "border-slate-600 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20"
+                }`}
+              />
+              {pinError && (
+                <p className="text-xs font-bold text-rose-400">
+                  ⚠️ 비밀번호가 일치하지 않습니다. 다시 입력해주세요.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
+            >
+              <i className="ri-shield-keyhole-fill text-lg text-amber-300"></i>
+              <span>관제 시스템 로그인</span>
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+            <span>마을지기 v1.2</span>
+            <Link to="/" className="text-emerald-400 hover:underline font-bold flex items-center gap-1">
+              <span>🏠 홈으로 돌아가기</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background-50 min-h-screen flex flex-col">
       <Navbar />
@@ -95,7 +188,7 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 text-xs font-bold rounded-full bg-primary-800 text-accent-300">
-                ADMIN SYSTEM
+                🔒 ADMIN SYSTEM
               </span>
               <span className="text-xs text-foreground-500">
                 실시간 업데이트: {new Date().toLocaleTimeString("ko-KR")}
@@ -133,6 +226,15 @@ export default function AdminPage() {
             >
               <i className="ri-refresh-line"></i>
               새로고침
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 shadow-xs transition-colors"
+              title="관리자 세션 종료"
+            >
+              <i className="ri-logout-box-r-line"></i>
+              로그아웃
             </button>
           </div>
         </div>
