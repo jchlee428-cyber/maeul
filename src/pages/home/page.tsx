@@ -1041,7 +1041,7 @@ export default function Home() {
               </span>
             </button>
 
-            <p className="text-center text-xs text-slate-600 font-medium leading-tight">
+            <p className="text-center text-[11px] sm:text-xs text-slate-600 font-medium leading-tight tracking-[-0.08em] sm:tracking-normal">
               {UI_TRANSLATIONS.privacyNotice?.[selectedLang] || "🔒 개인정보는 일체 저장되지 않습니다. 위급 상황 시 119 · 112"}
             </p>
           </div>
