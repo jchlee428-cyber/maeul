@@ -152,10 +152,6 @@ export default function AdminPage() {
                   활용기간: {PUBLIC_DATA_CONFIG.validPeriod}
                 </span>
               </div>
-              <div className="text-xs text-primary-100 flex items-center gap-3 flex-wrap">
-                <span>📍 End Point: <code className="bg-black/30 px-1.5 py-0.5 rounded text-accent-200 font-mono text-[11px]">{PUBLIC_DATA_CONFIG.endPoint}</code></span>
-                <span>🔑 일반 인증키: <code className="bg-black/30 px-1.5 py-0.5 rounded text-accent-200 font-mono text-[11px]">U4Uj9B...TiZeXdBO0naKEj0z6MvKAbddVeeIAUsiPjrhQ+E1YyMTf+5qKFjM6BXA== (등록 완료)</code></span>
-              </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
