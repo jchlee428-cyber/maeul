@@ -5,7 +5,7 @@ export const websiteSchema = {
   "@type": "WebSite",
   name: "마을지기",
   url: SITE_URL,
-  description: "지역사회 문제 해결을 돕는 AI 상담 서비스",
+  description: "AI 상담 서비스",
 };
 
 export const faqSchema = {
