@@ -247,6 +247,8 @@ export default function Home() {
   useEffect(() => {
     if (location.hash === "#faq") {
       navigate("/faq", { replace: true });
+    } else if (location.hash === "#intro" || location.hash === "#about") {
+      navigate("/intro", { replace: true });
     }
   }, [location.hash, navigate]);
 

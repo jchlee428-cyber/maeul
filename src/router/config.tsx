@@ -12,6 +12,7 @@ const WelfareFinderPage = lazy(() => import("../pages/welfare/page"));
 const EasyDocsPage = lazy(() => import("../pages/docs/page"));
 const MarketPage = lazy(() => import("../pages/market/page"));
 const FAQPage = lazy(() => import("../pages/faq/page"));
+const IntroPage = lazy(() => import("../pages/intro/page"));
 
 function PageLoader() {
   return (
@@ -90,6 +91,22 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<PageLoader />}>
         <FAQPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/intro",
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <IntroPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/about",
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <IntroPage />
       </Suspense>
     ),
   },
