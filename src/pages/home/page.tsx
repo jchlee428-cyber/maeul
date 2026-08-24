@@ -56,6 +56,51 @@ interface Message {
   matchedResource?: CommunityResource;
 }
 
+function extractPhoneDigits(str: string): string | null {
+  const match = str.match(/(?:0\d{1,2}-\d{3,4}-\d{4}|1[56]\d{2}-\d{4}|\b(?:119|112|129|110|1350|1332|1339|114|182)\b)/);
+  if (match) {
+    return match[0].replace(/[^0-9]/g, "");
+  }
+  const clean = str.replace(/[^0-9]/g, "");
+  return clean.length >= 3 ? clean : null;
+}
+
+function renderTextWithPhoneLinks(rawText: string, keyPrefix: string) {
+  // Regex matches: 📞 129, 📞 국번없이 129 (무료), 📞 031-590-2114, 1544-7788, 1666-5522, 119, 112, etc.
+  const phonePattern = /((?:📞|☎️)?\s*(?:국번없이\s*)?(?:0\d{1,2}-\d{3,4}-\d{4}|1[56]\d{2}-\d{4}|\b(?:119|112|129|110|1350|1332|1339|114|182)\b)(?:\s*\([^)]+\))?)/g;
+  const segments = rawText.split(phonePattern);
+
+  return segments.map((seg, sIdx) => {
+    if (!seg) return null;
+
+    const digits = extractPhoneDigits(seg);
+    const isPhoneMatch = digits && (
+      seg.includes("📞") ||
+      seg.includes("☎️") ||
+      seg.includes("-") ||
+      seg.includes("국번없이") ||
+      ["119", "112", "129", "110", "1350", "182", "114"].some((n) => seg.includes(n))
+    );
+
+    if (isPhoneMatch) {
+      return (
+        <a
+          key={`${keyPrefix}-phone-${sIdx}`}
+          href={`tel:${digits}`}
+          className="inline-flex items-center gap-1 font-black text-emerald-950 bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 border border-emerald-400 px-2 py-0.5 rounded-lg shadow-xs transition-all active:scale-95 cursor-pointer text-xs sm:text-sm my-0.5 align-middle"
+          title={`📞 ${digits} 전화 연결 (터치하면 바로 통화)`}
+        >
+          <span className="text-base text-emerald-700 animate-pulse shrink-0">📞</span>
+          <span className="underline underline-offset-2">{seg.replace(/^[📞☎️]\s*/, "")}</span>
+          <span className="text-[10px] bg-emerald-700 text-white font-extrabold px-1.5 py-0.2 rounded shrink-0 ml-0.5">전화걸기</span>
+        </a>
+      );
+    }
+
+    return <span key={`${keyPrefix}-txt-${sIdx}`}>{seg}</span>;
+  });
+}
+
 function FormattedMessageText({ text }: { text: string }) {
   const lines = text.split("\n");
 
@@ -88,7 +133,7 @@ function FormattedMessageText({ text }: { text: string }) {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
           <strong key={pIdx} className="font-extrabold text-emerald-950 bg-emerald-100/70 px-1 py-0.5 rounded">
-            {part.slice(2, -2)}
+            {renderTextWithPhoneLinks(part.slice(2, -2), `bold-${pIdx}`)}
           </strong>
         );
       }
@@ -102,7 +147,7 @@ function FormattedMessageText({ text }: { text: string }) {
         );
       }
 
-      return <span key={pIdx}>{part}</span>;
+      return renderTextWithPhoneLinks(part, `norm-${pIdx}`);
     });
   };
 
@@ -837,9 +882,17 @@ export default function Home() {
                               소관: {m.ragResult.sources.department || "남양주시 평내동 종합행정복지센터"} (확인일: 2026-08-20)
                             </span>
                           </div>
-                          <span className="text-xs sm:text-sm px-2.5 py-1 bg-white border border-slate-300 text-emerald-900 rounded-lg font-bold">
-                            📞 {UI_TRANSLATIONS.inquiryContactLabel?.[selectedLang] || "문의"}: {m.ragResult.sources.inquiryContact || village.communityCenterPhone}
-                          </span>
+                          <a
+                            href={`tel:${extractPhoneDigits(m.ragResult.sources.inquiryContact || village.communityCenterPhone) || "129"}`}
+                            className="text-xs sm:text-sm px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 border border-emerald-400 text-emerald-950 rounded-xl font-extrabold inline-flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+                            title="터치하여 즉시 전화 걸기"
+                          >
+                            <span className="text-base text-emerald-700 animate-pulse shrink-0">📞</span>
+                            <span className="underline underline-offset-2">
+                              {UI_TRANSLATIONS.inquiryContactLabel?.[selectedLang] || "문의"}: {m.ragResult.sources.inquiryContact || village.communityCenterPhone}
+                            </span>
+                            <span className="text-[10px] bg-emerald-700 text-white font-black px-1.5 py-0.5 rounded ml-0.5 shrink-0">전화걸기</span>
+                          </a>
                         </div>
                       )}
 
@@ -889,8 +942,8 @@ export default function Home() {
                                     <i className={speakingStepNum === st.stepNum ? "ri-stop-fill text-sm" : "ri-volume-up-fill text-sm text-emerald-700"}></i>
                                   </button>
                                 </div>
-                                <div className="text-slate-900 whitespace-pre-line leading-relaxed text-sm sm:text-base font-medium">
-                                  {isEasyKorean ? convertToEasyKorean(translatedContent) : translatedContent}
+                                <div className="text-slate-900 leading-relaxed text-sm sm:text-base font-medium">
+                                  <FormattedMessageText text={isEasyKorean ? convertToEasyKorean(translatedContent) : translatedContent} />
                                 </div>
                               </div>
                             </div>
