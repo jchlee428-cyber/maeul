@@ -336,8 +336,41 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "사회보장급여 신청서, 소득·재산 신고서, 금융정보제공동의서, 가족관계증명서",
     inquiryContact: "한부모가족 상담전화 (1644-6621) / 보건복지상담센터 (129) / 관할 주민센터",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-DISABLED-JOB-001",
+    sourceApi: "보건복지부 / 한국장애인고용공단 장애인일자리사업 공공데이터 (ID: 150125)",
+    sourceUrl: "https://www.kead.or.kr",
+    department: "보건복지부 장애인자립기반과 / 한국장애인고용공단 경기북부지사 / 남양주시장애인복지관",
+    category: "job",
+    categoryLabel: "장애인일자리",
+    serviceName: "장애인 맞춤형 공공일자리 및 직업재활 지원사업 (복지일자리·일반형·특화형)",
+    legalBasis: "장애인복지법 제21조(직업) 및 장애인고용촉진 및 직업재활법",
+    targetCriteria: "만 18세 이상 등록 장애인 (미취업 상태로서 집 근처 쉬운 공공근로, 도서관 사서보조, 행정보조, 환경정비, 소일거리를 희망하는 장애인 누구나)",
+    supportDetails: "1) 참여형 복지일자리: 주 14시간(월 56시간) 근무, 집 근처 도서관 정리, 공공기관 우편물 분류, 환경정비 (월 약 55만 원 지급, 4대보험), 2) 일반형 일자리: 주 20~40시간 읍·면·동 행정복지센터 행정 도우미 (월 105만~210만 원), 3) 특화형 일자리: 시각장애인 안마사 파견, 발달장애인 요양보호사 보조",
+    applicationProcess: "매년 11~12월 정기모집 및 연중 수시모집 ➜ 주소지 읍·면·동 행정복지센터 복지팀 또는 남양주시장애인복지관 방문 접수",
+    requiredDocuments: "장애인일자리 참여신청서, 복지카드(장애인등록증), 주민등록등본",
+    inquiryContact: "남양주시 장애인복지과 (031-590-2224) / 한국장애인고용공단 (1588-1519) / 남양주시장애인복지관 (031-592-7150)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-WOMEN-JOB-001",
+    sourceApi: "여성가족부 / 고용노동부 여성새로일하기센터 시간선택제 공공데이터 (ID: 150779)",
+    sourceUrl: "https://saeil.mogef.go.kr",
+    department: "여성가족부 여성인력개발과 / 남양주여성새로일하기센터",
+    category: "job",
+    categoryLabel: "시간제일자리",
+    serviceName: "한부모·양육부모 맞춤형 시간선택제(유연근무) 일자리 및 새일여성인턴",
+    legalBasis: "경력단절여성등의 경제활동 촉진법 제10조 및 고용정책 기본법 제25조",
+    targetCriteria: "아이 등하교 시간(오전 9시~오후 2~3시)에만 일할 수 있는 한부모, 양육 부모, 경력단절 여성 및 유연근무 희망자",
+    supportDetails: "1) 시간선택제 일자리: 하루 4~6시간 근무(학교 방과후 도우미, 급식보조, 공공기관 사무보조, 돌봄교사 등), 2) 새일여성인턴: 기업 인턴 연계 및 월 80만 원 인턴장려금 지원, 3) 1:1 취업상담사 전담 배정 및 무료 직무훈련",
+    applicationProcess: "남양주여성새로일하기센터(금곡동 본관 또는 다산분소) 방문 또는 유선 구직 등록 ➜ 아이 양육시간 맞춤 일자리 매칭",
+    requiredDocuments: "구직신청서(센터 구비), 신분증, 이력서(센터에서 작성 코칭 지원)",
+    inquiryContact: "남양주여성새로일하기센터 (031-590-2680 / 031-553-8260) / 고용노동부 (1350)",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 
@@ -406,8 +439,29 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-00. [장애인 맞춤형 공공일자리] - 장애인 + 일자리, 공공근로, 취업, 일할 곳, 소일거리
+  // =========================================================================
+  if (
+    (q.includes("장애") || q.includes("장애인") || q.includes("복지카드") || q.includes("몸이")) &&
+    (q.includes("일자리") || q.includes("공공근로") || q.includes("취업") || q.includes("일할") || q.includes("소일거리") || q.includes("직업") || q.includes("구직") || q.includes("알바"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DISABLED-JOB-001") || null;
+  }
+
+  // =========================================================================
+  // 0-01. [한부모·양육부모 시간선택제 일자리] - 한부모/육아/아이 키우는 + 일자리, 시간제, 유연근무
+  // =========================================================================
+  if (
+    (q.includes("한부모") || q.includes("미혼모") || q.includes("미혼부") || (q.includes("아이") && (q.includes("키우") || q.includes("엄마") || q.includes("아빠")))) &&
+    (q.includes("일자리") || q.includes("시간제") || q.includes("유연근무") || q.includes("취업") || q.includes("일할") || q.includes("알바") || q.includes("시간에만") || q.includes("구직"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-WOMEN-JOB-001") || null;
+  }
+
+  // =========================================================================
   // 0-0. [초등 방과 후 아동 돌봄] - 초등학생, 아이, 방과후, 돌봄교실, 아동센터, 늘봄학교, 다함께돌봄
   // =========================================================================
+
   if (
     (q.includes("초등") || q.includes("아이") || q.includes("자녀") || q.includes("아동") || q.includes("어린이") || q.includes("학생")) &&
     (q.includes("돌봄") || q.includes("방과후") || q.includes("방과 후") || q.includes("아동센터") || q.includes("늘봄") || q.includes("보육") || q.includes("맡길") || q.includes("돌봐") || q.includes("돌봄교실"))

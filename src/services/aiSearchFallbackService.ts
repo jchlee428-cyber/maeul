@@ -81,7 +81,41 @@ ${reply.trim()}
   const isPyeongnae = q.includes("평내");
   const lowerQ = q.toLowerCase();
 
+  // A-0-000. 장애인 맞춤형 공공일자리
+  if ((lowerQ.includes("장애") || lowerQ.includes("장애인") || lowerQ.includes("복지카드") || lowerQ.includes("몸이")) && (lowerQ.includes("일자리") || lowerQ.includes("공공근로") || lowerQ.includes("취업") || lowerQ.includes("일할") || lowerQ.includes("소일거리") || lowerQ.includes("알바"))) {
+    return `✨ **AI 마을지기 장애인 맞춤 공공일자리 길라잡이**
+
+문의하신 **"${q}"**에 대해 몸에 무리 없이 집 근처에서 일하실 수 있는 장애인 전용 공공일자리 사업을 안내해 드립니다.
+
+### 🏢 1. 주요 장애인 공공일자리 유형
+- **참여형 복지일자리**: 주 14시간(월 56시간) 근무, 집 근처 도서관 정리, 공공기관 우편물 분류, 환경정비 등 쉬운 업무 (월 약 55만 원 지급, 4대보험)
+- **일반형 일자리**: 주 20~40시간 읍·면·동 행정복지센터 및 공공기관 행정업무 보조 (월 105만~210만 원)
+- **특화형 일자리**: 시각장애인 안마사 파견, 발달장애인 요양보호사 보조
+
+### 📋 2. 신청 및 문의처
+- **남양주시장애인복지관**: 📞 **031-592-7150** (직업재활 및 일자리 상담)
+- **한국장애인고용공단 (경기북부지사)**: 📞 **1588-1519**
+- **관할 읍·면·동 행정복지센터 복지팀**: 매년 11~12월 정기 모집 및 결원 시 수시 모집 접수`;
+  }
+
+  // A-0-001. 한부모/양육부모 시간선택제 일자리
+  if ((lowerQ.includes("한부모") || lowerQ.includes("미혼모") || lowerQ.includes("미혼부") || (lowerQ.includes("아이") && (lowerQ.includes("키우") || lowerQ.includes("엄마") || lowerQ.includes("아빠")))) && (lowerQ.includes("일자리") || lowerQ.includes("시간제") || lowerQ.includes("유연근무") || lowerQ.includes("시간에만") || lowerQ.includes("취업") || lowerQ.includes("일할") || lowerQ.includes("알바"))) {
+    return `✨ **AI 마을지기 한부모·양육부모 맞춤 시간제 일자리 길라잡이**
+
+문의하신 **"${q}"**에 대해 아이 학교 및 돌봄 시간에 맞춰 일하실 수 있는 유연근무 일자리 경로입니다.
+
+### 🏢 1. 시간선택제 일자리 지원 기관
+- **남양주여성새로일하기센터**: 📞 **031-590-2680** (아이 등하교 시간 맞춤 하루 4~6시간 시간선택제 일자리 및 학교 방과후 도우미 매칭)
+- **남양주시 일자리센터**: 📞 **031-560-1919** (지자체 시간제 공공근로 및 유연근무 희망 구직 등록)
+- **새일여성인턴제**: 취업 연계 시 월 80만 원 인턴장려금 및 전담 직업상담사 1:1 코칭
+
+### 📋 2. 주민 행동 순서
+1. **여성새로일하기센터 또는 일자리센터 방문/유선 등록**: "아이 등교 시간(오전 9시~오후 2시) 근무 희망" 조건으로 구직표 작성
+2. **맞춤 채용 알선**: 초등학교 급식·방과후 도우미, 공공기관 사무보조, 돌봄교사 등 시간제 일자리 알선`;
+  }
+
   // A-0-00. 초등학생/아이/방과후 돌봄 및 아동센터
+
   if ((lowerQ.includes("초등") || lowerQ.includes("아이") || lowerQ.includes("자녀") || lowerQ.includes("아동") || lowerQ.includes("어린이")) && (lowerQ.includes("돌봄") || lowerQ.includes("방과후") || lowerQ.includes("방과 후") || lowerQ.includes("아동센터") || lowerQ.includes("늘봄") || lowerQ.includes("맡길"))) {
     return `✨ **AI 마을지기 초등 방과 후 온종일 돌봄 길라잡이**
 
