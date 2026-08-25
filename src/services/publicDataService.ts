@@ -304,8 +304,41 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "1) 신분증 (주민등록증 또는 운전면허증), 2) 통장 사본 (지원금 수령용), 3) 임대차계약서 (월세/전세 거주 시)",
     inquiryContact: "보건복지상담센터 (국번없이 129) / 관할 읍·면·동 행정복지센터 복지팀",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-CHILD-CARE-001",
+    sourceApi: "보건복지부 / 교육부 온종일돌봄 및 지역아동센터 공공데이터 (ID: 150421)",
+    sourceUrl: "https://www.gov.kr/portal/onjongilCare",
+    department: "보건복지부 인구아동정책관 / 교육부 늘봄학교추진단 / 남양주시 여성아동과",
+    category: "edu",
+    categoryLabel: "아동·돌봄",
+    serviceName: "초등 방과 후 온종일 돌봄 (다함께돌봄센터·지역아동센터·늘봄학교)",
+    legalBasis: "아동복지법 제44조의2(다함께돌봄센터) 및 제52조(아동복지시설의 종류)",
+    targetCriteria: "만 6세~12세(초등학생) 돌봄이 필요한 아동 (소득 무관 맞벌이, 한부모, 다자녀 가구 등 방과 후 나홀로 아동 우선)",
+    supportDetails: "1) 다함께돌봄센터: 소득 무관 방과 후 안전 돌봄, 숙제 지도, 문화 프로그램 및 간식 제공(월 이용료 5~10만 원 내외 또는 지자체 무상), 2) 지역아동센터: 방과 후 학습 지도 및 무료 급식·석식 제공, 3) 학교 늘봄학교: 초등학교 내 맞춤형 방과후 프로그램 및 돌봄 무료 연계",
+    applicationProcess: "정부24(www.gov.kr) '온종일돌봄 원스톱 서비스' 온라인 신청 또는 거주지 관할 다함께돌봄센터/지역아동센터 유선 방문 접수",
+    requiredDocuments: "신청서, 재직증명서(맞벌이 시) 또는 주민등록등본",
+    inquiryContact: "남양주시 여성아동과 (031-590-2415) / 다함께돌봄센터 / 보건복지상담센터 (129)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-SINGLE-PARENT-001",
+    sourceApi: "여성가족부 한부모가족 복지지원 공공데이터 (ID: 150655)",
+    sourceUrl: "https://www.mogef.go.kr",
+    department: "여성가족부 가족지원과 / 읍·면·동 행정복지센터",
+    category: "welfare",
+    categoryLabel: "한부모·가족",
+    serviceName: "한부모가족 아동양육비 및 교육비·생활안정 지원사업",
+    legalBasis: "한부모가족지원법 제12조(복지 급여의 내용)",
+    targetCriteria: "한부모가족, 조손가족, 청소년한부모(만 24세 이하)로서 기준중위소득 63% 이하(2인 가구 약 232만 원 이하)",
+    supportDetails: "1) 아동양육비: 만 18세 미만 자녀 1인당 월 21만 원 지급(청소년한부모 월 35~40만 원), 2) 추가양육비: 조손가구 및 35세 이상 미혼 한부모 월 5만 원 추가, 3) 학용품비: 중·고등학생 자녀 연 9.3만 원, 4) 교육급여 및 방과후 자유수강권 우선 전액 지원",
+    applicationProcess: "주소지 읍·면·동 행정복지센터 방문 신청 또는 복지로(www.bokjiro.go.kr) 온라인 신청",
+    requiredDocuments: "사회보장급여 신청서, 소득·재산 신고서, 금융정보제공동의서, 가족관계증명서",
+    inquiryContact: "한부모가족 상담전화 (1644-6621) / 보건복지상담센터 (129) / 관할 주민센터",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 
@@ -373,19 +406,49 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
-  // 0-0. [복지 신청 서류 및 절차 안내] - 서류가 복잡, 무슨 서류, 서류 설명, 신청 서류, 준비물
+  // 0-0. [초등 방과 후 아동 돌봄] - 초등학생, 아이, 방과후, 돌봄교실, 아동센터, 늘봄학교, 다함께돌봄
   // =========================================================================
   if (
-    (q.includes("서류") && (q.includes("복잡") || q.includes("설명") || q.includes("쉽게") || q.includes("준비") || q.includes("무슨") || q.includes("어떤") || q.includes("필요") || q.includes("가져가") || q.includes("챙겨"))) ||
-    (q.includes("신청") && (q.includes("서류") || q.includes("준비물") || (q.includes("동사무소") && q.includes("어떻게")) || (q.includes("주민센터") && q.includes("어떻게"))))
+    (q.includes("초등") || q.includes("아이") || q.includes("자녀") || q.includes("아동") || q.includes("어린이") || q.includes("학생")) &&
+    (q.includes("돌봄") || q.includes("방과후") || q.includes("방과 후") || q.includes("아동센터") || q.includes("늘봄") || q.includes("보육") || q.includes("맡길") || q.includes("돌봐") || q.includes("돌봄교실"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-CHILD-CARE-001") || null;
+  }
+
+  // =========================================================================
+  // 0-1. [초·중·고 교육비 / 준비물값 / 급식비 / 학용품비 / 교육급여]
+  // =========================================================================
+  if (
+    q.includes("교육급여") || q.includes("교육비") || q.includes("준비물값") || q.includes("학용품비") ||
+    q.includes("급식비") || q.includes("방과후 자유수강권") || q.includes("교육활동지원비") ||
+    ((q.includes("학생") || q.includes("아이") || q.includes("학교")) && (q.includes("학비") || q.includes("수강료") || q.includes("준비물") || q.includes("급식")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOE-001") || null;
+  }
+
+  // =========================================================================
+  // 0-2. [한부모가족 아동양육비 및 생활안정] - 한부모, 미혼모, 미혼부, 조손가족
+  // =========================================================================
+  if (
+    q.includes("한부모") || q.includes("미혼모") || q.includes("미혼부") || q.includes("조손가정") || q.includes("조손가족") ||
+    (q.includes("양육비") && (q.includes("지원") || q.includes("신청")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-SINGLE-PARENT-001") || null;
+  }
+
+  // =========================================================================
+  // 0-3. [복지 신청 서류 및 절차 안내] - 서류가 복잡, 무슨 서류, 서류 설명, 신청 서류
+  // =========================================================================
+  if (
+    (q.includes("서류") && (q.includes("복잡") || q.includes("설명") || q.includes("쉽게") || q.includes("무슨") || q.includes("어떤") || q.includes("가져가") || q.includes("챙겨"))) ||
+    (q.includes("신청") && q.includes("서류") && !q.includes("교육비") && !q.includes("일자리"))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-DOC-EASY-001") || null;
   }
 
   // =========================================================================
-  // 0-1. [무료 법률 지원 및 소송구조] - 사기, 변호사, 법률상담, 소송, 고소, 피해 (최우선 판별)
+  // 0-4. [무료 법률 지원 및 소송구조] - 사기, 변호사, 법률상담, 소송, 고소, 피해
   // =========================================================================
-
   if (
     q.includes("변호사") || q.includes("법률") || q.includes("사기") || q.includes("소송") ||
     q.includes("고소") || q.includes("피해자") || q.includes("임금체불") || q.includes("전세사기") ||
@@ -395,7 +458,7 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   }
 
   // =========================================================================
-  // 0-2. [채무조정 및 개인파산·면책] - 빚, 채무, 독촉, 개인파산, 회생, 워크아웃, 추심, 신용불량
+  // 0-5. [채무조정 및 개인파산·면책] - 빚, 채무, 독촉, 개인파산, 회생, 워크아웃, 추심, 신용불량
   // =========================================================================
   if (
     q.includes("개인파산") || q.includes("채무조정") || q.includes("개인회생") || q.includes("워크아웃") ||
@@ -407,9 +470,8 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   }
 
   // =========================================================================
-  // 1. [다문화·외국인 주민 지원] - 다문화, 한국어 교육, 통번역, 외국인 정착 등 (최우선 판별)
+  // 1. [다문화·외국인 주민 지원] - 다문화, 한국어 교육, 통번역, 외국인 정착 등
   // =========================================================================
-
   if (
     q.includes("다문화") || q.includes("외국인") || q.includes("결혼이민") || q.includes("이민자") ||
     (q.includes("한국말") && (q.includes("서툴") || q.includes("배우") || q.includes("공부") || q.includes("힘들") || q.includes("가르쳐"))) ||
@@ -462,14 +524,16 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   }
 
   // =========================================================================
-  // 6. [어르신 식사·반찬·독거노인 돌봄] - 식사/밥/반찬/고독사/돌봄
+  // 6. [어르신 식사·반찬·독거노인 돌봄] - 아동 키워드가 없을 때만 매칭
   // =========================================================================
   if (
+    !q.includes("아이") && !q.includes("초등") && !q.includes("자녀") && !q.includes("아동") && !q.includes("학생") && !q.includes("어린이") &&
     (q.includes("노인") || q.includes("어르신") || q.includes("독거") || q.includes("할머니") || q.includes("할아버지") || q.includes("혼자")) &&
     (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥") || q.includes("끼니") || q.includes("안부"))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-002") || null;
   }
+
 
   // =========================================================================
   // 7. [의료비·수술비·병원비 환급·재난적의료비]
