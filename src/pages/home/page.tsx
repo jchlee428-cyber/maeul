@@ -559,10 +559,45 @@ export default function Home() {
       query.includes("어려") || query.includes("힘들") || query.includes("막막") || query.includes("수당")
     ) && !query.includes("버스") && !query.includes("지하철") && !query.includes("강좌") && !query.includes("수강신청") && !query.includes("pyeongnae") && !query.includes("nyj.go.kr") && !query.includes("남양주시청");
 
+    // 0순위: [보건복지부 공식 누리집(https://www.mohw.go.kr) 또는 남양주시청/평내동 누리집 명시적 질의]
+    const isDirectMohwWeb = query.includes("mohw.go.kr") || (query.includes("보건복지부") && (query.includes("홈페이지") || query.includes("누리집") || query.includes("사이트") || query.includes("링크") || query.includes("검색")));
+    if (isDirectMohwWeb) {
+      try {
+        const simpleResponse = await checkAndHandleSimpleQueryAsync(query);
+        if (simpleResponse && simpleResponse.isSimple) {
+          let reviewedText = reviewAndRefineResponse(query, simpleResponse.replyText).reviewedText;
+          if (isEasyKorean) reviewedText = convertToEasyKorean(reviewedText);
+          if (selectedLang !== "ko") reviewedText = translateTextToTargetLang(reviewedText, selectedLang);
+
+          saveConsultationSession({
+            userQuery: query,
+            matchedServiceName: "보건복지부 공식 누리집 안내",
+            categoryLabel: "보건복지부",
+            replyText: reviewedText
+          });
+          loadHistory();
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: String(Date.now()),
+              sender: "bot",
+              text: reviewedText
+            }
+          ]);
+          setIsThinking(false);
+          return;
+        }
+      } catch (e) {
+        console.warn("MOHW web query lookup error", e);
+      }
+    }
+
     // =========================================================================
     // 1순위 (최우선): [복지·생계·의료·돌봄·주거·긴급지원 공공데이터 RAG 맞춤 분석]
     // =========================================================================
     const matchedRag = searchAndAnalyzePublicData(query);
+
     if (matchedRag) {
       setTimeout(() => {
         const matchedRes = communityResources.find((r) => r.category === matchedRag.matchedPublicData.category) || communityResources[0];

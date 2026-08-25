@@ -5,11 +5,13 @@ import { getRealtimeBusInfo, localBusRoutes } from "./precisionBusService";
 import { generateAISearchFallbackReply } from "./aiSearchFallbackService";
 import { isPyeongnaeCenterQuery, searchPyeongnaeCenterWeb } from "./pyeongnaeCenterService";
 import { isNamyangjuCityHallQuery, searchNamyangjuCityHallWeb } from "./namyangjuCityHallService";
+import { isMohwQuery, searchMohwPortal } from "./mohwService";
 
 export interface SimpleQueryResponse {
   isSimple: boolean;
   replyText: string;
 }
+
 
 // 관내 주요 행정/공공/치안/문화 시설 데이터베이스
 const localPublicFacilityDB: Record<string, { phone: string; address: string; extra?: string }> = {
@@ -57,7 +59,16 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     return null;
   }
 
-  // 0-1. [남양주시청 공식 누리집(https://www.nyj.go.kr/www/index.do) 웹페이지 정밀 검색 및 안내]
+  // 0-1. [보건복지부 공식 누리집(https://www.mohw.go.kr) 웹페이지 정밀 검색 및 안내]
+  if (isMohwQuery(rawQ)) {
+    const mohwReply = searchMohwPortal(rawQ);
+    return {
+      isSimple: true,
+      replyText: mohwReply
+    };
+  }
+
+  // 0-2. [남양주시청 공식 누리집(https://www.nyj.go.kr/www/index.do) 웹페이지 정밀 검색 및 안내]
   if (isNamyangjuCityHallQuery(rawQ)) {
     const nyjReply = searchNamyangjuCityHallWeb(rawQ);
     return {
@@ -66,7 +77,7 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
     };
   }
 
-  // 0-2. [평내동 주민자치센터(http://pyeongnae.co.kr) 웹페이지 정밀 검색 및 안내]
+  // 0-3. [평내동 주민자치센터(http://pyeongnae.co.kr) 웹페이지 정밀 검색 및 안내]
   if (isPyeongnaeCenterQuery(rawQ)) {
     const pyeongnaeReply = searchPyeongnaeCenterWeb(rawQ);
     return {
@@ -74,6 +85,7 @@ export async function checkAndHandleSimpleQueryAsync(userQuery: string): Promise
       replyText: pyeongnaeReply
     };
   }
+
 
   // 1. [초정밀 버스 실시간 위치 및 노선/구간 질의 - 1순위 최우선 처리]
   if (
