@@ -368,8 +368,25 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "구직신청서(센터 구비), 신분증, 이력서(센터에서 작성 코칭 지원)",
     inquiryContact: "남양주여성새로일하기센터 (031-590-2680 / 031-553-8260) / 고용노동부 (1350)",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-DEMENTIA-CARE-001",
+    sourceApi: "보건복지부 / 국민건강보험공단 노인장기요양보험 및 치매안심센터 공공데이터 (ID: 150249)",
+    sourceUrl: "https://www.longtermcare.or.kr",
+    department: "보건복지부 치매정책과 / 국민건강보험공단 남양주가평지사 / 남양주시 치매안심센터",
+    category: "health",
+    categoryLabel: "치매·주간보호",
+    serviceName: "치매 어르신 주야간보호(데이케어센터) 및 치매안심센터 낮돌봄 쉼터",
+    legalBasis: "노인장기요양보험법 제23조(재가급여) 및 치매관리법 제12조(치매안심센터의 설치)",
+    targetCriteria: "치매 증상이 있거나 기억력 저하, 거동 불편으로 낮 동안 안전한 시설 돌봄 및 인지재활이 필요한 어르신과 부양가족",
+    supportDetails: "1) 주야간보호(데이케어센터): 차량 픽업(송영) ➜ 낮 동안 전문 간호, 식사·간식, 물리치료, 치매 인지재활 프로그램 ➜ 저녁 귀가 (장기요양등급 1~5등급 및 인지지원등급 시 이용료 85~100% 국비 지원, 본인부담금 0~15%), 2) 치매안심센터 쉼터: 등급 판정 전이라도 무료 낮돌봄(1일 3시간), 무료 치매정밀검사(CIST), 치매약제비 월 3만 원 지원",
+    applicationProcess: "1) 장기요양 등급 신청: 국민건강보험공단(1577-1000) 방문/온라인 신청, 2) 치매 쉼터·검사: 관할 남양주시 보건소 치매안심센터 유선 방문",
+    requiredDocuments: "장기요양인정신청서, 의사소견서(등급 신청 시), 신분증",
+    inquiryContact: "국민건강보험공단 (1577-1000) / 남양주시 치매안심센터 (남양주보건소: 031-590-4048, 풍양: 031-590-8381, 동부: 031-590-8716) / 치매상담콜센터 (1899-9988)",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 
@@ -439,8 +456,20 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-000. [치매 어르신 주야간보호(데이케어) 및 치매안심센터] - 치매, 주간보호, 데이케어, 낮 동안, 낮돌봄
+  // =========================================================================
+  if (
+    q.includes("치매") || q.includes("주간보호") || q.includes("데이케어") || q.includes("노인유치원") ||
+    (q.includes("낮") && (q.includes("모셔") || q.includes("돌봄") || q.includes("맡길") || q.includes("보호") || q.includes("시설") || q.includes("센터"))) ||
+    ((q.includes("부모님") || q.includes("어르신") || q.includes("노인")) && (q.includes("기억력") || q.includes("인지장애") || q.includes("장기요양")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DEMENTIA-CARE-001") || null;
+  }
+
+  // =========================================================================
   // 0-00. [장애인 맞춤형 공공일자리] - 장애인 + 일자리, 공공근로, 취업, 일할 곳, 소일거리
   // =========================================================================
+
   if (
     (q.includes("장애") || q.includes("장애인") || q.includes("복지카드") || q.includes("몸이")) &&
     (q.includes("일자리") || q.includes("공공근로") || q.includes("취업") || q.includes("일할") || q.includes("소일거리") || q.includes("직업") || q.includes("구직") || q.includes("알바"))

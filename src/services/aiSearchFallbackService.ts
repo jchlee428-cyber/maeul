@@ -81,7 +81,25 @@ ${reply.trim()}
   const isPyeongnae = q.includes("평내");
   const lowerQ = q.toLowerCase();
 
+  // A-0-0000. 치매 어르신 주야간보호(데이케어) 및 치매안심센터
+  if (lowerQ.includes("치매") || lowerQ.includes("주간보호") || lowerQ.includes("데이케어") || lowerQ.includes("노인유치원") || (lowerQ.includes("낮") && (lowerQ.includes("모셔") || lowerQ.includes("돌봄") || lowerQ.includes("맡길") || lowerQ.includes("시설") || lowerQ.includes("센터")))) {
+    return `✨ **AI 마을지기 치매 어르신 낮돌봄 & 주야간보호(데이케어) 길라잡이**
+
+문의하신 **"${q}"**에 대해 치매 어르신을 낮 동안 안심하고 모실 수 있는 공공 지원 서비스입니다.
+
+### 🏥 1. 이용 가능한 핵심 치매 돌봄 시설
+- **주야간보호(데이케어센터)**: 아침 픽업 차량 ➜ 낮 동안 전문 간호, 물리치료, 인지재활, 점심/간식 ➜ 저녁 귀가 (노인장기요양등급 판정 시 **이용료 85~100% 국비 지원**)
+- **남양주시 치매안심센터 낮돌봄 쉼터**: 등급 판정 전이라도 보건소에서 **무료 인지강화 낮돌봄 쉼터(1일 3시간)** 및 치매 치료약제비(월 3만 원) 지원
+- **가족 휴식지원 (치매가족 휴가제)**: 연간 최대 9일까지 단기보호시설 입소 또는 방문돌봄 전액 지원
+
+### 📋 2. 신청 및 문의처
+- **노인장기요양보험 등급 신청**: 국민건강보험공단 (📞 **1577-1000**)
+- **남양주시 치매안심센터**: 남양주보건소(📞 **031-590-4048**), 풍양보건소(📞 **031-590-8381**), 동부보건센터(📞 **031-590-8716**)
+- **24시간 치매상담콜센터**: 📞 **1899-9988**`;
+  }
+
   // A-0-000. 장애인 맞춤형 공공일자리
+
   if ((lowerQ.includes("장애") || lowerQ.includes("장애인") || lowerQ.includes("복지카드") || lowerQ.includes("몸이")) && (lowerQ.includes("일자리") || lowerQ.includes("공공근로") || lowerQ.includes("취업") || lowerQ.includes("일할") || lowerQ.includes("소일거리") || lowerQ.includes("알바"))) {
     return `✨ **AI 마을지기 장애인 맞춤 공공일자리 길라잡이**
 
