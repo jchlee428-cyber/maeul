@@ -6,6 +6,7 @@ interface LocalStore {
   id: string;
   name: string;
   category: string;
+  categoryGroup: "food" | "market" | "life" | "health";
   address: string;
   phone: string;
   desc: string;
@@ -18,6 +19,7 @@ const LOCAL_STORES: LocalStore[] = [
     id: "s1",
     name: "평내 장터 손칼국수 & 보리밥",
     category: "한식 / 전통면",
+    categoryGroup: "food",
     address: "경기도 남양주시 평내로 29번길 14",
     phone: "031-591-3320",
     desc: "매일 직접 반죽한 쫄깃한 손칼국수와 구수한 보리밥 정식을 정직한 가격에 대접하는 평내동 대표 맛집입니다.",
@@ -26,27 +28,60 @@ const LOCAL_STORES: LocalStore[] = [
   },
   {
     id: "s2",
-    name: "호평 늘을마을 친환경 로컬마켓",
+    name: "호평 늘을마을 친환경 로컬마켓 & 반찬",
     category: "친환경 로컬푸드",
+    categoryGroup: "market",
     address: "경기도 남양주시 호평로 46번길 8",
     phone: "031-592-8811",
-    desc: "남양주 관내 농가에서 당일 수확한 신선한 무농약 쌈채소와 유기농 과일을 직거래 판매합니다.",
+    desc: "남양주 관내 농가에서 당일 수확한 신선한 무농약 쌈채소와 유기농 과일, 정갈한 저염 어르신 맞춤 밑반찬을 직거래 판매합니다.",
     promo: "남양주 땡큐페이 결제 시 10% 추가 적립",
-    tags: ["당일수확", "친환경", "평내호평역인근"]
+    tags: ["당일수확", "친환경", "평내호평역인근", "저염반찬"]
   },
   {
     id: "s3",
     name: "금곡 홍유릉 쉼터 베이커리 카페",
     category: "카페 / 디저트",
+    categoryGroup: "food",
     address: "경기도 남양주시 금곡동 홍유릉로 248",
     phone: "031-593-7740",
     desc: "역사 깊은 홍유릉 산책로 입구에서 갓 구운 천연발효 빵과 스페셜티 커피를 즐길 수 있는 주민 쉼터입니다.",
     promo: "텀블러 지참 시 전 음료 500원 할인",
     tags: ["홍유릉산책", "천연발효", "주민사랑방"]
+  },
+  {
+    id: "s4",
+    name: "평내 늘푸른 약국 (공공심야약국)",
+    category: "약국 / 건강상담",
+    categoryGroup: "health",
+    address: "경기도 남양주시 경춘로 1256 (평내동)",
+    phone: "031-591-1190",
+    desc: "밤 10시까지 불을 밝히는 공공심야약국으로, 어르신 복약지도와 혈압·당뇨 자가관리 상담을 무료로 도와드립니다.",
+    promo: "어르신 맞춤 복약수첩 및 비타민 무료 증정",
+    tags: ["공공심야약국", "복약상담", "남양주사랑상품권"]
+  },
+  {
+    id: "s5",
+    name: "금곡 명품 세탁 & 옷수선 클리닝",
+    category: "생활편의 / 세탁수선",
+    categoryGroup: "life",
+    address: "경기도 남양주시 금곡로 78번길 5",
+    phone: "031-592-4411",
+    desc: "30년 장인 정신으로 아끼는 옷을 꼼꼼하게 복원 세탁하고 수선해 드립니다. 거동이 불편하신 독거 어르신 댁은 무료 수거·배달을 지원합니다.",
+    promo: "65세 이상 독거 어르신 의류·이불 무료 수거배달",
+    tags: ["무료수거배달", "장인세탁", "착한이웃가게"]
   }
 ];
 
+const CATEGORY_TABS = [
+  { key: "all", label: "전체 보기", icon: "🏬" },
+  { key: "food", label: "착한 식당 & 카페", icon: "🍲" },
+  { key: "market", label: "로컬푸드 & 반찬", icon: "🥬" },
+  { key: "life", label: "생활편의 & 세탁", icon: "🧺" },
+  { key: "health", label: "약국 & 동네의원", icon: "💊" }
+];
+
 export default function MarketPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [storeName, setStoreName] = useState("평내 메인프라자 도토리마을");
   const [storeCategory, setStoreCategory] = useState("한식 / 묵요리 전문점");
   const [storeMemo, setStoreMemo] = useState("100% 국산 도토리로 직접 쑨 도토리묵밥과 바삭한 해물파전. 봄맞이 주민 감사 15% 할인 행사");
@@ -57,6 +92,10 @@ export default function MarketPage() {
     snsPost: string;
     multilingual: { en: string; vi: string; zh: string };
   } | null>(null);
+
+  const filteredStores = selectedCategory === "all"
+    ? LOCAL_STORES
+    : LOCAL_STORES.filter(s => s.categoryGroup === selectedCategory);
 
   const handleGeneratePromo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,13 +135,37 @@ export default function MarketPage() {
 
         {/* 1. 평내·호평·금곡 동네 가게 목록 */}
         <div className="mb-12">
-          <h2 className="font-heading text-lg sm:text-xl font-black text-slate-950 mb-4 flex flex-wrap items-center gap-2 tracking-[-0.05em] sm:tracking-normal break-keep">
-            <span>📍 평내·호평·금곡 추천 동네 가게</span>
-            <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">지역화폐 가맹점</span>
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <h2 className="font-heading text-lg sm:text-xl font-black text-slate-950 flex flex-wrap items-center gap-2 tracking-[-0.05em] sm:tracking-normal break-keep">
+              <span>📍 평내·호평·금곡 추천 동네 가게</span>
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">지역화폐 가맹점</span>
+            </h2>
+          </div>
+
+          {/* 🌟 1번 반영: 업종별 빠른 필터 탭 */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = selectedCategory === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setSelectedCategory(tab.key)}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all active:scale-95 ${
+                    isActive
+                      ? "bg-amber-500 text-slate-950 shadow-md ring-2 ring-amber-400"
+                      : "bg-white text-slate-700 border-2 border-slate-200 hover:border-amber-300 hover:bg-amber-50/50"
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {LOCAL_STORES.map((s) => (
+            {filteredStores.map((s) => (
               <div
                 key={s.id}
                 className="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm hover:border-amber-400 hover:shadow-md transition-all flex flex-col justify-between"
@@ -122,7 +185,22 @@ export default function MarketPage() {
                     </a>
                   </div>
                   <h3 className="font-heading font-black text-lg text-slate-900">{s.name}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{s.address}</p>
+                  
+                  {/* 🌟 2번 반영: 지도 길찾기 연동 버튼 */}
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <p className="text-xs text-slate-500 truncate">{s.address}</p>
+                    <a
+                      href={`https://map.naver.com/v5/search/${encodeURIComponent(s.address + " " + s.name)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md inline-flex items-center gap-1 transition-colors"
+                      title="네이버 지도에서 길찾기 열기"
+                    >
+                      <span>📍</span>
+                      <span>길찾기</span>
+                    </a>
+                  </div>
+
                   <p className="text-xs md:text-sm text-slate-700 mt-3 leading-relaxed">{s.desc}</p>
                 </div>
 
@@ -142,6 +220,7 @@ export default function MarketPage() {
             ))}
           </div>
         </div>
+
 
         {/* 2. 소상공인 상인용 AI 홍보 생성기 (핵심 차별화 기능) */}
         <div className="bg-white border-2 border-amber-300 rounded-3xl p-6 md:p-8 shadow-lg">
