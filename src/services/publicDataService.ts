@@ -416,8 +416,25 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "신분증, 주거급여 신청서, 주택 노후 상태 확인서 또는 임대인 동의서(임차가구 에너지개선 시)",
     inquiryContact: "한국에너지재단 콜센터 (1670-7651) / 마이홈 콜센터 (1600-1004) / 관할 읍·면·동 행정복지센터 복지팀",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-BASIC-LIVELIHOOD-001",
+    sourceApi: "보건복지부 국민기초생활보장제도 맞춤형 급여 안내 공공데이터 (ID: 150010)",
+    sourceUrl: "https://www.bokjiro.go.kr",
+    department: "보건복지부 기초생활보장과 / 읍·면·동 행정복지센터",
+    category: "welfare",
+    categoryLabel: "기초생활수급",
+    serviceName: "국민기초생활보장 4대 맞춤형 급여 (생계·의료·주거·교육급여 자격 기준)",
+    legalBasis: "국민기초생활보장법 제7조(급여의 종류) 및 제8조(생계급여의 내용)",
+    targetCriteria: "소득인정액이 기준중위소득 이하인 저소득 취약가구 (1인 가구 기준: 생계급여 약 71만 원, 의료급여 약 89만 원, 주거급여 약 107만 원, 교육급여 약 111만 원 이하)",
+    supportDetails: "1) 생계급여: 기준금액과 가구소득의 차액을 매월 20일 현금 전액 지급 (4인 가구 최대 월 183만 원), 2) 의료급여: 1종·2종 수급권자 병원비·약값 0원~극소액(입원비 전액 국비), 3) 주거급여: [부양의무자 기준 전면 폐지] 실제 거주 전월세 전액 현금 지원 및 자가 집수리 전액 무료, 4) 교육급여: [부양의무자 폐지] 초·중·고 교육활동비 연 최대 72만 원 바우처 지급",
+    applicationProcess: "주민등록지 관할 읍·면·동 행정복지센터 복지팀 방문 상담 및 신청 ➜ 통합조사(소득·재산 전산 확인) ➜ 보장 결정 통보",
+    requiredDocuments: "사회보장급여 신청서, 소득·재산 신고서, 금융정보제공동의서, 임대차계약서, 신분증, 통장 사본",
+    inquiryContact: "보건복지상담센터 (국번없이 129) / 관할 읍·면·동 행정복지센터 복지팀",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 
@@ -489,8 +506,20 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-00000. [국민기초생활수급 4대 급여 자격 및 신청 기준] - 기초생활수급, 수급자 조건, 수급자 자격, 생계급여 조건
+  // =========================================================================
+  if (
+    q.includes("기초생활수급") || q.includes("수급자 조건") || q.includes("수급자 자격") ||
+    q.includes("수급자 신청") || q.includes("생계급여 조건") || q.includes("수급자 되") ||
+    ((q.includes("기초수급") || q.includes("수급자")) && (q.includes("조건") || q.includes("기준") || q.includes("자격") || q.includes("얼마") || q.includes("신청")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-BASIC-LIVELIHOOD-001") || null;
+  }
+
+  // =========================================================================
   // 0-0000. [LH 공공임대주택 & 전세임대] - LH, 전세임대, 공공임대, 영구임대, 국민임대, 매입임대, 행복주택
   // =========================================================================
+
   if (
     q.includes("전세임대") || q.includes("공공임대") || q.includes("영구임대") || q.includes("국민임대") ||
     q.includes("매입임대") || q.includes("행복주택") || (q.includes("lh") && (q.includes("임대") || q.includes("신청") || q.includes("청약") || q.includes("전세"))) ||
@@ -687,16 +716,19 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   }
 
   // =========================================================================
-  // 8. [긴급 생계비·월세 체납·생활고 위기가구] - 구체적인 생계위기 키워드로 엄격화
+  // 8. [긴급 생계비·월세 체납·생활고 위기가구] - 구어체 생계위기 키워드 대폭 확장
   // =========================================================================
   if (
     q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비 지원") ||
-    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("못 내") || q.includes("쫓겨"))) ||
-    (q.includes("실직") && (q.includes("생계") || q.includes("생활비") || q.includes("당장"))) ||
-    q.includes("쌀이 없") || q.includes("당장 굶") || q.includes("생계위기") || q.includes("단전단수")
+    q.includes("돈이나 쌀") || q.includes("먹을 쌀") || q.includes("쌀 지원") || q.includes("쌀이 없") ||
+    q.includes("당장 굶") || q.includes("생계위기") || q.includes("단전단수") ||
+    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("못 내") || q.includes("쫓겨") || q.includes("밀려"))) ||
+    ((q.includes("실직") || q.includes("그만두") || q.includes("잘렸") || q.includes("퇴사")) && (q.includes("생계") || q.includes("생활비") || q.includes("당장") || q.includes("돈") || q.includes("쌀"))) ||
+    ((q.includes("생활비") || q.includes("돈이")) && (q.includes("없는데") || q.includes("없어서") || q.includes("없고")) && (q.includes("당장") || q.includes("지원") || q.includes("쌀") || q.includes("돈")))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
   }
+
 
   // =========================================================================
   // 9. [일반 청장년 일자리 / 국민취업지원제도 / 구직촉진수당]

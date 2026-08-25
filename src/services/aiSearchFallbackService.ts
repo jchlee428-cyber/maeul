@@ -81,7 +81,42 @@ ${reply.trim()}
   const isPyeongnae = q.includes("평내");
   const lowerQ = q.toLowerCase();
 
+  // A-0-000000. 기초생활수급자 신청 자격 & 4대 급여
+  if (lowerQ.includes("기초생활수급") || lowerQ.includes("수급자 조건") || lowerQ.includes("수급자 자격") || lowerQ.includes("수급자 신청") || lowerQ.includes("생계급여 조건") || lowerQ.includes("수급자 되") || ((lowerQ.includes("기초수급") || lowerQ.includes("수급자")) && (lowerQ.includes("조건") || lowerQ.includes("기준") || lowerQ.includes("자격") || lowerQ.includes("신청")))) {
+    return `✨ **AI 마을지기 알기 쉬운 기초생활수급 4대 급여 자격 길라잡이**
+
+문의하신 **"${q}"**에 대해 2026년 기준 알기 쉽게 정리된 수급자 선정 기준입니다.
+
+### 📋 1. 기초생활보장 4대 맞춤형 급여 (중복 수혜 가능)
+1. **생계급여 (중위소득 32% 이하)**: 1인 가구 월 소득 약 71만 원 / 4인 가구 약 183만 원 이하 시 차액 전액 매월 20일 현금 지급
+2. **의료급여 (중위소득 40% 이하)**: 병원비·약값 0원~극소액 (입원 및 수술비 전액 국비)
+3. **주거급여 (중위소득 48% 이하)**: **[부양의무자 기준 전면 폐지!]** 자녀/부모 재산·소득 상관없이 실제 월세 전액 지원 및 집수리 무료
+4. **교육급여 (중위소득 50% 이하)**: **[부양의무자 폐지!]** 초·중·고 교육비 및 연 최대 72만 원 교육활동지원비 바우처 지급
+
+### 📝 2. 신청 방법
+- **신청 장소**: 주민등록지 관할 읍·면·동 행정복지센터 복지팀 방문 접수
+- **준비물**: 신분증, 통장 사본, 임대차계약서 (신청서/금융동의서는 창구에서 서명)
+- **문의처**: 보건복지상담센터 (📞 **국번없이 129**) / 관할 주민센터 복지팀`;
+  }
+
+  // A-0-000001. 갑작스러운 실직/소득상실 긴급 생계비 & 쌀 지원
+  if (lowerQ.includes("돈이나 쌀") || lowerQ.includes("먹을 쌀") || lowerQ.includes("쌀 지원") || lowerQ.includes("쌀이 없") || lowerQ.includes("당장 굶") || ((lowerQ.includes("실직") || lowerQ.includes("그만두") || lowerQ.includes("잘렸")) && (lowerQ.includes("생계") || lowerQ.includes("생활비") || lowerQ.includes("당장") || lowerQ.includes("돈") || lowerQ.includes("쌀"))) || ((lowerQ.includes("생활비") || lowerQ.includes("돈이")) && lowerQ.includes("없") && (lowerQ.includes("당장") || lowerQ.includes("지원") || lowerQ.includes("쌀")))) {
+    return `✨ **AI 마을지기 긴급 생계비 & 푸드뱅크 쌀·식료품 지원 길라잡이**
+
+문의하신 **"${q}"**에 대해 당장 생계가 곤란할 때 '선지원'받으실 수 있는 긴급 복지 지원책입니다.
+
+### 🍚 1. 즉시 지원받을 수 있는 공공 지원
+- **긴급복지 생계지원금 (현금 즉시 지급)**: 실직·휴폐업 등으로 소득이 끊겼을 때 **신청 즉시 4인 가구 월 약 183만 원 (1인 가구 약 71만 원)** 통장 입금 (선지원 후조사 원칙)
+- **남양주시 푸드뱅크·푸드마켓 (무료 쌀 & 식료품)**: 당장 먹을 양식이 없을 때 쌀, 라면, 통조림, 식료품 무료 긴급 배부
+- **긴급 연료비**: 동절기 난방비 월 15만 원 추가 지원
+
+### 📋 2. 신청 방법 및 긴급 문의처
+- **전화 신청**: 보건복지상담센터 (📞 **국번없이 129**, 24시간 운영) ➜ 관할 긴급복지팀 즉시 출동 연계
+- **방문 신청**: 거주지 읍·면·동 행정복지센터 복지팀 또는 남양주시 희망케어센터 (📞 **031-590-8941**)`;
+  }
+
   // A-0-00000. LH 공공임대주택 & 전세임대
+
   if (lowerQ.includes("전세임대") || lowerQ.includes("공공임대") || lowerQ.includes("영구임대") || lowerQ.includes("국민임대") || lowerQ.includes("매입임대") || lowerQ.includes("행복주택") || (lowerQ.includes("lh") && (lowerQ.includes("임대") || lowerQ.includes("청약") || lowerQ.includes("전세")))) {
     return `✨ **AI 마을지기 LH 맞춤 공공임대주택 길라잡이**
 
