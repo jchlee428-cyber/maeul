@@ -256,8 +256,41 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "신분증, 의사소견서 또는 정신건강복지센터 의뢰서(심리상담 바우처 신청 시)",
     inquiryContact: "남양주시정신건강복지센터 (031-592-5891) / 정신건강 위기상담전화 (1577-0199) / 자살예방상담전화 (109)",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-LEGAL-AID-001",
+    sourceApi: "법무부 / 대한법률구조공단 무료 법률구조 공공데이터 (ID: 150288)",
+    sourceUrl: "https://www.klac.or.kr",
+    department: "법무부 법무과 / 대한법률구조공단 남양주지소 / 남양주시청 무료법률상담실",
+    category: "gov",
+    categoryLabel: "무료법률지원",
+    serviceName: "대한법률구조공단 무료 법률상담 및 취약계층 무료 소송대리",
+    legalBasis: "법률구조법 제2조(법률구조의 내용) 및 제3조(법률구조법인의 설립)",
+    targetCriteria: "사기 피해자, 임금체불 근로자, 전세사기 피해자, 기초생활수급자, 차상위계층, 중위소득 125% 이하 국민 및 변호사 선임이 어려운 서민",
+    supportDetails: "1) 무료 법률상담: 민사·가사·형사 전 분야 전액 무료 전화(132) 및 대면 상담, 2) 무료 소송대리: 소송비용(인지대, 송달료) 및 공단 소속 변호사 선임비 전액 국비지원, 3) 읍·면·동 마을변호사 무료 법률자문",
+    applicationProcess: "전화상담(국번없이 132) 또는 대한법률구조공단 홈페이지(www.klac.or.kr) 방문예약 ➜ 관할 지소(남양주시 다산중앙로 82번안길) 방문 접수",
+    requiredDocuments: "신분증, 피해 사실 입증서류(계약서, 입금내역서, 문자/카카오톡 내역), 소득증빙서류(수급자증명서 또는 소득금액증명원)",
+    inquiryContact: "대한법률구조공단 콜센터 (국번없이 132) / 남양주시청 무료법률상담 (031-590-2114)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-DEBT-RELIEF-001",
+    sourceApi: "금융위원회 / 서민금융진흥원 / 신용회복위원회 채무조정 공공데이터 (ID: 150731)",
+    sourceUrl: "https://www.ccrs.or.kr",
+    department: "금융위원회 서민금융과 / 신용회복위원회 / 서민금융통합지원센터",
+    category: "welfare",
+    categoryLabel: "채무조정·파산",
+    serviceName: "신용회복위원회 채무조정(신속·프리·개인워크아웃) 및 개인회생·파산 무료지원",
+    legalBasis: "서민의 금융생활 지원에 관한 법률 제72조 및 채무자 회생 및 파산에 관한 법률",
+    targetCriteria: "빚이 과다하여 갚기 어렵거나 독촉 전화/압류에 시달리는 주민, 다중채무자, 연체자 또는 연체 위기자 (소득이 없거나 최저생계비 이하인 경우 파산/면책 지원)",
+    supportDetails: "1) 채무조정 신청 즉시 모든 금융기관 빚 독촉·추심·압류 법적 즉시 중단(접수 당일 효력), 2) 이자 전액 감면 및 원금 최대 90% 감면(취약계층), 3) 최장 10년 분할상환, 4) 상환 불능 시 법원 개인파산·면책 절차 및 변호사 선임비용 전액 무료 연계",
+    applicationProcess: "서민금융콜센터(1397) 또는 신용회복위원회(1600-5500) 유선 상담 ➜ 남양주 서민금융통합지원센터(구리역 인근) 방문 또는 '신용회복위원회 앱' 비대면 신청",
+    requiredDocuments: "신분증, 주민등록등본, 소득증빙서류(소득 있는 경우), 부채증명서(센터에서 조회 대행 가능)",
+    inquiryContact: "신용회복위원회 (1600-5500) / 서민금융콜센터 (1397) / 대한법률구조공단 개인회생파산센터 (132)",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 export interface RAGAnalysisResult {
   query: string;
@@ -323,8 +356,32 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-1. [무료 법률 지원 및 소송구조] - 사기, 변호사, 법률상담, 소송, 고소, 피해 (최우선 판별)
+  // =========================================================================
+  if (
+    q.includes("변호사") || q.includes("법률") || q.includes("사기") || q.includes("소송") ||
+    q.includes("고소") || q.includes("피해자") || q.includes("임금체불") || q.includes("전세사기") ||
+    (q.includes("법") && (q.includes("상담") || q.includes("도움") || q.includes("무료")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-LEGAL-AID-001") || null;
+  }
+
+  // =========================================================================
+  // 0-2. [채무조정 및 개인파산·면책] - 빚, 채무, 독촉, 개인파산, 회생, 워크아웃, 추심, 신용불량
+  // =========================================================================
+  if (
+    q.includes("개인파산") || q.includes("채무조정") || q.includes("개인회생") || q.includes("워크아웃") ||
+    q.includes("신용회복") || q.includes("신용불량") || q.includes("독촉") || q.includes("추심") ||
+    (q.includes("빚") && (q.includes("많아") || q.includes("탕감") || q.includes("못 갚") || q.includes("독촉") || q.includes("시달") || q.includes("상환") || q.includes("이자") || q.includes("해결"))) ||
+    (q.includes("채무") && (q.includes("감면") || q.includes("조정") || q.includes("탕감") || q.includes("통합") || q.includes("상담")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DEBT-RELIEF-001") || null;
+  }
+
+  // =========================================================================
   // 1. [다문화·외국인 주민 지원] - 다문화, 한국어 교육, 통번역, 외국인 정착 등 (최우선 판별)
   // =========================================================================
+
   if (
     q.includes("다문화") || q.includes("외국인") || q.includes("결혼이민") || q.includes("이민자") ||
     (q.includes("한국말") && (q.includes("서툴") || q.includes("배우") || q.includes("공부") || q.includes("힘들") || q.includes("가르쳐"))) ||
