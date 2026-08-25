@@ -97,23 +97,85 @@ export default function MarketPage() {
     ? LOCAL_STORES
     : LOCAL_STORES.filter(s => s.categoryGroup === selectedCategory);
 
-  const handleGeneratePromo = (e: React.FormEvent) => {
+  const handleGeneratePromo = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!storeName.trim()) return;
     setIsGenerating(true);
+
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+    const name = storeName.trim();
+    const cat = storeCategory.trim() || "지역 착한 가게";
+    const memo = storeMemo.trim() || "정직하고 친절하게 모십니다.";
+
+    // 1. OpenAI API 연동 시도 (실제 LLM 실시간 생성)
+    if (apiKey && !apiKey.includes("your-openai-api-key")) {
+      try {
+        const prompt = `당신은 소상공인 골목상권 활성화를 돕는 지역 마을 AI 카피라이터입니다.
+다음 소상공인 가게 정보를 바탕으로 4가지 홍보 콘텐츠를 한국어 및 다국어로 작성하여 JSON 형식으로만 반환해 주세요.
+
+[가게 정보]
+- 가게 상호명: ${name}
+- 업종/대표메뉴: ${cat}
+- 홍보/할인 내용: ${memo}
+
+[반환 JSON 규격]
+{
+  "intro": "정중하고 따뜻한 이웃 주민 대상 2~3줄 가게 소개 인사말",
+  "posterCopy": "가게 앞 배너나 포스터에 들어갈 눈에 띄는 헤드카피와 할인/대표메뉴 강조 문구 (이모지 포함)",
+  "snsPost": "인스타그램/당근마켓/지역 맘카페에 올릴 친근한 홍보 게시글 (해시태그 3~4개 포함)",
+  "multilingual": {
+    "en": "Short inviting promotion for English-speaking residents with key menu and offer",
+    "vi": "Đoạn quảng cáo ngắn gọn, ấm áp bằng tiếng Việt dành cho cư dân người Việt",
+    "zh": "面向华人居民及游客的温馨中文店铺推荐与优惠说明"
+  }
+}`;
+
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: prompt }],
+            response_format: { type: "json_object" },
+            temperature: 0.7
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const parsed = JSON.parse(data.choices[0].message.content);
+          setAiPromoResult(parsed);
+          setIsGenerating(false);
+          return;
+        }
+      } catch (err) {
+        console.warn("OpenAI API call failed in promo generator, falling back to smart local template:", err);
+      }
+    }
+
+    // 2. 스마트 로컬 동적 생성 엔진 (입력 데이터를 100% 동적으로 파싱하여 조합)
     setTimeout(() => {
+      // 할인/이벤트 문구 추출
+      const isDiscount = memo.includes("할인") || memo.includes("%") || memo.includes("원") || memo.includes("무료") || memo.includes("증정") || memo.includes("서비스");
+      const eventHighlight = isDiscount ? memo : `${memo} (마을 주민 특별 우대)`;
+
       setAiPromoResult({
-        intro: `안녕하세요! 맑고 깨끗한 남양주시 수동면 송천리의 명물, [${storeName}]입니다. 우리 땅에서 정성껏 자란 수동 잣의 깊은 풍미를 그대로 담아 정직하게 대접합니다.`,
-        posterCopy: `🌲 "수동 잣의 진한 고소함이 한 잔에 쏙!"\n봄맞이 우리 동네 이웃 특별 감사 20% 할인 대축제! 이번 주말, 송천리에서 만나요!`,
-        snsPost: `[#남양주맛집 #수동면송천리] 봄바람 살랑이는 날, 맑은 수동계곡에서 즐기는 진한 잣 막걸리와 바삭한 파전 한 상! 🍶🌸\n\n📌 위치: 남양주시 수동면 송천리\n🎁 혜택: 마을지기 보고 오셨다고 말씀하시면 음료수 1병 서비스!\n\n#우리동네가게 #마을지기AI #수동면맛집`,
+        intro: `안녕하세요! 정직한 맛과 따뜻한 정성을 담아 주민 여러분을 모시는 [${name}]입니다. 대표 메뉴인 [${cat}]을(를) 정성껏 준비하여 이웃 여러분께 특별한 만족을 드립니다.`,
+        posterCopy: `✨ "${cat}의 깊고 진한 맛, [${name}]에서 만나보세요!"\n📢 [우리 동네 이웃 특별 행사]\n👉 ${eventHighlight}\n따뜻한 정성과 푸짐한 인심으로 정성껏 모시겠습니다!`,
+        snsPost: `[#우리동네맛집 #${name.replace(/\s+/g, "")}] 이웃 여러분, 안녕하세요! 🌿\n\n[${name}]에서 정성 가득한 [${cat}] 메뉴를 준비했습니다.\n\n📌 안내: ${memo}\n🎁 혜택: 마을지기 보고 오셨다고 말씀해 주시면 더욱 정성껏 모십니다!\n\n#남양주골목상권 #${cat.split("/")[0].trim()} #착한가게 #마을지기AI`,
         multilingual: {
-          en: `Welcome to [${storeName}] in Songcheon-ri! Enjoy freshly brewed local pine-nut drinks and traditional dishes made with 100% natural ingredients. Spring special 20% discount now!`,
-          vi: `Chào mừng bạn đến với [${storeName}] tại làng Songcheon-ri! Thưởng thức các món ăn truyền thống và đồ uống đặc sản hạt thông thơm ngon. Giảm giá đặc biệt 20% cho mùa xuân!`,
-          zh: `欢迎光临松川里 [${storeName}]！品尝用纯天然当地松子精心酿造的传统饮品与特色美食。春季邻里感恩回馈20%特惠中！`
+          en: `Welcome to [${name}]! Enjoy our authentic [${cat}]. Special offer: ${memo}. We warmly welcome all neighborhood residents and visitors!`,
+          vi: `Chào mừng quý khách đến với [${name}]! Thưởng thức món [${cat}] thơm ngon và chất lượng. Ưu đãi đặc biệt: ${memo}. Hân hạnh phục vụ bà con lối xóm!`,
+          zh: `欢迎光临 [${name}]！品尝由我们精心制作的正宗 [${cat}]。特别优惠：${memo}。期待各位邻里居民的光临！`
         }
       });
       setIsGenerating(false);
-    }, 700);
+    }, 600);
   };
+
 
   return (
     <div className="bg-slate-50 min-h-screen flex flex-col text-slate-900">
