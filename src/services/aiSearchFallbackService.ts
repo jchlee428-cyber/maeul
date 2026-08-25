@@ -81,7 +81,40 @@ ${reply.trim()}
   const isPyeongnae = q.includes("평내");
   const lowerQ = q.toLowerCase();
 
+  // [상황 인텐트 번역 1: 고액 병원비·치료비 위기]
+  if ((lowerQ.includes("몸이 아") || lowerQ.includes("아픈데") || lowerQ.includes("병원") || lowerQ.includes("수술") || lowerQ.includes("치료") || lowerQ.includes("약값")) && (lowerQ.includes("돈이 없") || lowerQ.includes("돈 없") || lowerQ.includes("병원비") || lowerQ.includes("어떡") || lowerQ.includes("도와"))) {
+    return `✨ **AI 마을지기 과도한 병원비·수술비 국비지원 길라잡이**
+
+문의하신 **"${q}"**에 대해 과도한 의료비 부담을 덜어드리는 공공 지원 제도입니다.
+
+### 🏥 1. 주요 병원비 지원 제도
+- **국민건강보험공단 재난적의료비 지원사업**: 연간 최대 5,000만 원 한도 내 본인부담 의료비의 **50~80% 국비 지원 환급** (중위소득 100% 이하 가구)
+- **긴급복지 의료지원**: 질병·부상으로 긴급 수술/치료 시 **최대 300만 원 긴급 선지원**
+- **병원 내 의료사회복지팀**: 입원 중인 대형병원 원무과 사회복지팀 상담 연계
+
+### 📋 2. 신청 문의처
+- **국민건강보험공단 고객센터**: 📞 **1577-1000**
+- **보건복지상담센터**: 📞 **국번없이 129** (긴급 의료지원 상담)`;
+  }
+
+  // [상황 인텐트 번역 2: 극심한 생활고·당장 쓸 돈 없음]
+  if ((lowerQ.includes("돈이 없") || lowerQ.includes("돈 없") || lowerQ.includes("생활비") || lowerQ.includes("통장") || lowerQ.includes("한 푼도")) && (lowerQ.includes("어떡") || lowerQ.includes("어쩌") || lowerQ.includes("당장") || lowerQ.includes("막막") || lowerQ.includes("도와") || lowerQ.includes("살려"))) {
+    return `✨ **AI 마을지기 긴급 생계비 & 푸드뱅크 지원 길라잡이**
+
+문의하신 **"${q}"**에 대해 당장 생계가 곤란할 때 '선지원'받으실 수 있는 긴급 복지 지원책입니다.
+
+### 🍚 1. 즉시 지원받을 수 있는 공공 지원
+- **긴급복지 생계지원금 (현금 즉시 지급)**: 소득이 끊겼을 때 **신청 즉시 4인 가구 월 약 183만 원 (1인 가구 약 71만 원)** 통장 입금 (선지원 후조사 원칙)
+- **남양주시 푸드뱅크·푸드마켓**: 당장 먹을 쌀, 라면, 식료품 무료 긴급 배부
+- **긴급 연료비**: 동절기 난방비 월 15만 원 추가 지원
+
+### 📋 2. 신청 방법 및 긴급 문의처
+- **전화 신청**: 보건복지상담센터 (📞 **국번없이 129**, 24시간)
+- **방문 신청**: 거주지 읍·면·동 행정복지센터 복지팀 또는 남양주시 희망케어센터 (📞 **031-590-8941**)`;
+  }
+
   // A-0-000000. 기초생활수급자 신청 자격 & 4대 급여
+
   if (lowerQ.includes("기초생활수급") || lowerQ.includes("수급자 조건") || lowerQ.includes("수급자 자격") || lowerQ.includes("수급자 신청") || lowerQ.includes("생계급여 조건") || lowerQ.includes("수급자 되") || ((lowerQ.includes("기초수급") || lowerQ.includes("수급자")) && (lowerQ.includes("조건") || lowerQ.includes("기준") || lowerQ.includes("자격") || lowerQ.includes("신청")))) {
     return `✨ **AI 마을지기 알기 쉬운 기초생활수급 4대 급여 자격 길라잡이**
 

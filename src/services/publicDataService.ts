@@ -506,6 +506,76 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 🌟 [지능형 감정·상황 인텐트 해석기 (Emotion & Situation Intent Translator)] 🌟
+  // 주민이 전문 행정 용어를 몰라도, 자신의 불행이나 어려움을 호소하면 최적 공공 자원으로 자동 연결
+  // =========================================================================
+
+  // [상황 A: 질병·고액 병원비·치료비 위기] 
+  // "몸이 아픈데 병원비가 없어요", "수술해야 하는데 돈이 없어요", "약값이 너무 많이 나와요"
+  if (
+    (q.includes("몸이 아") || q.includes("아픈데") || q.includes("병원") || q.includes("수술") || q.includes("치료") || q.includes("약값") || q.includes("진료") || q.includes("입원") || q.includes("간병")) &&
+    (q.includes("돈이 없") || q.includes("돈 없") || q.includes("병원비") || q.includes("수술비") || q.includes("치료비") || q.includes("약값") || q.includes("비싸") || q.includes("부담") || q.includes("어떡") || q.includes("도와") || q.includes("지원"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-NHIS-001") || null;
+  }
+
+  // [상황 B: 극심한 생활고·당장 굶주림·소득 단절]
+  // "돈이 없는데 당장 어떡하죠?", "먹고살 돈이 없어요", "통장에 0원이에요", "당장 굶게 생겼어요", "살려주세요"
+  if (
+    (q.includes("돈이 없") || q.includes("돈 없") || q.includes("생활비") || q.includes("통장") || q.includes("굶") || q.includes("먹을 게") || q.includes("양식") || q.includes("쌀") || q.includes("소득이 없") || q.includes("한 푼도")) &&
+    (q.includes("어떡") || q.includes("어쩌") || q.includes("당장") || q.includes("막막") || q.includes("도와") || q.includes("살려") || q.includes("힘들") || q.includes("지원") || q.includes("죽고 싶") || q.includes("0원") || q.includes("바닥"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
+  }
+
+  // [상황 C: 주거 퇴거 위기·쫓겨남·길거리 나앉음]
+  // "방 빼라고 난리예요", "길거리에 나앉게 생겼어요", "월세가 밀려 쫓겨나요", "갈 곳이 없어요"
+  if (
+    q.includes("방 빼") || q.includes("쫓겨") || q.includes("나앉게") || q.includes("길거리") || q.includes("길바닥") ||
+    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("못 내") || q.includes("밀려") || q.includes("없어"))) ||
+    (q.includes("갈 곳이") && (q.includes("없") || q.includes("막막")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
+  }
+
+  // [상황 D: 빚 독촉·통장 압류·채무 파산 위기]
+  // "빚쟁이가 찾아와요", "통장이 압류됐어요", "이자 갚을 돈이 없어요", "빚 때문에 죽고 싶어요"
+  if (
+    q.includes("빚쟁이") || q.includes("압류") || q.includes("사채") || q.includes("독촉") || q.includes("돌려막기") ||
+    ((q.includes("빚") || q.includes("대출") || q.includes("이자") || q.includes("카드값") || q.includes("채무")) && (q.includes("못 갚") || q.includes("힘들") || q.includes("파산") || q.includes("막막") || q.includes("해결") || q.includes("어떡") || q.includes("탕감")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DEBT-RELIEF-001") || null;
+  }
+
+  // [상황 E: 사기·임금체불·억울한 법적 분쟁]
+  // "사기 당했어요", "월급을 떼였어요", "변호사 살 돈이 없어요", "고소당했어요"
+  if (
+    q.includes("사기 당") || q.includes("사기꾼") || q.includes("돈을 떼") || q.includes("월급을 떼") || q.includes("임금체불") ||
+    ((q.includes("변호사") || q.includes("소송") || q.includes("고소") || q.includes("법률")) && (q.includes("돈이 없") || q.includes("무료") || q.includes("도와") || q.includes("상담") || q.includes("비용")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-LEGAL-AID-001") || null;
+  }
+
+  // [상황 F: 부모님 치매·인지저하·낮 동안 모실 곳]
+  // "부모님이 자꾸 길을 잃어요", "치매 증상이 있으신데 낮에 봐줄 사람이 없어요"
+  if (
+    q.includes("치매") || q.includes("주간보호") || q.includes("데이케어") || q.includes("노인유치원") ||
+    (q.includes("부모님") && (q.includes("기억력") || q.includes("길을 잃") || q.includes("깜빡") || q.includes("인지") || q.includes("모셔줄") || q.includes("돌봐줄"))) ||
+    (q.includes("낮") && (q.includes("모셔") || q.includes("돌봄") || q.includes("맡길") || q.includes("보호") || q.includes("시설") || q.includes("센터")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DEMENTIA-CARE-001") || null;
+  }
+
+  // [상황 G: 극심한 우울·마음의 상처·정신적 고통]
+  // "너무 우울하고 살기 싫어요", "눈물만 나고 잠을 못 자요", "마음이 너무 괴로워요"
+  if (
+    (q.includes("우울") || q.includes("눈물") || q.includes("마음이") || q.includes("잠을 못") || q.includes("불안") || q.includes("공황")) &&
+    (q.includes("괴로") || q.includes("힘들") || q.includes("상담") || q.includes("살기 싫") || q.includes("어떡") || q.includes("치료") || q.includes("도와"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-MIND-001") || null;
+  }
+
+  // =========================================================================
   // 0-00000. [국민기초생활수급 4대 급여 자격 및 신청 기준] - 기초생활수급, 수급자 조건, 수급자 자격, 생계급여 조건
   // =========================================================================
   if (
@@ -515,6 +585,7 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BASIC-LIVELIHOOD-001") || null;
   }
+
 
   // =========================================================================
   // 0-0000. [LH 공공임대주택 & 전세임대] - LH, 전세임대, 공공임대, 영구임대, 국민임대, 매입임대, 행복주택
