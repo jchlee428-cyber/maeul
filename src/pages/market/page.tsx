@@ -92,6 +92,23 @@ export default function MarketPage() {
     snsPost: string;
     multilingual: { en: string; vi: string; zh: string };
   } | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+
+  const handleCopy = (key: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => {
+      setCopiedKey(null);
+    }, 2000);
+  };
+
+  const handleCopyAll = () => {
+    if (!aiPromoResult) return;
+    const fullText = `[📢 포스터 / 현수막 홍보 문구]\n${aiPromoResult.posterCopy}\n\n[📱 SNS / 당근마켓 홍보글]\n${aiPromoResult.snsPost}\n\n[🌏 외국인용 다국어 안내]\n- English: ${aiPromoResult.multilingual.en}\n- Tiếng Việt: ${aiPromoResult.multilingual.vi}\n- 中文: ${aiPromoResult.multilingual.zh}`;
+    handleCopy("all", fullText);
+  };
+
 
   const filteredStores = selectedCategory === "all"
     ? LOCAL_STORES
@@ -356,34 +373,110 @@ export default function MarketPage() {
           {/* AI 홍보 생성 결과 */}
           {aiPromoResult && (
             <div className="mt-8 pt-6 border-t-2 border-slate-100 space-y-4">
-              <h3 className="font-heading font-black text-lg text-emerald-900 flex items-center gap-1.5">
-                <i className="ri-checkbox-circle-fill text-emerald-600"></i>
-                AI가 완성한 맞춤 홍보 콘텐츠
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-heading font-black text-lg text-emerald-900 flex items-center gap-1.5">
+                  <i className="ri-checkbox-circle-fill text-emerald-600"></i>
+                  AI가 완성한 맞춤 홍보 콘텐츠
+                </h3>
+                <button
+                  type="button"
+                  onClick={handleCopyAll}
+                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black inline-flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
+                >
+                  <span>{copiedKey === "all" ? "✓ 전체 복사완료!" : "📋 전체 한 번에 복사"}</span>
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
-                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-300">
-                  <strong className="text-amber-950 block mb-1 font-extrabold">📢 포스터 / 현수막 홍보 문구:</strong>
-                  <p className="text-slate-900 font-bold whitespace-pre-line leading-relaxed">{aiPromoResult.posterCopy}</p>
+                {/* 1. 포스터 문구 */}
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-300 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <strong className="text-amber-950 font-extrabold flex items-center gap-1">
+                        <span>📢</span> 포스터 / 현수막 홍보 문구
+                      </strong>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy("poster", aiPromoResult.posterCopy)}
+                        className="text-[11px] font-bold text-amber-900 bg-amber-200/80 hover:bg-amber-300 px-2 py-0.5 rounded-lg inline-flex items-center gap-1 transition-colors"
+                      >
+                        <span>{copiedKey === "poster" ? "✓ 복사됨" : "📋 복사"}</span>
+                      </button>
+                    </div>
+                    <p className="text-slate-900 font-bold whitespace-pre-line leading-relaxed">{aiPromoResult.posterCopy}</p>
+                  </div>
                 </div>
 
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-300">
-                  <strong className="text-emerald-950 block mb-1 font-extrabold">📱 SNS / 당근마켓 홍보글:</strong>
-                  <p className="text-slate-900 font-bold whitespace-pre-line leading-relaxed">{aiPromoResult.snsPost}</p>
+                {/* 2. SNS / 당근마켓 홍보글 */}
+                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-300 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <strong className="text-emerald-950 font-extrabold flex items-center gap-1">
+                        <span>📱</span> SNS / 당근마켓 홍보글
+                      </strong>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy("sns", aiPromoResult.snsPost)}
+                        className="text-[11px] font-bold text-emerald-900 bg-emerald-200/80 hover:bg-emerald-300 px-2 py-0.5 rounded-lg inline-flex items-center gap-1 transition-colors"
+                      >
+                        <span>{copiedKey === "sns" ? "✓ 복사됨" : "📋 복사"}</span>
+                      </button>
+                    </div>
+                    <p className="text-slate-900 font-bold whitespace-pre-line leading-relaxed">{aiPromoResult.snsPost}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* 외국인 손님용 3개국 다국어 홍보문 */}
+              {/* 3. 외국인 손님용 3개국 다국어 홍보문 */}
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-300">
-                <strong className="text-slate-950 block mb-2 font-extrabold">🌏 외국인 주민 및 관광객용 다국어 안내문:</strong>
+                <div className="flex items-center justify-between mb-2">
+                  <strong className="text-slate-950 font-extrabold flex items-center gap-1">
+                    <span>🌏</span> 외국인 주민 및 관광객용 다국어 안내문
+                  </strong>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy("multi", `English: ${aiPromoResult.multilingual.en}\nTiếng Việt: ${aiPromoResult.multilingual.vi}\n中文: ${aiPromoResult.multilingual.zh}`)}
+                    className="text-[11px] font-bold text-slate-800 bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded-lg inline-flex items-center gap-1 transition-colors"
+                  >
+                    <span>{copiedKey === "multi" ? "✓ 복사됨" : "📋 다국어 전체 복사"}</span>
+                  </button>
+                </div>
                 <div className="space-y-2 text-xs text-slate-800 font-medium">
-                  <div><strong>🇺🇸 English:</strong> {aiPromoResult.multilingual.en}</div>
-                  <div><strong>🇻🇳 Tiếng Việt:</strong> {aiPromoResult.multilingual.vi}</div>
-                  <div><strong>🇨🇳 中文:</strong> {aiPromoResult.multilingual.zh}</div>
+                  <div className="flex items-start justify-between gap-2 p-2 bg-white rounded-xl border border-slate-200">
+                    <div><strong>🇺🇸 English:</strong> {aiPromoResult.multilingual.en}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("en", aiPromoResult.multilingual.en)}
+                      className="shrink-0 text-[10px] font-bold text-slate-600 hover:text-slate-950"
+                    >
+                      {copiedKey === "en" ? "✓" : "복사"}
+                    </button>
+                  </div>
+                  <div className="flex items-start justify-between gap-2 p-2 bg-white rounded-xl border border-slate-200">
+                    <div><strong>🇻🇳 Tiếng Việt:</strong> {aiPromoResult.multilingual.vi}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("vi", aiPromoResult.multilingual.vi)}
+                      className="shrink-0 text-[10px] font-bold text-slate-600 hover:text-slate-950"
+                    >
+                      {copiedKey === "vi" ? "✓" : "복사"}
+                    </button>
+                  </div>
+                  <div className="flex items-start justify-between gap-2 p-2 bg-white rounded-xl border border-slate-200">
+                    <div><strong>🇨🇳 中文:</strong> {aiPromoResult.multilingual.zh}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("zh", aiPromoResult.multilingual.zh)}
+                      className="shrink-0 text-[10px] font-bold text-slate-600 hover:text-slate-950"
+                    >
+                      {copiedKey === "zh" ? "✓" : "복사"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
+
         </div>
       </main>
 
