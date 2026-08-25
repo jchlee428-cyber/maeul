@@ -384,8 +384,41 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "장기요양인정신청서, 의사소견서(등급 신청 시), 신분증",
     inquiryContact: "국민건강보험공단 (1577-1000) / 남양주시 치매안심센터 (남양주보건소: 031-590-4048, 풍양: 031-590-8381, 동부: 031-590-8716) / 치매상담콜센터 (1899-9988)",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-LH-RENT-001",
+    sourceApi: "국토교통부 / LH 한국토지주택공사 마이홈 공공임대주택 OpenAPI (ID: 150915)",
+    sourceUrl: "https://apply.lh.or.kr",
+    department: "국토교통부 공공주택지원과 / LH 한국토지주택공사 서울동부권주거복지지사",
+    category: "housing",
+    categoryLabel: "공공임대·LH",
+    serviceName: "LH 맞춤형 공공임대주택 (전세임대·영구임대·국민임대·매입임대)",
+    legalBasis: "공공주택 특별법 제4조(공공주택사업자) 및 주거기본법 제15조",
+    targetCriteria: "기초생활수급자, 차상위계층, 한부모가족, 청년, 신혼부부 및 무주택 저소득 가구",
+    supportDetails: "1) LH 전세임대: 입주자가 원하는 전셋집을 구하면 LH가 집주인과 전세계약(수도권 최대 1억 3천만 원 한도) 후 입주자에게 연 1~2% 초저리로 재임대, 2) 영구·국민임대: 시세의 30~50% 수준으로 최장 30~50년 안정 거주, 3) 매입임대: 도심 내 다가구주택을 LH가 매입하여 저렴하게 공급",
+    applicationProcess: "1) LH 전세임대·매입임대: 주소지 읍·면·동 행정복지센터 복지팀 방문 신청, 2) 국민·행복주택: 'LH청약플러스(apply.lh.or.kr)' 온라인 청약 접수",
+    requiredDocuments: "공공임대주택 공급신청서, 주민등록등본·초본, 가족관계증명서, 금융정보제공동의서, 신분증",
+    inquiryContact: "LH 콜센터 (1600-1004) / 마이홈 콜센터 (1600-1004) / 주소지 행정복지센터 복지팀",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-HOME-REPAIR-001",
+    sourceApi: "국토교통부 / 한국에너지재단 저소득층 주택 개보수 및 에너지효율개선 공공데이터 (ID: 150345)",
+    sourceUrl: "https://www.energyf.or.kr",
+    department: "국토교통부 주거복지정책과 / 한국에너지재단 / 읍·면·동 행정복지센터",
+    category: "housing",
+    categoryLabel: "무료집수리",
+    serviceName: "저소득층 무료 집수리 및 난방·단열·친환경 보일러 무상교체 지원사업",
+    legalBasis: "주거급여법 제8조(수선유지급여) 및 에너지법 제16조의2",
+    targetCriteria: "주거환경이 열악하거나 집이 춥고 낡아 도배·장판·단열·난방 수리가 시급한 기초수급자, 차상위계층 및 저소득 취약가구 (자가가구 및 임차가구)",
+    supportDetails: "1) 주거급여 수선유지급여: 자가가구 대상 도배·장판(경보수 최대 457만 원), 단열·난방·창호(중보수 849만 원), 지붕·난방전체(대보수 1,241만 원) 전액 국비 무상 공사, 2) 한국에너지재단 에너지효율개선: 가구당 최대 330만 원 한도 내 벽체 단열, 창호(이중창) 및 친환경 콘덴싱 보일러 전액 무료 교체, 3) 지자체 집수리 봉사단 연계",
+    applicationProcess: "주소지 읍·면·동 행정복지센터 복지팀 방문 신청 (연중 상시 접수 및 매년 초 집중 신청)",
+    requiredDocuments: "신분증, 주거급여 신청서, 주택 노후 상태 확인서 또는 임대인 동의서(임차가구 에너지개선 시)",
+    inquiryContact: "한국에너지재단 콜센터 (1670-7651) / 마이홈 콜센터 (1600-1004) / 관할 읍·면·동 행정복지센터 복지팀",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 
@@ -456,6 +489,28 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-0000. [LH 공공임대주택 & 전세임대] - LH, 전세임대, 공공임대, 영구임대, 국민임대, 매입임대, 행복주택
+  // =========================================================================
+  if (
+    q.includes("전세임대") || q.includes("공공임대") || q.includes("영구임대") || q.includes("국민임대") ||
+    q.includes("매입임대") || q.includes("행복주택") || (q.includes("lh") && (q.includes("임대") || q.includes("신청") || q.includes("청약") || q.includes("전세"))) ||
+    ((q.includes("저소득층") || q.includes("취약계층") || q.includes("수급자")) && q.includes("임대주택"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-LH-RENT-001") || null;
+  }
+
+  // =========================================================================
+  // 0-0001. [저소득층 무료 집수리 & 난방·도배·보일러 무상교체] - 도배, 장판, 난방, 보일러, 집수리, 춥고 낡
+  // =========================================================================
+  if (
+    q.includes("도배") || q.includes("장판") || q.includes("집수리") || q.includes("수선유지") ||
+    ((q.includes("난방") || q.includes("보일러") || q.includes("단열") || q.includes("창호") || q.includes("샤시") || q.includes("지붕")) && (q.includes("고쳐") || q.includes("무료") || q.includes("수리") || q.includes("지원") || q.includes("교체") || q.includes("사업"))) ||
+    (q.includes("집이") && (q.includes("춥") || q.includes("낡") || q.includes("물 새") || q.includes("바람")))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-HOME-REPAIR-001") || null;
+  }
+
+  // =========================================================================
   // 0-000. [치매 어르신 주야간보호(데이케어) 및 치매안심센터] - 치매, 주간보호, 데이케어, 낮 동안, 낮돌봄
   // =========================================================================
   if (
@@ -465,6 +520,7 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-DEMENTIA-CARE-001") || null;
   }
+
 
   // =========================================================================
   // 0-00. [장애인 맞춤형 공공일자리] - 장애인 + 일자리, 공공근로, 취업, 일할 곳, 소일거리

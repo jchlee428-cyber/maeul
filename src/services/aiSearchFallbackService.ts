@@ -81,7 +81,41 @@ ${reply.trim()}
   const isPyeongnae = q.includes("평내");
   const lowerQ = q.toLowerCase();
 
+  // A-0-00000. LH 공공임대주택 & 전세임대
+  if (lowerQ.includes("전세임대") || lowerQ.includes("공공임대") || lowerQ.includes("영구임대") || lowerQ.includes("국민임대") || lowerQ.includes("매입임대") || lowerQ.includes("행복주택") || (lowerQ.includes("lh") && (lowerQ.includes("임대") || lowerQ.includes("청약") || lowerQ.includes("전세")))) {
+    return `✨ **AI 마을지기 LH 맞춤 공공임대주택 길라잡이**
+
+문의하신 **"${q}"**에 대해 저소득층, 청년, 신혼부부를 위한 LH 공공임대주택 신청 경로를 안내해 드립니다.
+
+### 🏢 1. 주요 공공임대주택 유형
+- **LH 전세임대**: 원하는 전셋집을 구하면 LH가 집주인과 전세계약(최대 1억 3천만 원 지원) 후 입주자에게 연 1~2% 초저리로 재임대
+- **영구·국민임대주택**: 시세의 30~50% 수준으로 최장 30~50년간 안정적으로 거주
+- **매입임대주택**: 도심 내 다가구주택을 LH가 매입하여 시세보다 저렴하게 공급
+
+### 📋 2. 신청 방법 및 문의처
+1. **LH 전세임대·매입임대**: 주소지 읍·면·동 행정복지센터 복지팀 방문 접수
+2. **국민·행복주택**: [LH청약플러스(apply.lh.or.kr)](https://apply.lh.or.kr) 온라인 청약 접수
+- **마이홈 / LH 콜센터**: 📞 **1600-1004** (전국 공공임대 통합 상담)`;
+  }
+
+  // A-0-00001. 저소득층 무료 집수리 & 보일러·도배·난방 무상교체
+  if (lowerQ.includes("도배") || lowerQ.includes("장판") || lowerQ.includes("집수리") || lowerQ.includes("수선유지") || ((lowerQ.includes("난방") || lowerQ.includes("보일러") || lowerQ.includes("단열") || lowerQ.includes("창호") || lowerQ.includes("샤시")) && (lowerQ.includes("고쳐") || lowerQ.includes("무료") || lowerQ.includes("수리") || lowerQ.includes("지원") || lowerQ.includes("교체"))) || (lowerQ.includes("집이") && (lowerQ.includes("춥") || lowerQ.includes("낡")))) {
+    return `✨ **AI 마을지기 저소득층 무료 집수리·난방지원 길라잡이**
+
+문의하신 **"${q}"**에 대해 춥고 낡은 주택을 전액 국비로 무상 수리받으실 수 있는 공공 지원 사업입니다.
+
+### 🛠️ 1. 무상 집수리 지원 사업
+- **주거급여 수선유지급여 (자가가구)**: 도배·장판(최대 457만 원), 단열·난방·창호(최대 849만 원), 지붕·난방전체(최대 1,241만 원) 전액 무료 공사
+- **한국에너지재단 에너지효율개선사업**: 가구당 최대 330만 원 한도 내 벽체 단열, 창호(이중창), 친환경 콘덴싱 보일러 무료 교체 시공
+- **지자체 희망의 집수리 봉사단**: 취약계층 노후주택 안전 점검 및 소규모 수리
+
+### 📋 2. 신청 방법 및 문의처
+- **주소지 읍·면·동 행정복지센터 복지팀**: 방문하여 "주거급여 수선유지급여" 또는 "에너지효율개선 집수리" 신청
+- **한국에너지재단 콜센터**: 📞 **1670-7651** / **마이홈 콜센터**: 📞 **1600-1004**`;
+  }
+
   // A-0-0000. 치매 어르신 주야간보호(데이케어) 및 치매안심센터
+
   if (lowerQ.includes("치매") || lowerQ.includes("주간보호") || lowerQ.includes("데이케어") || lowerQ.includes("노인유치원") || (lowerQ.includes("낮") && (lowerQ.includes("모셔") || lowerQ.includes("돌봄") || lowerQ.includes("맡길") || lowerQ.includes("시설") || lowerQ.includes("센터")))) {
     return `✨ **AI 마을지기 치매 어르신 낮돌봄 & 주야간보호(데이케어) 길라잡이**
 
