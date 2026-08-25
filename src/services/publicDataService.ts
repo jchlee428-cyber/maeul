@@ -192,6 +192,70 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "사회보장급여 신청서, 소득·재산신고서, 금융정보제공동의서, 신분증",
     inquiryContact: "중앙상담센터 (1544-9654) 또는 보건복지상담센터 (129)",
     lastUpdated: "2026-01-15"
+  },
+  {
+    id: "PUB-SENIOR-JOB-001",
+    sourceApi: "보건복지부 / 한국노인인력개발원 노인사회활동지원 OpenAPI (ID: 150119)",
+    sourceUrl: "https://www.kordi.or.kr",
+    department: "보건복지부 노인지원과 / 남양주시니어클럽 / 남양주시 노인복지관",
+    category: "job",
+    categoryLabel: "노인일자리",
+    serviceName: "노인 일자리 및 사회활동 지원사업 (시니어클럽·사회서비스형·시장형)",
+    legalBasis: "노인복지법 제23조(노인사회참여 지원) 및 노인 일자리 및 사회활동 지원에 관한 법률",
+    targetCriteria: "만 60세 이상 또는 만 65세 이상 어르신 (경비·단순청소 외 공공행정 도우미, 실버카페 바리스타, 도서관 지원, 숲해설, 보육시설 도우미, 시장형 사업단, 신중년 경력형 일자리 등)",
+    supportDetails: "1) 공익활동형(만65세+): 월 30시간 활동 시 월 29만 원 지급, 2) 사회서비스형(만65세+, 일부 60세+): 보육/공공기관/안전관리 주 15시간 근무 월 최대 76만 원+주휴수당, 3) 시장형/취업알선형(만60세+): 실버카페, 제조·배송, 전문직 은퇴자 맞춤형 민간 연계 일자리(급여 사업단별 상이)",
+    applicationProcess: "남양주시니어클럽(031-594-5500), 남양주시노인복지관(031-595-5060), 대한노인회 남양주시지회 방문 접수 또는 '노인일자리여기(www.seniorro.or.kr)' 온라인 신청",
+    requiredDocuments: "주민등록등본, 신분증, 관련 자격증 사본(해당 직종)",
+    inquiryContact: "남양주시니어클럽 (031-594-5500) / 한국노인인력개발원 (1544-3388) / 남양주시청 노인복지과 (031-590-2223)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-MOGEF-MULTI-001",
+    sourceApi: "여성가족부 다문화가족종합정보 포털 다누리 공공데이터 (ID: 150622)",
+    sourceUrl: "https://www.liveinkorea.kr",
+    department: "여성가족부 다문화가족과 / 남양주시가족센터 (건강가정·다문화가족지원센터)",
+    category: "edu",
+    categoryLabel: "다문화·가족",
+    serviceName: "다문화가족·외국인 주민 통합지원 (한국어 교육·통번역·생활적응)",
+    legalBasis: "다문화가족지원법 제6조(생활정보 제공 및 교육 지원) 및 제11조(통역·번역 서비스)",
+    targetCriteria: "다문화가족, 결혼이민자, 중도입국자녀, 외국인 주민 및 한국어 학습과 초기 한국생활 정착에 도움이 필요한 주민",
+    supportDetails: "1) 단계별 무료 한국어교실 (기초/초급/중급/토픽대비반/야간·주말반 운영), 2) 무료 통번역 서비스 (병원, 관공서, 학교 동행 및 전화 통역 - 베트남어, 중국어, 영어, 필리핀어, 몽골어, 러시아어 등), 3) 가족상담 및 자녀 언어발달·이중언어 코칭, 4) 취업 기초 교육 및 자격증 취득 지원",
+    applicationProcess: "남양주시가족센터(금곡동 본관 또는 다산 분소) 방문 또는 유선 등록 ➜ 수준별 반 배정 및 통번역사 즉시 매칭",
+    requiredDocuments: "외국인등록증 또는 주민등록등본, 가족관계증명서",
+    inquiryContact: "남양주시가족센터 (031-555-8261 / 031-553-8211) / 다누리콜센터 (1577-1366, 24시간 13개국어)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-DISABILITY-001",
+    sourceApi: "보건복지부 장애인복지서비스 공공데이터 (ID: 150311)",
+    sourceUrl: "https://www.mohw.go.kr",
+    department: "보건복지부 장애인정책과 / 국민연금공단 / 남양주시 장애인복지과",
+    category: "welfare",
+    categoryLabel: "장애인복지",
+    serviceName: "장애인 활동지원 및 일상생활 보조기기 지원사업",
+    legalBasis: "장애인활동 지원에 관한 법률 제5조 및 장애인복지법 제65조",
+    targetCriteria: "만 6세 이상 ~ 만 65세 미만의 등록 장애인 (소득수준 무관, 신체·가사·사회활동 돌봄이 필요한 자)",
+    supportDetails: "활동지원사 파견(식사보조, 개인위생, 외출·출퇴근 동행, 가사도우미 - 월 최대 480시간 바우처 지원) 및 전동휠체어·보청기 등 보조기기 건강보험 국비 지원",
+    applicationProcess: "주민등록지 관할 읍·면·동 행정복지센터 또는 국민연금공단 지사 방문 신청 ➜ 종합조사 ➜ 등급 결정",
+    requiredDocuments: "사회보장급여 신청서, 신분증, 장애인등록증",
+    inquiryContact: "국민연금공단 콜센터 (1355) / 보건복지상담센터 (129) / 남양주시 장애인복지관 (031-592-7150)",
+    lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-MIND-001",
+    sourceApi: "보건복지부 정신건강복지센터 및 전국민 마음투자 공공데이터 (ID: 150530)",
+    sourceUrl: "https://www.mohw.go.kr",
+    department: "보건복지부 정신건강정책과 / 남양주시정신건강복지센터",
+    category: "health",
+    categoryLabel: "마음건강",
+    serviceName: "전국민 마음투자 심리상담 지원 및 정신건강 상담 (우울·불안·스트레스)",
+    legalBasis: "정신건강증진 및 정신질환자 복지서비스 지원에 관한 법률 제15조",
+    targetCriteria: "우울감, 불안, 대인관계 스트레스, 번아웃, 고립감 등으로 전문 심리상담 또는 정신건강의학과 상담이 필요한 모든 주민",
+    supportDetails: "1) 1:1 전문 심리상담 바우처 총 8회(회당 7~8만 원 상당 지원), 2) 정신건강복지센터 무료 1:1 심층상담 및 의료비(외래 치료비 연 최대 40만 원 지원), 3) 24시간 정신건강 위기상담전화",
+    applicationProcess: "읍·면·동 행정복지센터 방문하여 바우처 신청 또는 남양주시정신건강복지센터(금곡동 보건소 내) 유선 예약 상담",
+    requiredDocuments: "신분증, 의사소견서 또는 정신건강복지센터 의뢰서(심리상담 바우처 신청 시)",
+    inquiryContact: "남양주시정신건강복지센터 (031-592-5891) / 정신건강 위기상담전화 (1577-0199) / 자살예방상담전화 (109)",
+    lastUpdated: "2026-08-25"
   }
 ];
 
@@ -253,12 +317,56 @@ export async function fetchPublicDataAPITest(pageNo: number = 1, numOfRows: numb
 }
 
 /**
- * 사용자의 질의가 특정 공공데이터 지원 제도와 정확히 일치하는지 정밀 판별
+ * 사용자의 질의가 특정 공공데이터 지원 제도와 정확히 일치하는지 정밀 판별 (우선순위 기반 정밀 분류)
  */
 export function matchPublicDataRecord(userQuery: string): PublicDataRecord | null {
   const q = userQuery.toLowerCase().trim();
 
-  // 1. 외출·동행·이동지원·드림콜 (종교/병원/외출/거동불편)
+  // =========================================================================
+  // 1. [다문화·외국인 주민 지원] - 다문화, 한국어 교육, 통번역, 외국인 정착 등 (최우선 판별)
+  // =========================================================================
+  if (
+    q.includes("다문화") || q.includes("외국인") || q.includes("결혼이민") || q.includes("이민자") ||
+    (q.includes("한국말") && (q.includes("서툴") || q.includes("배우") || q.includes("공부") || q.includes("힘들") || q.includes("가르쳐"))) ||
+    (q.includes("한국어") && (q.includes("공부") || q.includes("수업") || q.includes("학습") || q.includes("교실") || q.includes("센터") || q.includes("학원") || q.includes("배우"))) ||
+    q.includes("통번역") || q.includes("이중언어") || q.includes("가족센터") || q.includes("다누리")
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOGEF-MULTI-001") || null;
+  }
+
+  // =========================================================================
+  // 2. [노인 일자리 및 시니어 사회활동] - 60세+, 65세+, 은퇴, 시니어클럽, 경비/청소 외 일자리
+  // =========================================================================
+  if (
+    (q.includes("노인") || q.includes("시니어") || q.includes("어르신") || q.includes("60세") || q.includes("65세") || q.includes("은퇴") || q.includes("정년")) &&
+    (q.includes("일자리") || q.includes("취업") || q.includes("일할") || q.includes("직업") || q.includes("구직") || q.includes("경비") || q.includes("청소") || q.includes("소일거리") || q.includes("시니어클럽") || q.includes("공익활동"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-SENIOR-JOB-001") || null;
+  }
+
+  // =========================================================================
+  // 3. [장애인 복지 및 일상 지원] - 장애인, 활동지원사, 보조기기, 휠체어 지원
+  // =========================================================================
+  if (
+    (q.includes("장애") || q.includes("장애인") || q.includes("복지카드")) &&
+    (q.includes("활동지원") || q.includes("활동보조") || q.includes("보조기기") || q.includes("휠체어") || q.includes("도우미") || q.includes("혜택") || q.includes("급여"))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DISABILITY-001") || null;
+  }
+
+  // =========================================================================
+  // 4. [정신건강 및 심리상담] - 우울, 스트레스, 심리상담, 불안, 마음투자
+  // =========================================================================
+  if (
+    q.includes("우울") || q.includes("마음건강") || q.includes("심리상담") || q.includes("정신건강") ||
+    q.includes("번아웃") || q.includes("불안장애") || q.includes("공황") || q.includes("자살") || q.includes("살기 싫")
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-MIND-001") || null;
+  }
+
+  // =========================================================================
+  // 5. [외출·동행·이동지원·드림콜] - 거동불편, 병원동행, 휠체어 콜택시
+  // =========================================================================
   if (
     q.includes("교회") || q.includes("성당") || q.includes("절") || q.includes("외출") ||
     q.includes("동행") || q.includes("거동") || q.includes("휠체어") || q.includes("보행") ||
@@ -268,15 +376,19 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-003") || null;
   }
 
-  // 2. 어르신 식사·반찬·독거노인 돌봄 (식사/밥/반찬/고독사/돌봄)
+  // =========================================================================
+  // 6. [어르신 식사·반찬·독거노인 돌봄] - 식사/밥/반찬/고독사/돌봄
+  // =========================================================================
   if (
     (q.includes("노인") || q.includes("어르신") || q.includes("독거") || q.includes("할머니") || q.includes("할아버지") || q.includes("혼자")) &&
-    (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥") || q.includes("끼니") || q.includes("굶") || q.includes("안부"))
+    (q.includes("식사") || q.includes("돌봄") || q.includes("반찬") || q.includes("급식") || q.includes("밥") || q.includes("끼니") || q.includes("안부"))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-002") || null;
   }
 
-  // 3. 의료비·수술비·병원비 환급·재난적의료비 (병원/수술/치료/약값/간병/입원)
+  // =========================================================================
+  // 7. [의료비·수술비·병원비 환급·재난적의료비]
+  // =========================================================================
   if (
     q.includes("수술비") || q.includes("재난적의료비") || q.includes("본인부담상한제") ||
     (q.includes("병원") && (q.includes("지원") || q.includes("돈") || q.includes("비용") || q.includes("비싸") || q.includes("환급") || q.includes("도움"))) ||
@@ -286,33 +398,39 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
     return publicDataRepository.find((p) => p.id === "PUB-NHIS-001") || null;
   }
 
-  // 4. 긴급 생계비·월세 체납·실직 위기·생활고 (돈이 없음/막막함/긴급지원)
+  // =========================================================================
+  // 8. [긴급 생계비·월세 체납·생활고 위기가구] - 구체적인 생계위기 키워드로 엄격화
+  // =========================================================================
   if (
-    q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비") || q.includes("생활비") ||
-    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("막막") || q.includes("내기 힘들") || q.includes("못 내"))) ||
-    (q.includes("실직") && (q.includes("생계") || q.includes("도움") || q.includes("막막"))) ||
-    q.includes("굶") || q.includes("쌀이 없") || q.includes("먹고 살") || q.includes("돈이 없") ||
-    (q.includes("도와") && (q.includes("막막") || q.includes("살기") || q.includes("위기") || q.includes("힘들")))
+    q.includes("긴급복지") || q.includes("긴급생계") || q.includes("생계비 지원") ||
+    (q.includes("월세") && (q.includes("밀렸") || q.includes("체납") || q.includes("못 내") || q.includes("쫓겨"))) ||
+    (q.includes("실직") && (q.includes("생계") || q.includes("생활비") || q.includes("당장"))) ||
+    q.includes("쌀이 없") || q.includes("당장 굶") || q.includes("생계위기") || q.includes("단전단수")
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-BOKJI-001") || null;
   }
 
-  // 5. 국민취업지원제도 / 구직촉진수당 / 일자리 지원금
+  // =========================================================================
+  // 9. [일반 청장년 일자리 / 국민취업지원제도 / 구직촉진수당]
+  // =========================================================================
   if (
     q.includes("구직촉진수당") || q.includes("국민취업지원") ||
-    (q.includes("취업") && (q.includes("수당") || q.includes("지원금") || q.includes("패키지"))) ||
-    (q.includes("구직") && (q.includes("지원금") || q.includes("수당") || q.includes("급여"))) ||
-    (q.includes("일자리") && (q.includes("지원금") || q.includes("수당")))
+    (q.includes("취업") && (q.includes("수당") || q.includes("지원금") || q.includes("패키지") || q.includes("교육비"))) ||
+    (q.includes("구직") && (q.includes("지원금") || q.includes("수당") || q.includes("급여")))
   ) {
     return publicDataRepository.find((p) => p.id === "PUB-MOEL-001") || null;
   }
 
-  // 6. 맞춤형 주거급여 / 월세 지원 / 집수리 지원
+  // =========================================================================
+  // 10. [맞춤형 주거급여 / 주택수리 지원]
+  // =========================================================================
   if ((q.includes("주거급여") || q.includes("월세지원") || q.includes("집수리 지원") || q.includes("보증금 지원")) && !q.includes("공공요금")) {
     return publicDataRepository.find((p) => p.id === "PUB-MOLIT-001") || null;
   }
 
-  // 7. 에너지바우처 / 난방비·전기요금 감면 / 가스비
+  // =========================================================================
+  // 11. [에너지바우처 / 난방비·전기요금 감면]
+  // =========================================================================
   if (
     q.includes("에너지바우처") || (q.includes("난방비") && (q.includes("지원") || q.includes("감면") || q.includes("신청"))) ||
     (q.includes("가스비") && (q.includes("감면") || q.includes("지원"))) ||
@@ -322,19 +440,30 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
     return publicDataRepository.find((p) => p.id === "PUB-MOTIE-001") || null;
   }
 
-  // 8. 남양주시 공공기관 및 복지관 디렉토리
+  // =========================================================================
+  // 12. [초중고 교육급여]
+  // =========================================================================
+  if (q.includes("교육급여") || q.includes("교육비 지원") || q.includes("방과후 지원") || (q.includes("학생") && q.includes("학비"))) {
+    return publicDataRepository.find((p) => p.id === "PUB-MOE-001") || null;
+  }
+
+  // =========================================================================
+  // 13. [남양주시 공공기관 및 복지관 디렉토리]
+  // =========================================================================
   if (q.includes("남양주") && (q.includes("복지관") || q.includes("희망케어") || q.includes("복지재단") || q.includes("자원봉사센터"))) {
     return publicDataRepository.find((p) => p.id === "PUB-NYJ-ORGS-001") || null;
   }
 
-  // 9. 남양주시 공공요금 감면 고시
+  // =========================================================================
+  // 14. [남양주시 공공요금 감면 고시]
+  // =========================================================================
   if (q.includes("공공요금 감면") || q.includes("상하수도 감면") || q.includes("종량제봉투 무료")) {
     return publicDataRepository.find((p) => p.id === "PUB-NYJ-FEES-001") || null;
   }
 
-  // 일반 개괄 질문이거나 매칭되지 않는 경우 null 반환 (2순위 로컬/교통 또는 3순위 OpenAI 스마트 검색으로 라우팅)
   return null;
 }
+
 
 /**
  * 공공데이터 검색 기반 RAG 파이프라인 실행기 (정밀 일치하는 공공 제도가 있을 때만 4단계 플랜 반환)
