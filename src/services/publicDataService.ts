@@ -288,8 +288,25 @@ export const publicDataRepository: PublicDataRecord[] = [
     requiredDocuments: "신분증, 주민등록등본, 소득증빙서류(소득 있는 경우), 부채증명서(센터에서 조회 대행 가능)",
     inquiryContact: "신용회복위원회 (1600-5500) / 서민금융콜센터 (1397) / 대한법률구조공단 개인회생파산센터 (132)",
     lastUpdated: "2026-08-25"
+  },
+  {
+    id: "PUB-DOC-EASY-001",
+    sourceApi: "보건복지부 / 행정안전부 사회보장급여 신청 및 행정정보공동이용 안내 (ID: 150002)",
+    sourceUrl: "https://www.bokjiro.go.kr",
+    department: "보건복지부 복지행정지원관 / 행정안전부 행정정보공유과 / 읍·면·동 행정복지센터",
+    category: "welfare",
+    categoryLabel: "복지서류안내",
+    serviceName: "알기 쉬운 복지 신청 필수 서류 안내 (3대 핵심 서류 및 공무원 전산조회 대행)",
+    legalBasis: "사회보장급여법 제5조(급여의 신청) 및 전자정부법 제36조(행정정보의 효율적 관리 및 이용)",
+    targetCriteria: "동사무소(행정복지센터) 복지급여(기초생계·주거·의료급여, 기초연금, 한부모, 장애인수당 등) 신청 서류가 복잡하여 준비에 어려움을 겪는 모든 주민 및 어르신",
+    supportDetails: "1) 집에서 챙길 서류는 딱 3가지(① 신분증, ② 본인 명의 통장 사본, ③ 임대차계약서-전월세 거주 시), 2) 주민등록등본·초본·가족관계증명서·토지대장 등은 창구에서 '행정정보 공동이용 동의'만 하면 공무원이 무료 전산 자동 조회(미리 뗄 필요 없음), 3) 사회보장급여신청서·금융정보제공동의서는 창구에서 공무원 안내에 따라 서명(사인)만 진행",
+    applicationProcess: "신분증과 통장사본을 챙겨 거주지 읍·면·동 행정복지센터 복지팀 방문 ➜ 창구 양식 서명 및 전산 일괄 접수",
+    requiredDocuments: "1) 신분증 (주민등록증 또는 운전면허증), 2) 통장 사본 (지원금 수령용), 3) 임대차계약서 (월세/전세 거주 시)",
+    inquiryContact: "보건복지상담센터 (국번없이 129) / 관할 읍·면·동 행정복지센터 복지팀",
+    lastUpdated: "2026-08-25"
   }
 ];
+
 
 
 export interface RAGAnalysisResult {
@@ -356,8 +373,19 @@ export function matchPublicDataRecord(userQuery: string): PublicDataRecord | nul
   const q = userQuery.toLowerCase().trim();
 
   // =========================================================================
+  // 0-0. [복지 신청 서류 및 절차 안내] - 서류가 복잡, 무슨 서류, 서류 설명, 신청 서류, 준비물
+  // =========================================================================
+  if (
+    (q.includes("서류") && (q.includes("복잡") || q.includes("설명") || q.includes("쉽게") || q.includes("준비") || q.includes("무슨") || q.includes("어떤") || q.includes("필요") || q.includes("가져가") || q.includes("챙겨"))) ||
+    (q.includes("신청") && (q.includes("서류") || q.includes("준비물") || (q.includes("동사무소") && q.includes("어떻게")) || (q.includes("주민센터") && q.includes("어떻게"))))
+  ) {
+    return publicDataRepository.find((p) => p.id === "PUB-DOC-EASY-001") || null;
+  }
+
+  // =========================================================================
   // 0-1. [무료 법률 지원 및 소송구조] - 사기, 변호사, 법률상담, 소송, 고소, 피해 (최우선 판별)
   // =========================================================================
+
   if (
     q.includes("변호사") || q.includes("법률") || q.includes("사기") || q.includes("소송") ||
     q.includes("고소") || q.includes("피해자") || q.includes("임금체불") || q.includes("전세사기") ||
