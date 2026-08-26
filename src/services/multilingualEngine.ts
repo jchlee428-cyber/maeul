@@ -876,3 +876,130 @@ export function translateTextToTargetLang(text: string, targetLang: string): str
   return text;
 }
 
+/**
+ * Dynamically analyzes arbitrary administrative document text (from file upload or user paste)
+ */
+export function analyzeCustomAdminDoc(inputText: string, lang: string = "ko"): AdminDocReport {
+  // 1. Check if matching preset samples
+  if (inputText.includes("의료지원") || inputText.includes("건강검진") || inputText.includes("보건소") || inputText.includes("계절근로자")) {
+    const preset = MULTILINGUAL_DOC_ANALYSIS.medical?.[lang] || MULTILINGUAL_DOC_ANALYSIS.medical?.ko;
+    if (preset) return preset;
+  }
+  if (inputText.includes("긴급생활안정자금") || inputText.includes("긴급복지") || inputText.includes("생계안정") || inputText.includes("기준중위소득")) {
+    const preset = MULTILINGUAL_DOC_ANALYSIS.emergency?.[lang] || MULTILINGUAL_DOC_ANALYSIS.emergency?.ko;
+    if (preset) return preset;
+  }
+
+  // 2. Dynamic extraction from custom text
+  const lines = inputText.split("\n").map((l) => l.trim()).filter(Boolean);
+  
+  // Extract terms found in text
+  const matchedTerms: { term: string; explanation: string }[] = [];
+  for (const [term, data] of Object.entries(ADMINISTRATIVE_TERM_SIMPLIFIER)) {
+    if (inputText.includes(term)) {
+      matchedTerms.push({
+        term: `${term} (${data.easy})`,
+        explanation: data.explanation
+      });
+    }
+  }
+
+  // Default fallback terms if none found
+  if (matchedTerms.length === 0) {
+    matchedTerms.push(
+      { term: "행정복지센터", explanation: "주민등록등본 발급과 복지 상담을 받는 동네 관공서(동주민센터)입니다." },
+      { term: "구비서류", explanation: "신청을 위해 본인이 직접 준비해서 제출해야 하는 서류 목록입니다." },
+      { term: "소득인정액", explanation: "복지 자격을 심사하기 위해 월소득과 재산을 합쳐 산정한 공적 기준 금액입니다." }
+    );
+  }
+
+  // Extract dates / deadline
+  let dates = "공고문 내 신청 기한 및 상세 일정 확인 필요";
+  const dateLine = lines.find((l) => /(신청기한|기한|일시|기간|접수기간|마감)/i.test(l));
+  if (dateLine) {
+    dates = dateLine.replace(/^[-*•0-9.\s]+(신청기한|기한|일시|기간|접수기간|마감)[:\s]*/i, "").trim() || dateLine;
+  } else {
+    const dateMatch = inputText.match(/\d{4}[.\-/년]\s*\d{1,2}[.\-/월]\s*\d{1,2}/);
+    if (dateMatch) {
+      dates = `${dateMatch[0]} 전후 (상세 기한 공고문 참조)`;
+    }
+  }
+
+  // Extract target
+  let target = "관내 주민등록 거주자 및 공고 지원 조건 충족 가구";
+  const targetLine = lines.find((l) => /(지원대상|대상자|대상|신청자격|자격요건)/i.test(l));
+  if (targetLine) {
+    target = targetLine.replace(/^[-*•0-9.\s]+(지원대상|대상자|대상|신청자격|자격요건)[:\s]*/i, "").trim() || targetLine;
+  }
+
+  // Extract documents
+  let documents: string[] = ["신분증 (주민등록증, 외국인등록증, 여권 또는 운전면허증)", "통장 사본 (본인 명의 입금 계좌)"];
+  const docLine = lines.find((l) => /(구비서류|제출서류|준비물|지참물|첨부서류)/i.test(l));
+  if (docLine) {
+    const docText = docLine.replace(/^[-*•0-9.\s]+(구비서류|제출서류|준비물|지참물|첨부서류)[:\s]*/i, "").trim();
+    if (docText) {
+      const parts = docText.split(/[,/·\n]/).map((p) => p.trim()).filter((p) => p.length > 1);
+      if (parts.length > 0) {
+        documents = parts;
+      }
+    }
+  }
+
+  // Extract place / contact
+  let whereToApply = "관할 읍면동 행정복지센터(주민센터) 맞춤형복지팀";
+  const placeLine = lines.find((l) => /(신청장소|접수장소|장소|신청방법|접수처)/i.test(l));
+  if (placeLine) {
+    whereToApply = placeLine.replace(/^[-*•0-9.\s]+(신청장소|접수장소|장소|신청방법|접수처)[:\s]*/i, "").trim() || placeLine;
+  }
+
+  let contact = "남양주시청 복지콜센터 / 보건복지상담센터 (129)";
+  const contactLine = lines.find((l) => /(문의처|문의|연락처|상담전화|전화번호)/i.test(l));
+  if (contactLine) {
+    contact = contactLine.replace(/^[-*•0-9.\s]+(문의처|문의|연락처|상담전화|전화번호)[:\s]*/i, "").trim() || contactLine;
+  } else {
+    const phoneMatch = inputText.match(/0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4}|\b129\b/);
+    if (phoneMatch) {
+      contact = `관련 문의처: ${phoneMatch[0]}`;
+    }
+  }
+
+  // Extract dynamic summary
+  const summary: string[] = [];
+  const titleCandidate = lines.find((l) => l.includes("공고") || l.includes("안내") || l.includes("지원") || l.includes("계획") || l.includes("프로젝트") || l.length > 8) || lines[0] || "공문서 주요 안내";
+  
+  const cleanTitle = titleCandidate.replace(/^[0-9.\-•\s]+/, "").slice(0, 120).trim();
+  summary.push(`[핵심] ${cleanTitle}`);
+
+  // Find key action or purpose lines
+  const keyPoints = lines.filter((l) => {
+    if (l === titleCandidate) return false;
+    return /(사업목적|목적|문제|배경|지원내용|내용|방법|혜택|지원금|금액|서비스)/i.test(l) && l.length > 15;
+  });
+
+  if (keyPoints.length > 0) {
+    // Clean up to first 2 concise sentences
+    const point1 = keyPoints[0].replace(/^[0-9.\-•\s]+/, "").trim();
+    summary.push(point1.length > 150 ? point1.slice(0, 140) + "..." : point1);
+    if (keyPoints.length > 1) {
+      const point2 = keyPoints[1].replace(/^[0-9.\-•\s]+/, "").trim();
+      summary.push(point2.length > 150 ? point2.slice(0, 140) + "..." : point2);
+    }
+  }
+
+  if (summary.length < 3) {
+    summary.push(`신청 방법 및 장소: ${whereToApply} (기한: ${dates})`);
+  }
+
+  return {
+    summary: summary.slice(0, 3),
+    terms: matchedTerms.slice(0, 4),
+    dates,
+    target,
+    documents,
+    whereToApply,
+    contact
+  };
+}
+
+
+

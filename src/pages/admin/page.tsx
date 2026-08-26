@@ -6,6 +6,7 @@ import {
   getCases,
   updateCase,
   getDashboardStats,
+  resetCasesToDefault,
   type CommunityCase,
   type ProcessStatus,
   type VerificationStatus,
@@ -42,13 +43,41 @@ export default function AdminPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
 
+  // 새로고침 상태 및 시간 관리
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdatedTime, setLastUpdatedTime] = useState<string>(() =>
+    new Date().toLocaleTimeString("ko-KR")
+  );
+  const [showRefreshFeedback, setShowRefreshFeedback] = useState(false);
+
   // 공공데이터 API 테스트 상태
   const [apiTestLoading, setApiTestLoading] = useState(false);
   const [apiTestResult, setApiTestResult] = useState<{ success: boolean; source: string } | null>(null);
 
   const refreshData = () => {
-    setCases(getCases());
-    setStats(getDashboardStats());
+    setIsRefreshing(true);
+    const updatedCases = getCases();
+    const updatedStats = getDashboardStats();
+    setCases(updatedCases);
+    setStats(updatedStats);
+    setLastUpdatedTime(new Date().toLocaleTimeString("ko-KR"));
+
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setShowRefreshFeedback(true);
+      setTimeout(() => setShowRefreshFeedback(false), 2200);
+    }, 350);
+  };
+
+  const handleResetToDefault = () => {
+    if (window.confirm("상담 사례를 기본 시연 데이터(5건)로 초기화하시겠습니까?")) {
+      const reset = resetCasesToDefault();
+      setCases(reset);
+      setStats(getDashboardStats());
+      setLastUpdatedTime(new Date().toLocaleTimeString("ko-KR"));
+      setShowRefreshFeedback(true);
+      setTimeout(() => setShowRefreshFeedback(false), 2200);
+    }
   };
 
   useEffect(() => {
@@ -190,8 +219,9 @@ export default function AdminPage() {
               <span className="px-3 py-1 text-xs font-bold rounded-full bg-primary-800 text-accent-300">
                 🔒 ADMIN SYSTEM
               </span>
-              <span className="text-xs text-foreground-500">
-                실시간 업데이트: {new Date().toLocaleTimeString("ko-KR")}
+              <span className="text-xs text-foreground-500 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                실시간 업데이트: <strong className="text-emerald-700">{lastUpdatedTime}</strong>
               </span>
             </div>
             <h1 className="font-heading text-2xl md:text-4xl font-bold text-primary-950 mt-1">
@@ -202,7 +232,7 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* [🏠 홈 (실증 성과 보고)] 예쁜 집 모양 단독 아이콘 버튼 */}
             <Link
               to="/cases"
@@ -220,15 +250,35 @@ export default function AdminPage() {
               1:1 AI 상담창
             </Link>
 
+            {/* 활성화된 새로고침 버튼 */}
             <button
+              type="button"
               onClick={refreshData}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl bg-white border border-primary-200 text-primary-800 hover:bg-primary-50 shadow-xs transition-colors"
+              disabled={isRefreshing}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-white border border-emerald-300 text-emerald-950 hover:bg-emerald-50 hover:border-emerald-500 shadow-xs transition-all active:scale-95 cursor-pointer disabled:opacity-75"
+              title="실시간 통계 및 사례 새로고침"
             >
-              <i className="ri-refresh-line"></i>
-              새로고침
+              <i
+                className={`ri-refresh-line text-emerald-700 text-base transition-transform ${
+                  isRefreshing ? "animate-spin text-emerald-600" : ""
+                }`}
+              ></i>
+              <span>{isRefreshing ? "동기화 중..." : "새로고침"}</span>
+            </button>
+
+            {/* 기본 시연 데이터 초기화 버튼 */}
+            <button
+              type="button"
+              onClick={handleResetToDefault}
+              className="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 shadow-xs transition-colors"
+              title="기본 5건(17건 통계)으로 데이터 초기화"
+            >
+              <i className="ri-restart-line"></i>
+              <span>초기화</span>
             </button>
 
             <button
+              type="button"
               onClick={handleLogout}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 shadow-xs transition-colors"
               title="관리자 세션 종료"
@@ -238,6 +288,14 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+
+        {/* 새로고침 완료 플로팅 알림 */}
+        {showRefreshFeedback && (
+          <div className="fixed top-20 right-6 z-50 bg-emerald-800 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl border border-emerald-600 flex items-center gap-2 animate-fadeIn">
+            <i className="ri-checkbox-circle-fill text-accent-300 text-base"></i>
+            <span>최신 상담 통계 및 사례가 성공적으로 동기화되었습니다! ({lastUpdatedTime})</span>
+          </div>
+        )}
 
         {/* 🌟 공공데이터포털 공식 API 연동 상태 배너 (사용자 인증키 연동됨) */}
         <div className="p-4 rounded-2xl bg-gradient-to-r from-primary-900 via-primary-800 to-primary-950 text-white shadow-md mb-6 border border-primary-700">

@@ -15,6 +15,7 @@ export default function Footer() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
               className="inline-flex items-center gap-2.5 px-8 py-4 text-base md:text-lg font-bold rounded-full bg-accent-500 text-foreground-950 hover:bg-accent-400 transition-all shadow-lg whitespace-nowrap"
             >
               <i className="ri-chat-3-line"></i>
@@ -22,6 +23,7 @@ export default function Footer() {
             </Link>
             <Link
               to="/guide"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
               className="inline-flex items-center gap-2.5 px-7 py-4 text-base font-semibold rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur transition-colors whitespace-nowrap"
             >
               <i className="ri-book-open-line"></i>
@@ -29,6 +31,7 @@ export default function Footer() {
             </Link>
             <Link
               to="/admin"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
               className="inline-flex items-center gap-2 px-6 py-4 text-base font-semibold rounded-full bg-primary-800 hover:bg-primary-700 text-accent-300 transition-colors whitespace-nowrap border border-accent-300/30"
             >
               <i className="ri-dashboard-line"></i>
@@ -51,19 +54,39 @@ export default function Footer() {
           </div>
 
           <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm md:text-base">
-            <Link to="/guide" className="text-white/90 hover:text-accent-300 transition-colors">
+            <Link
+              to="/guide"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
+              className="text-white/90 hover:text-accent-300 transition-colors"
+            >
               자원 가이드
             </Link>
-            <Link to="/cases" className="text-white/90 hover:text-accent-300 transition-colors">
+            <Link
+              to="/cases"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
+              className="text-white/90 hover:text-accent-300 transition-colors"
+            >
               실증 사례 & 성과
             </Link>
-            <Link to="/admin" className="text-accent-300 hover:text-white font-semibold transition-colors flex items-center gap-1">
+            <Link
+              to="/admin"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
+              className="text-accent-300 hover:text-white font-semibold transition-colors flex items-center gap-1"
+            >
               <span>🔒 마을관리자 관제</span>
             </Link>
-            <Link to="/intro" className="text-white/90 hover:text-accent-300 transition-colors">
+            <Link
+              to="/intro"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
+              className="text-white/90 hover:text-accent-300 transition-colors"
+            >
               서비스 소개
             </Link>
-            <Link to="/faq" className="text-white/90 hover:text-accent-300 transition-colors">
+            <Link
+              to="/faq"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })}
+              className="text-white/90 hover:text-accent-300 transition-colors"
+            >
               자주 묻는 질문
             </Link>
           </nav>

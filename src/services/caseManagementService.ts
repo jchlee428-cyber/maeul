@@ -181,3 +181,13 @@ export function getDashboardStats(): DashboardStats {
     unverifiedCount
   };
 }
+
+export function resetCasesToDefault(): CommunityCase[] {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialCases));
+  } catch (e) {
+    console.error("Failed to reset cases in storage", e);
+  }
+  return initialCases;
+}
+
