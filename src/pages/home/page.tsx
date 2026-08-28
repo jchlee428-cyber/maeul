@@ -760,141 +760,145 @@ export default function Home() {
       <SchemaOrg />
       <main className="w-full h-[100dvh] max-h-[100dvh] bg-slate-100 flex flex-col overflow-hidden text-slate-900">
         {/* 1. 상단 딥그린 헤더 (LOCAL FIRST 지역선택 & 다국어 & 쉬운 한국어 탑재) */}
-        <header className="w-full px-2.5 sm:px-6 py-2 sm:py-3 bg-emerald-900 text-white flex flex-col sm:flex-row items-center justify-between gap-2 shadow-md shrink-0 z-20">
-          <div className="flex items-center justify-between w-full sm:w-auto">
-            {/* 좌측 로고 */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
-              <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-lg shadow shrink-0">
-                <i className="ri-heart-3-fill"></i>
-              </span>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="font-heading font-black text-base sm:text-lg text-white tracking-tight whitespace-nowrap">
-                  마을지기 AI
+        <header className="w-full bg-emerald-900 text-white shadow-md shrink-0 z-20">
+          <div className="max-w-5xl mx-auto px-3 sm:px-6 py-2 sm:py-3 flex flex-col sm:flex-row items-center justify-between gap-2 w-full">
+            <div className="flex items-center justify-between w-full sm:w-auto">
+              {/* 좌측 로고 */}
+              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
+                <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base sm:text-lg shadow shrink-0">
+                  <i className="ri-heart-3-fill"></i>
                 </span>
-                <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0">
-                  {village.name}
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="font-heading font-black text-base sm:text-lg text-white tracking-tight whitespace-nowrap">
+                    마을지기 AI
+                  </span>
+                  <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black bg-emerald-950 text-amber-300 rounded border border-amber-300/40 shrink-0">
+                    {village.name}
+                  </span>
+                </div>
+              </div>
+
+              {/* 모바일 우측 빠른 액션 */}
+              <div className="flex items-center gap-1 sm:hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm("새 대화를 시작할까요?")) resetToWelcome();
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-700 text-white text-xs font-bold"
+                >
+                  새 대화
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
+                  className="px-2 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold font-mono"
+                >
+                  📁 {consultationHistory.length}
+                </button>
               </div>
             </div>
 
-            {/* 모바일 우측 빠른 액션 */}
-            <div className="flex items-center gap-1 sm:hidden">
+            {/* 중앙 & 우측: LOCAL FIRST 지역 선택기 + 10개국 다국어 + 쉬운한국어 스위치 */}
+            <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              {/* 1. 지역 선택 (충분히 넓혀서 '평내동' 안 잘리게 설정) */}
+              <select
+                value={selectedVillageCode}
+                onChange={(e) => setSelectedVillageCode(e.target.value)}
+                className="flex-1 sm:flex-none min-w-[105px] px-2.5 sm:px-3 py-1.5 bg-emerald-950 text-emerald-200 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
+                title="우리 동네 마을 선택"
+              >
+                {AVAILABLE_REGIONS[0].townships[0].villages.map((v) => (
+                  <option key={v.code} value={v.code}>
+                    📍 {v.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* 2. 10개 다국어 선택 (슬림하고 콤팩트하게 줄임) */}
+              <select
+                value={selectedLang}
+                onChange={(e) => setSelectedLang(e.target.value)}
+                className="w-auto max-w-[90px] sm:max-w-none px-2 py-1.5 bg-emerald-950 text-amber-300 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
+                title="언어 선택 (10개 다국어)"
+              >
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.flag} {l.nativeName}
+                  </option>
+                ))}
+              </select>
+
+              {/* 3. 쉬운 한국어 토글 버튼 */}
               <button
                 type="button"
-                onClick={() => {
-                  if (confirm("새 대화를 시작할까요?")) resetToWelcome();
-                }}
-                className="px-2.5 py-1 rounded-lg bg-emerald-700 text-white text-xs font-bold"
+                onClick={() => setIsEasyKorean(!isEasyKorean)}
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all shrink-0 border whitespace-nowrap shadow-xs ${
+                  isEasyKorean
+                    ? "bg-amber-400 text-slate-950 border-amber-500 shadow-sm"
+                    : "bg-emerald-950/80 text-emerald-200 border-emerald-700 hover:bg-emerald-950"
+                }`}
+                title="어려운 행정용어를 쉬운 말로 풀어서 설명합니다"
               >
-                새 대화
-              </button>
-              <button
-                type="button"
-                onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
-                className="px-2 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold font-mono"
-              >
-                📁 {consultationHistory.length}
-              </button>
-            </div>
-          </div>
-
-          {/* 중앙 & 우측: LOCAL FIRST 지역 선택기 + 10개국 다국어 + 쉬운한국어 스위치 */}
-          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
-            {/* 1. 지역 선택 (충분히 넓혀서 '평내동' 안 잘리게 설정) */}
-            <select
-              value={selectedVillageCode}
-              onChange={(e) => setSelectedVillageCode(e.target.value)}
-              className="flex-1 sm:flex-none min-w-[105px] px-2.5 sm:px-3 py-1.5 bg-emerald-950 text-emerald-200 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
-              title="우리 동네 마을 선택"
-            >
-              {AVAILABLE_REGIONS[0].townships[0].villages.map((v) => (
-                <option key={v.code} value={v.code}>
-                  📍 {v.name}
-                </option>
-              ))}
-            </select>
-
-            {/* 2. 10개 다국어 선택 (슬림하고 콤팩트하게 줄임) */}
-            <select
-              value={selectedLang}
-              onChange={(e) => setSelectedLang(e.target.value)}
-              className="w-auto max-w-[90px] sm:max-w-none px-2 py-1.5 bg-emerald-950 text-amber-300 border border-emerald-700 rounded-xl text-xs font-black focus:outline-none shrink-0 cursor-pointer shadow-xs"
-              title="언어 선택 (10개 다국어)"
-            >
-              {SUPPORTED_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.flag} {l.nativeName}
-                </option>
-              ))}
-            </select>
-
-            {/* 3. 쉬운 한국어 토글 버튼 */}
-            <button
-              type="button"
-              onClick={() => setIsEasyKorean(!isEasyKorean)}
-              className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all shrink-0 border whitespace-nowrap shadow-xs ${
-                isEasyKorean
-                  ? "bg-amber-400 text-slate-950 border-amber-500 shadow-sm"
-                  : "bg-emerald-950/80 text-emerald-200 border-emerald-700 hover:bg-emerald-950"
-              }`}
-              title="어려운 행정용어를 쉬운 말로 풀어서 설명합니다"
-            >
-              {isEasyKorean ? "✨ 쉬운말" : "쉬운말 OFF"}
-            </button>
-
-            {/* 데스크톱 버튼 그룹 */}
-            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm("현재 대화를 비우고 '새 대화'를 시작할까요?")) resetToWelcome();
-                }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs font-black shadow ring-1 ring-emerald-300/80"
-              >
-                <i className="ri-refresh-line"></i>
-                <span>새 대화</span>
+                {isEasyKorean ? "✨ 쉬운말" : "쉬운말 OFF"}
               </button>
 
-              <button
-                type="button"
-                onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow"
-              >
-                <i className="ri-folder-history-fill"></i>
-                <span className="font-mono">{consultationHistory.length}</span>
-              </button>
+              {/* 데스크톱 버튼 그룹 */}
+              <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm("현재 대화를 비우고 '새 대화'를 시작할까요?")) resetToWelcome();
+                  }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white text-xs font-black shadow ring-1 ring-emerald-300/80"
+                >
+                  <i className="ri-refresh-line"></i>
+                  <span>새 대화</span>
+                </button>
 
-              <Link
-                to="/dashboard"
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white"
-                title="우리 동네 대시보드"
-              >
-                <i className="ri-dashboard-3-line text-base"></i>
-              </Link>
+                <button
+                  type="button"
+                  onClick={() => { loadHistory(); setIsHistoryModalOpen(true); }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow"
+                >
+                  <i className="ri-folder-history-fill"></i>
+                  <span className="font-mono">{consultationHistory.length}</span>
+                </button>
+
+                <Link
+                  to="/dashboard"
+                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white"
+                  title="우리 동네 대시보드"
+                >
+                  <i className="ri-dashboard-3-line text-base"></i>
+                </Link>
+              </div>
             </div>
           </div>
         </header>
 
         {/* 2. 5대 주요 서비스 원터치 바로가기 탭 바 */}
-        <div className="bg-emerald-800/90 text-white px-2.5 sm:px-6 py-1.5 shrink-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold">
-          <span className="text-amber-300 font-extrabold whitespace-nowrap mr-1">
-            <i className="ri-compass-3-line"></i> 바로가기:
-          </span>
-          <Link to="/dashboard" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
-            📊 동네 대시보드
-          </Link>
-          <Link to="/welfare" className="px-2.5 py-1 rounded-md bg-blue-900/80 hover:bg-blue-900 whitespace-nowrap text-blue-200">
-            🎯 맞춤 지원 자가진단
-          </Link>
-          <Link to="/docs" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
-            📄 공문서 쉽게 보기
-          </Link>
-          <Link to="/market" className="px-2.5 py-1 rounded-md bg-amber-950/80 hover:bg-amber-950 whitespace-nowrap text-amber-300">
-            🏪 동네 가게 & AI 홍보
-          </Link>
-          <Link to="/guide" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
-            📋 자원 가이드
-          </Link>
+        <div className="w-full bg-emerald-800/90 text-white shrink-0 border-t border-emerald-700/50">
+          <div className="max-w-5xl mx-auto px-3 sm:px-6 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold w-full">
+            <span className="text-amber-300 font-extrabold whitespace-nowrap mr-1">
+              <i className="ri-compass-3-line"></i> 바로가기:
+            </span>
+            <Link to="/dashboard" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+              📊 동네 대시보드
+            </Link>
+            <Link to="/welfare" className="px-2.5 py-1 rounded-md bg-blue-900/80 hover:bg-blue-900 whitespace-nowrap text-blue-200">
+              🎯 맞춤 지원 자가진단
+            </Link>
+            <Link to="/docs" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+              📄 공문서 쉽게 보기
+            </Link>
+            <Link to="/market" className="px-2.5 py-1 rounded-md bg-amber-950/80 hover:bg-amber-950 whitespace-nowrap text-amber-300">
+              🏪 동네 가게 & AI 홍보
+            </Link>
+            <Link to="/guide" className="px-2.5 py-1 rounded-md bg-emerald-950/70 hover:bg-emerald-950 whitespace-nowrap">
+              📋 자원 가이드
+            </Link>
+          </div>
         </div>
 
         {/* 3. 중앙 대화 스트림 영역 */}
