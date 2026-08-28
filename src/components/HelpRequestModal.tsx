@@ -63,10 +63,10 @@ export default function HelpRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-primary-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-primary-200 overflow-hidden my-auto max-h-[92vh] max-h-[92dvh] flex flex-col">
         {/* 상단 바 */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-primary-700 text-white shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 bg-primary-700 text-white shrink-0">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-accent-500 text-foreground-950 flex items-center justify-center font-bold text-sm sm:text-base shrink-0">
               <i className="ri-hand-heart-fill"></i>
@@ -78,7 +78,7 @@ export default function HelpRequestModal({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white shrink-0 ml-1"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/20 hover:bg-white/30 text-white shrink-0 ml-1 transition-colors"
           >
             <i className="ri-close-line text-xl"></i>
           </button>
@@ -86,14 +86,14 @@ export default function HelpRequestModal({
 
         {submittedCase ? (
           /* 접수 완료 화면 */
-          <div className="p-6 md:p-8 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-center space-y-3.5 sm:space-y-4">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl sm:text-3xl mx-auto shadow-inner">
               <i className="ri-checkbox-circle-fill"></i>
             </div>
-            <h3 className="font-heading text-2xl font-bold text-foreground-900">
+            <h3 className="font-heading text-xl sm:text-2xl font-bold text-foreground-900">
               도움 요청이 안전하게 접수되었습니다
             </h3>
-            <div className="p-4 rounded-2xl bg-primary-50 border border-primary-200 text-left space-y-1.5 text-sm">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-primary-50 border border-primary-200 text-left space-y-1.5 text-xs sm:text-sm">
               <div className="flex justify-between items-center pb-2 border-b border-primary-200">
                 <span className="font-bold text-primary-900">사례 관리 번호</span>
                 <span className="font-mono font-bold text-primary-700 bg-white px-2 py-0.5 rounded border border-primary-300">
@@ -104,104 +104,108 @@ export default function HelpRequestModal({
               <p><strong>지역:</strong> {submittedCase.region}</p>
               <p><strong>접수 연락처:</strong> <span className="font-mono font-bold text-emerald-800">📞 {submittedCase.contactInfo}</span></p>
               <p><strong>처리 상태:</strong> <span className="text-amber-700 font-semibold">1단계 접수 완료 (마을관리자 확인 중)</span></p>
-              <div className="text-xs text-emerald-800 bg-emerald-100/80 p-2.5 rounded-xl border border-emerald-300 mt-2">
+              <div className="text-[11px] sm:text-xs text-emerald-800 bg-emerald-100/80 p-2.5 rounded-xl border border-emerald-300 mt-2">
                 🤝 <strong>마을관리자 연락 안내</strong>: 관할 마을관리자가 요청 내용을 확인 후, 남겨주신 위 번호로 <strong>24시간 내(평일 기준)</strong> 전화 또는 문자로 친절히 연락드릴 예정입니다.
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:scale-98 text-white font-bold rounded-xl transition-all shadow-md"
+              className="w-full py-3 sm:py-3.5 bg-primary-600 hover:bg-primary-700 active:scale-98 text-white font-bold rounded-xl transition-all shadow-md text-sm sm:text-base"
             >
               확인 및 대화창으로 돌아가기
             </button>
           </div>
         ) : (
           /* 입력 폼 */
-          <form onSubmit={handleSubmit} className="p-6 space-y-4 text-sm text-foreground-900">
-            {publicData && (
-              <div className="p-3.5 rounded-xl bg-primary-50 border border-primary-200">
-                <div className="text-xs font-bold text-primary-800">연계 희망 공공서비스</div>
-                <div className="font-bold text-foreground-900 text-sm mt-0.5">{publicData.serviceName}</div>
-                <div className="text-xs text-foreground-600 mt-1">소관: {publicData.department}</div>
-              </div>
-            )}
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+            {/* 스크롤 가능한 본문 영역 */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4 text-xs sm:text-sm text-foreground-900">
+              {publicData && (
+                <div className="p-3 sm:p-3.5 rounded-xl bg-primary-50 border border-primary-200">
+                  <div className="text-[11px] sm:text-xs font-bold text-primary-800">연계 희망 공공서비스</div>
+                  <div className="font-bold text-foreground-900 text-xs sm:text-sm mt-0.5">{publicData.serviceName}</div>
+                  <div className="text-[11px] sm:text-xs text-foreground-600 mt-0.5">소관: {publicData.department}</div>
+                </div>
+              )}
 
-            <div>
-              <label className="block font-bold text-foreground-800 mb-1">
-                거주 지역 (시/군/구 및 읍·면·동) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                placeholder="예: 경기도 남양주시 평내동"
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
-              />
-              <p className="text-[11px] text-gray-500 mt-1">관할 주민센터와 복지관을 매칭하기 위해 필요합니다.</p>
-            </div>
-
-            <div>
-              <label className="block font-bold text-foreground-800 mb-1">
-                상황 및 필요한 도움 요약 <span className="text-rose-500">*</span>
-              </label>
-              <textarea
-                required
-                rows={3}
-                value={situation}
-                onChange={(e) => setSituation(e.target.value)}
-                placeholder="도움이 필요한 구체적인 상황을 적어주세요 (이름, 주민번호 등 민감정보 입력 금지)"
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-foreground-800 mb-1">
-                연락 가능한 전화번호 (휴대폰 또는 일반전화) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="tel"
-                required
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                placeholder="예: 010-1234-5678 또는 031-590-0000"
-                className="w-full px-3.5 py-2.5 border-2 border-primary-400 rounded-xl font-mono text-base font-bold focus:ring-2 focus:ring-primary-500 focus:outline-none bg-primary-50/20"
-              />
-              <p className="text-[11px] text-emerald-800 font-medium mt-1">
-                🔒 남겨주신 번호는 <strong>마을관리자가 전화를 드려 지원 제도를 연계해드리는 용도</strong>로만 안전하게 사용됩니다.
-              </p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-              <label className="flex items-start gap-2 cursor-pointer text-xs text-foreground-700">
+              <div>
+                <label className="block font-bold text-foreground-800 mb-1 text-xs sm:text-sm">
+                  거주 지역 (시/군/구 및 읍·면·동) <span className="text-rose-500">*</span>
+                </label>
                 <input
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 text-primary-600 rounded"
+                  type="text"
+                  required
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  placeholder="예: 경기도 남양주시 평내동"
+                  className="w-full px-3 py-2 sm:px-3.5 sm:py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none text-xs sm:text-sm"
                 />
-                <span>
-                  <strong>[필수] 개인정보 최소 수집 및 공공 연계 동의</strong>: 입력하신 연락처와 지역 정보는 관할 지자체/복지기관 연계 목적으로만 활용되며, 문제 해결 후 즉시 파기됩니다.
-                </span>
-              </label>
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">관할 주민센터와 복지관을 매칭하기 위해 필요합니다.</p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-foreground-800 mb-1 text-xs sm:text-sm">
+                  상황 및 필요한 도움 요약 <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  value={situation}
+                  onChange={(e) => setSituation(e.target.value)}
+                  placeholder="도움이 필요한 구체적인 상황을 적어주세요 (이름, 주민번호 등 민감정보 입력 금지)"
+                  className="w-full px-3 py-2 sm:px-3.5 sm:py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:outline-none text-xs sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-foreground-800 mb-1 text-xs sm:text-sm">
+                  연락 가능한 전화번호 (휴대폰 또는 일반전화) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  placeholder="예: 010-1234-5678 또는 031-590-0000"
+                  className="w-full px-3 py-2 sm:px-3.5 sm:py-2.5 border-2 border-primary-400 rounded-xl font-mono text-sm sm:text-base font-bold focus:ring-2 focus:ring-primary-500 focus:outline-none bg-primary-50/20"
+                />
+                <p className="text-[10px] sm:text-[11px] text-emerald-800 font-medium mt-1">
+                  🔒 남겨주신 번호는 <strong>마을관리자가 전화를 드려 지원 제도를 연계해드리는 용도</strong>로만 안전하게 사용됩니다.
+                </p>
+              </div>
+
+              <div className="p-2.5 sm:p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <label className="flex items-start gap-2 cursor-pointer text-[11px] sm:text-xs text-foreground-700">
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-0.5 text-primary-600 rounded"
+                  />
+                  <span>
+                    <strong>[필수] 개인정보 최소 수집 및 공공 연계 동의</strong>: 입력하신 연락처와 지역 정보는 관할 지자체/복지기관 연계 목적으로만 활용되며, 문제 해결 후 즉시 파기됩니다.
+                  </span>
+                </label>
+              </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-2">
+            {/* 하단 고정 액션 버튼 바 */}
+            <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-2 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 text-foreground-700 bg-gray-100 hover:bg-gray-200 font-semibold rounded-xl"
+                className="flex-1 sm:flex-initial px-4 py-2.5 text-foreground-700 bg-white hover:bg-gray-100 border border-gray-200 font-semibold rounded-xl text-xs sm:text-sm transition-colors text-center"
               >
                 취소
               </button>
               <button
                 type="submit"
                 disabled={!agreed}
-                className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-bold rounded-xl shadow transition-colors flex items-center gap-1.5"
+                className="flex-1 sm:flex-initial px-5 py-2.5 bg-primary-600 hover:bg-primary-700 active:scale-98 disabled:opacity-50 text-white font-bold rounded-xl shadow transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
               >
                 <i className="ri-send-plane-fill"></i>
-                도움 요청 접수하기
+                <span>도움 요청 접수하기</span>
               </button>
             </div>
           </form>
