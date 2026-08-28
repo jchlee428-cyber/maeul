@@ -103,6 +103,13 @@ body {
   overflow-wrap: break-word;
 }
 
+/* 다국어 CJK 및 외국어 줄바꿈/금칙어(Kinsoku) 최적화 */
+[lang="ja"], [lang="zh"], [lang="th"], [lang="vi"], .lang-cjk, :lang(ja), :lang(zh), :lang(th) {
+  word-break: normal !important;
+  line-break: strict !important;
+  overflow-wrap: break-word !important;
+}
+
 #root {
   width: 100%;
   min-height: 100%;

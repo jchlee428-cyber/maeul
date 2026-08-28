@@ -652,7 +652,15 @@ export default function EasyDocsPage() {
 
         {/* AI 해설 결과 영역 */}
         {hasAnalyzed && activeReport && (
-          <div className="bg-white p-6 md:p-8 rounded-3xl border-2 border-emerald-300 shadow-xl space-y-6 animate-fadeIn">
+          <div 
+            lang={selectedLang}
+            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border-2 border-emerald-300 shadow-xl space-y-5 sm:space-y-6 animate-fadeIn overflow-hidden"
+            style={{
+              wordBreak: selectedLang === "ko" ? "keep-all" : "normal",
+              lineBreak: "strict",
+              overflowWrap: "break-word"
+            }}
+          >
             {/* 상단 헤더 & 마크다운 내보내기 툴바 */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b-2 border-slate-200">
               <div>
@@ -743,71 +751,78 @@ export default function EasyDocsPage() {
               /* 일반 리포트 카드 뷰 */
               <>
                 {/* 1. 핵심 요약 */}
-                <div className="p-5 bg-emerald-50 rounded-2xl border-2 border-emerald-300">
-                  <h3 className="font-black text-sm md:text-base text-emerald-950 flex items-center gap-1.5 mb-2.5">
-                    <i className="ri-checkbox-circle-fill text-emerald-600 text-lg"></i>
-                    {currentLabels.summaryTitle}
+                <div className="p-4 sm:p-5 bg-emerald-50 rounded-2xl border-2 border-emerald-300">
+                  <h3 className="font-black text-sm md:text-base text-emerald-950 flex items-center gap-2 mb-2.5">
+                    <i className="ri-checkbox-circle-fill text-emerald-600 text-lg shrink-0"></i>
+                    <span className="flex-1 min-w-0">{currentLabels.summaryTitle}</span>
                   </h3>
                   <ul className="space-y-2 text-xs md:text-sm text-emerald-950 font-bold leading-relaxed">
                     {activeReport.summary.map((s, idx) => (
                       <li key={idx} className="flex items-start gap-2.5">
                         <span className="text-emerald-700 font-extrabold mt-0.5 shrink-0">✔</span>
-                        <span>{s}</span>
+                        <span className="flex-1 min-w-0">{s}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 {/* 2. 어려운 행정용어 쉬운말 사전 */}
-                <div className="p-5 bg-amber-50 rounded-2xl border-2 border-amber-300">
-                  <h3 className="font-black text-sm md:text-base text-amber-950 flex items-center gap-1.5 mb-2.5">
-                    <i className="ri-book-open-fill text-amber-600 text-lg"></i>
-                    {currentLabels.termsTitle}
+                <div className="p-4 sm:p-5 bg-amber-50 rounded-2xl border-2 border-amber-300">
+                  <h3 className="font-black text-sm md:text-base text-amber-950 flex items-center gap-2 mb-2.5">
+                    <i className="ri-book-open-fill text-amber-600 text-lg shrink-0"></i>
+                    <span className="flex-1 min-w-0">{currentLabels.termsTitle}</span>
                   </h3>
                   <div className="space-y-2.5">
                     {activeReport.terms.map((t, idx) => (
-                      <div key={idx} className="text-xs md:text-sm bg-white p-3.5 rounded-xl border border-amber-200 shadow-xs">
-                        <strong className="text-amber-950 font-extrabold">{t.term}</strong>
-                        <span className="mx-2 text-slate-400 font-bold">➔</span>
-                        <span className="text-slate-900 font-bold">{t.explanation}</span>
+                      <div key={idx} className="text-xs md:text-sm bg-white p-3.5 sm:p-4 rounded-xl border border-amber-200 shadow-xs space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                          <strong className="text-amber-950 font-extrabold text-xs sm:text-sm">{t.term}</strong>
+                        </div>
+                        <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed pl-3.5 border-l-2 border-amber-200">
+                          {t.explanation}
+                        </p>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* 3. 5대 핵심 실천 정보 그리드 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-300">
-                    <strong className="text-slate-900 block mb-1 text-sm">{currentLabels.datesTitle}</strong>
-                    <span className="text-rose-700 font-extrabold text-sm">{activeReport.dates}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs md:text-sm">
+                  <div className="p-3.5 sm:p-4 bg-slate-50 rounded-2xl border border-slate-300">
+                    <strong className="text-slate-900 block mb-1 text-xs sm:text-sm">{currentLabels.datesTitle}</strong>
+                    <span className="text-rose-700 font-extrabold text-xs sm:text-sm">{activeReport.dates}</span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-300">
-                    <strong className="text-slate-900 block mb-1 text-sm">{currentLabels.targetTitle}</strong>
-                    <span className="text-slate-800 font-bold leading-relaxed">{activeReport.target}</span>
+                  <div className="p-3.5 sm:p-4 bg-slate-50 rounded-2xl border border-slate-300">
+                    <strong className="text-slate-900 block mb-1 text-xs sm:text-sm">{currentLabels.targetTitle}</strong>
+                    <p className="text-slate-800 font-bold leading-relaxed">{activeReport.target}</p>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-300">
-                    <strong className="text-slate-900 block mb-1 text-sm">{currentLabels.docsTitle}</strong>
-                    <ul className="list-disc pl-4 space-y-1 text-slate-800 font-bold">
+                  <div className="p-3.5 sm:p-4 bg-slate-50 rounded-2xl border border-slate-300">
+                    <strong className="text-slate-900 block mb-1 text-xs sm:text-sm">{currentLabels.docsTitle}</strong>
+                    <ul className="space-y-1 text-slate-800 font-bold mt-1">
                       {activeReport.documents.map((d, i) => (
-                        <li key={i}>{d}</li>
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-slate-400 shrink-0">▪</span>
+                          <span className="flex-1 min-w-0">{d}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-300">
-                    <strong className="text-slate-900 block mb-1 text-sm">{currentLabels.whereTitle}</strong>
+                  <div className="p-3.5 sm:p-4 bg-slate-50 rounded-2xl border border-slate-300">
+                    <strong className="text-slate-900 block mb-1 text-xs sm:text-sm">{currentLabels.whereTitle}</strong>
                     <p className="text-slate-800 font-bold leading-relaxed">{activeReport.whereToApply}</p>
                     <div className="mt-2 pt-2 border-t border-slate-200">
                       <a
                         href={`tel:${extractDigits(activeReport.contact)}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 rounded-lg font-black border border-emerald-400 active:scale-95 transition-all"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 rounded-lg font-black border border-emerald-400 active:scale-95 transition-all text-xs"
                         title="전화 걸기"
                       >
                         <span className="text-sm">📞</span>
                         <span className="underline underline-offset-2">{activeReport.contact}</span>
-                        <span className="text-[10px] bg-emerald-700 text-white px-1.5 py-0.2 rounded font-black">통화</span>
+                        <span className="text-[10px] bg-emerald-700 text-white px-1.5 py-0.5 rounded font-black">통화</span>
                       </a>
                     </div>
                   </div>
